@@ -11,14 +11,17 @@ import android.widget.TextView;
 public class HelloAndroid extends Activity {
 
   private boolean validFix;
+  private String myProvider;
 
   private double lastLat;
   private double lastLon;
   private float  lastAcc;
+  private long   lastFixMillis;
 
   private TextView latText;
   private TextView lonText;
   private TextView accText;
+  private TextView ageText;
 
   private LocationManager myLocationManager;
 
@@ -32,41 +35,50 @@ public class HelloAndroid extends Activity {
       latText = (TextView) findViewById(R.id.latitude);
       lonText = (TextView) findViewById(R.id.longitude);
       accText = (TextView) findViewById(R.id.accuracy);
+      ageText = (TextView) findViewById(R.id.age);
 
       String context = Context.LOCATION_SERVICE;
       myLocationManager = (LocationManager) getSystemService(context);
-      String provider = LocationManager.GPS_PROVIDER;
-      Location location = myLocationManager.getLastKnownLocation(provider);
+      myProvider = LocationManager.GPS_PROVIDER;
+      Location location = myLocationManager.getLastKnownLocation(myProvider);
       processNewLocation(location);
-      myLocationManager.requestLocationUpdates(provider, 1500, 3, myLocationListener);
 
     }
 
+  @Override
+    public void onStart() {
+      super.onStart();
+      myLocationManager.requestLocationUpdates(myProvider, 1500, 3, myLocationListener);
+    }
   @Override
     public void onStop() {
       myLocationManager.removeUpdates(myLocationListener);
       super.onStop();
     }
 
-  @Override
-    public void onPause() {
-      myLocationManager.removeUpdates(myLocationListener);
-      super.onStop();
-    }
+//   @Override
+//     public void onPause() {
+//       myLocationManager.removeUpdates(myLocationListener);
+//       super.onStop();
+//     }
 
   private void updateDisplay() {
     if (validFix) {
-      // String latString = "" + lastLat; // String.format("%.6f", lat);
+      long current_time = System.currentTimeMillis();
+      long age = (500 + current_time - lastFixMillis) / 1000;
       String latString = String.format("%.6f", lastLat);
       String lonString = String.format("%.6f", lastLon);
       String accString = String.format("%.1f", lastAcc);
+      String ageString = String.format("%d", age);
       latText.setText(latString);
       lonText.setText(lonString);
       accText.setText(accString);
+      ageText.setText(ageString);
     } else {
       latText.setText("???");
       lonText.setText("???");
       accText.setText("???");
+      ageText.setText("???");
     }
   }
 
@@ -82,6 +94,7 @@ public class HelloAndroid extends Activity {
       } else {
         lastAcc = 0.0f;
       }
+      lastFixMillis = location.getTime();
     }
     updateDisplay();
   }

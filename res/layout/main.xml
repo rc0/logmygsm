@@ -73,7 +73,26 @@
               android:layout_height="wrap_content"
               android:textAppearance="?android:attr/textAppearanceMedium"
               android:id="@+id/accuracy"
-              android:text="-2.75" android:layout_width="match_parent">
+              android:text="0" android:layout_width="match_parent">
+             </TextView>
+        </LinearLayout>
+    </TableRow>
+    <TableRow android:id="@+id/tableRow4" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <LinearLayout
+          android:id="@+id/linearLayout4"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content">
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/age_caption"
+              android:text="AGE/s:" android:layout_width="58dp" android:layout_gravity="center_horizontal">
+             </TextView>
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/age"
+              android:text="0" android:layout_width="match_parent">
              </TextView>
         </LinearLayout>
     </TableRow>
