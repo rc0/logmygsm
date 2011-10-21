@@ -12,11 +12,6 @@
 <TextView  
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
-    android:text="@string/goodbye"
-    />
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
     android:text="@string/CellStat"
     />
 <TableLayout android:layout_height="wrap_content" android:id="@+id/tableLayout1" android:layout_width="match_parent">
@@ -92,6 +87,63 @@
               android:layout_height="wrap_content"
               android:textAppearance="?android:attr/textAppearanceMedium"
               android:id="@+id/age"
+              android:text="0" android:layout_width="match_parent">
+             </TextView>
+        </LinearLayout>
+    </TableRow>
+    <TableRow android:id="@+id/tableRow5" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <LinearLayout
+          android:id="@+id/linearLayout5"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content">
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/cid_caption"
+              android:text="CID:" android:layout_width="58dp" android:layout_gravity="center_horizontal">
+             </TextView>
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/cid"
+              android:text="0" android:layout_width="match_parent">
+             </TextView>
+        </LinearLayout>
+    </TableRow>
+    <TableRow android:id="@+id/tableRow6" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <LinearLayout
+          android:id="@+id/linearLayout6"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content">
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/lac_caption"
+              android:text="LAC:" android:layout_width="58dp" android:layout_gravity="center_horizontal">
+             </TextView>
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/lac"
+              android:text="0" android:layout_width="match_parent">
+             </TextView>
+        </LinearLayout>
+    </TableRow>
+    <TableRow android:id="@+id/tableRow7" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <LinearLayout
+          android:id="@+id/linearLayout7"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content">
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/dBm_caption"
+              android:text="dBm:" android:layout_width="58dp" android:layout_gravity="center_horizontal">
+             </TextView>
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/dBm"
               android:text="0" android:layout_width="match_parent">
              </TextView>
         </LinearLayout>

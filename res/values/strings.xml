@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello World, HelloAndroid!</string>
-    <string name="goodbye">Goodbye, cruel world :-(</string>
     <string name="CellStat">Welcome to CellStat. The market leader in Cell Recording Software</string>
     <string name="app_name">Hello, Android</string>
 </resources>
