@@ -10,6 +10,7 @@ import android.telephony.TelephonyManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.CellLocation;
 import android.telephony.SignalStrength;
+import android.telephony.ServiceState;
 import android.telephony.gsm.GsmCellLocation;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ public class HelloAndroid extends Activity {
   private long   lastFixMillis;
 
   private char   lastNetworkType;
+  private char   lastState;
   private int    lastCid;
   private int    lastLac;
   private int    lastdBm;
@@ -83,6 +85,7 @@ public class HelloAndroid extends Activity {
 
       myTelephonyManager.listen(myPhoneStateListener,
             PhoneStateListener.LISTEN_CELL_LOCATION |
+            PhoneStateListener.LISTEN_SERVICE_STATE |
             PhoneStateListener.LISTEN_SIGNAL_STRENGTHS |
             PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
       myLocationManager.requestLocationUpdates(myProvider, 1500, 3, myLocationListener);
@@ -120,7 +123,7 @@ public class HelloAndroid extends Activity {
     }
     String cidString = String.format("%c %d", lastNetworkType, lastCid);
     String lacString = String.format("%d", lastLac);
-    String dBmString = String.format("%d", lastdBm);
+    String dBmString = String.format("%d %c", lastdBm, lastState);
     cidText.setText(cidString);
     lacText.setText(lacString);
     dBmText.setText(dBmString);
@@ -195,6 +198,16 @@ public class HelloAndroid extends Activity {
       updateDisplay();
     };
 
+    public void onServiceStateChanged(ServiceState newState) {
+      switch (newState.getState()) {
+        case ServiceState.STATE_EMERGENCY_ONLY: lastState = 'E'; break;
+        case ServiceState.STATE_IN_SERVICE:     lastState = 'A'; break; // available
+        case ServiceState.STATE_OUT_OF_SERVICE: lastState = 'X'; break;
+        case ServiceState.STATE_POWER_OFF:      lastState = 'O'; break;
+        default:                                lastState = '?'; break;
+      }
+      updateDisplay();
+    };
 
     public void onDataConnectionStateChanged(int state, int network_type) {
       handle_network_type(network_type);
