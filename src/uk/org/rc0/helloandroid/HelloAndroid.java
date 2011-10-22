@@ -9,10 +9,13 @@ import android.location.LocationListener;
 import android.telephony.TelephonyManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.CellLocation;
+import android.telephony.NeighboringCellInfo;
 import android.telephony.SignalStrength;
 import android.telephony.ServiceState;
 import android.telephony.gsm.GsmCellLocation;
 import android.widget.TextView;
+import java.lang.StringBuffer;
+import java.util.List;
 
 public class HelloAndroid extends Activity {
 
@@ -37,6 +40,7 @@ public class HelloAndroid extends Activity {
   private TextView cidText;
   private TextView lacText;
   private TextView dBmText;
+  private TextView neighborsText;
 
   private LocationManager myLocationManager;
   private TelephonyManager myTelephonyManager;
@@ -55,6 +59,7 @@ public class HelloAndroid extends Activity {
       cidText = (TextView) findViewById(R.id.cid);
       lacText = (TextView) findViewById(R.id.lac);
       dBmText = (TextView) findViewById(R.id.dBm);
+      neighborsText = (TextView) findViewById(R.id.neighbors);
 
       lastCid = 0;
       lastLac = 0;
@@ -127,6 +132,14 @@ public class HelloAndroid extends Activity {
     cidText.setText(cidString);
     lacText.setText(lacString);
     dBmText.setText(dBmString);
+
+    List<NeighboringCellInfo> lnci = myTelephonyManager.getNeighboringCellInfo();
+    StringBuffer neighbors = new StringBuffer(128);
+    for (NeighboringCellInfo nci : lnci) {
+      String myText = String.format("%8d %8d %8d\n", nci.getCid(), nci.getLac(), nci.getRssi());
+      neighbors.append(myText);
+    }
+    neighborsText.setText(neighbors);
   }
 
   private void processNewLocation(Location location) {
