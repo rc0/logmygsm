@@ -166,5 +166,27 @@
              </TextView>
         </LinearLayout>
     </TableRow>
+    <TableRow android:id="@+id/tableRow9" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <LinearLayout
+          android:id="@+id/linearLayout9"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content">
+            <TextView
+              android:layout_height="wrap_content"
+              android:layout_width="150dp"
+              android:id="@+id/dBm_caption"
+              android:text="Background Logging:"
+              android:layout_gravity="center">
+             </TextView>
+             <ToggleButton
+               android:text="Backgnd Log"
+               android:id="@+id/toggleBgLog"
+               android:layout_height="wrap_content"
+               android:layout_width="60dp"
+               android:layout_gravity="right"
+             >
+             </ToggleButton>
+        </LinearLayout>
+    </TableRow>
 </TableLayout>
 </LinearLayout>
