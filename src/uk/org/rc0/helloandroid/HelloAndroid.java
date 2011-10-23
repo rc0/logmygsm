@@ -71,23 +71,11 @@ public class HelloAndroid extends Activity {
       String context = Context.LOCATION_SERVICE;
       myLocationManager = (LocationManager) getSystemService(context);
       myProvider = LocationManager.GPS_PROVIDER;
-      Location location = myLocationManager.getLastKnownLocation(myProvider);
-      processNewLocation(location);
-
     }
 
   @Override
     public void onStart() {
       super.onStart();
-
-      // CellLocation init_location = TelephonyManager.getCellLocation();
-      // GsmCellLocation gsmLocation = (GsmCellLocation) location;
-      // lastCid = gsmLocation.getCid();
-      // lastLac = gsmLocation.getLac();
-
-      // int network_type = TelephonyManager.getNetworkType();
-      // handle_network_type(network_type);
-
       myTelephonyManager.listen(myPhoneStateListener,
             PhoneStateListener.LISTEN_CELL_LOCATION |
             PhoneStateListener.LISTEN_SERVICE_STATE |
@@ -142,7 +130,8 @@ public class HelloAndroid extends Activity {
     neighborsText.setText(neighbors);
   }
 
-  private void processNewLocation(Location location) {
+  private void CollectInfo() {
+    Location location = myLocationManager.getLastKnownLocation(myProvider);
     if (location == null) {
       validFix = false;
     } else {
@@ -156,8 +145,35 @@ public class HelloAndroid extends Activity {
       }
       lastFixMillis = location.getTime();
     }
+
+    CellLocation cl = myTelephonyManager.getCellLocation();
+    if (cl == null) {
+      lastCid = 0;
+      lastLac = 0;
+    } else {
+      GsmCellLocation gsmLocation = (GsmCellLocation) cl;
+      lastCid = gsmLocation.getCid();
+      lastLac = gsmLocation.getLac();
+    }
     updateDisplay();
-  }
+  };
+
+//   private void processNewLocation(Location location) {
+//     if (location == null) {
+//       validFix = false;
+//     } else {
+//       validFix = true;
+//       lastLat = location.getLatitude();
+//       lastLon = location.getLongitude();
+//       if (location.hasAccuracy()) {
+//         lastAcc = location.getAccuracy();
+//       } else {
+//         lastAcc = 0.0f;
+//       }
+//       lastFixMillis = location.getTime();
+//     }
+//     updateDisplay();
+//   }
 
   private void handle_network_type(int network_type) {
     switch (network_type) {
@@ -172,21 +188,18 @@ public class HelloAndroid extends Activity {
 
   private final LocationListener myLocationListener = new LocationListener () {
     public void onLocationChanged(Location location) {
-      processNewLocation(location);
+      CollectInfo();
     }
-
     public void onProviderDisabled(String provider) {
       validFix = false;
-      updateDisplay();
+      CollectInfo();
     }
-
     public void onProviderEnabled(String provider) {
-
+      CollectInfo();
     }
-
 
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
+      CollectInfo();
     }
 
   };
@@ -194,10 +207,7 @@ public class HelloAndroid extends Activity {
   private final PhoneStateListener myPhoneStateListener = new PhoneStateListener () {
 
     public void onCellLocationChanged(CellLocation location) {
-      GsmCellLocation gsmLocation = (GsmCellLocation) location;
-      lastCid = gsmLocation.getCid();
-      lastLac = gsmLocation.getLac();
-      updateDisplay();
+      CollectInfo();
     };
 
     public void onSignalStrengthsChanged(SignalStrength strength) {
@@ -208,7 +218,7 @@ public class HelloAndroid extends Activity {
       } else {
         lastdBm = -113 + 2*asu;
       }
-      updateDisplay();
+      CollectInfo();
     };
 
     public void onServiceStateChanged(ServiceState newState) {
@@ -219,12 +229,12 @@ public class HelloAndroid extends Activity {
         case ServiceState.STATE_POWER_OFF:      lastState = 'O'; break;
         default:                                lastState = '?'; break;
       }
-      updateDisplay();
+      CollectInfo();
     };
 
     public void onDataConnectionStateChanged(int state, int network_type) {
       handle_network_type(network_type);
-      updateDisplay();
+      CollectInfo();
     };
 
   };
