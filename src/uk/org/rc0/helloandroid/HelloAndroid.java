@@ -22,6 +22,8 @@ public class HelloAndroid extends Activity {
   private boolean validFix;
   private String myProvider;
 
+  private int    nReadings;
+
   private double lastLat;
   private double lastLon;
   private float  lastAcc;
@@ -41,6 +43,7 @@ public class HelloAndroid extends Activity {
   private TextView lacText;
   private TextView dBmText;
   private TextView neighborsText;
+  private TextView countText;
 
   private LocationManager myLocationManager;
   private TelephonyManager myTelephonyManager;
@@ -49,8 +52,8 @@ public class HelloAndroid extends Activity {
   @Override
     public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
-      //Object o = null;
       setContentView(R.layout.main);
+      nReadings = 0;
       validFix = false;
       latText = (TextView) findViewById(R.id.latitude);
       lonText = (TextView) findViewById(R.id.longitude);
@@ -60,6 +63,7 @@ public class HelloAndroid extends Activity {
       lacText = (TextView) findViewById(R.id.lac);
       dBmText = (TextView) findViewById(R.id.dBm);
       neighborsText = (TextView) findViewById(R.id.neighbors);
+      countText = (TextView) findViewById(R.id.count);
 
       lastCid = 0;
       lastLac = 0;
@@ -128,6 +132,8 @@ public class HelloAndroid extends Activity {
       neighbors.append(myText);
     }
     neighborsText.setText(neighbors);
+    String countString = String.format("%d", nReadings);
+    countText.setText(countString);
   }
 
   private void CollectInfo() {
@@ -155,25 +161,9 @@ public class HelloAndroid extends Activity {
       lastCid = gsmLocation.getCid();
       lastLac = gsmLocation.getLac();
     }
+    ++nReadings;
     updateDisplay();
   };
-
-//   private void processNewLocation(Location location) {
-//     if (location == null) {
-//       validFix = false;
-//     } else {
-//       validFix = true;
-//       lastLat = location.getLatitude();
-//       lastLon = location.getLongitude();
-//       if (location.hasAccuracy()) {
-//         lastAcc = location.getAccuracy();
-//       } else {
-//         lastAcc = 0.0f;
-//       }
-//       lastFixMillis = location.getTime();
-//     }
-//     updateDisplay();
-//   }
 
   private void handle_network_type(int network_type) {
     switch (network_type) {
@@ -229,12 +219,10 @@ public class HelloAndroid extends Activity {
         case ServiceState.STATE_POWER_OFF:      lastState = 'O'; break;
         default:                                lastState = '?'; break;
       }
-      CollectInfo();
     };
 
     public void onDataConnectionStateChanged(int state, int network_type) {
       handle_network_type(network_type);
-      CollectInfo();
     };
 
   };

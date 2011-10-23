@@ -14,6 +14,26 @@
     android:layout_height="wrap_content" 
     android:text="@string/CellStat"
     />
+<LinearLayout
+  android:id="@+id/linearLayout9"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content">
+    <TextView
+      android:layout_height="wrap_content"
+      android:layout_width="150dp"
+      android:id="@+id/dBm_caption"
+      android:text="Background Logging:"
+      android:layout_gravity="center">
+     </TextView>
+     <ToggleButton
+       android:text="Backgnd Log"
+       android:id="@+id/toggleBgLog"
+       android:layout_height="wrap_content"
+       android:layout_width="60dp"
+       android:layout_gravity="right"
+     >
+     </ToggleButton>
+</LinearLayout>
 <TableLayout android:layout_height="wrap_content" android:id="@+id/tableLayout1" android:layout_width="match_parent">
     <TableRow android:id="@+id/tableRow1" android:layout_width="match_parent" android:layout_height="wrap_content">
         <LinearLayout
@@ -166,26 +186,23 @@
              </TextView>
         </LinearLayout>
     </TableRow>
-    <TableRow android:id="@+id/tableRow9" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <TableRow android:id="@+id/tableRow10" android:layout_width="match_parent" android:layout_height="wrap_content">
         <LinearLayout
-          android:id="@+id/linearLayout9"
+          android:id="@+id/linearLayout10"
           android:layout_width="match_parent"
           android:layout_height="wrap_content">
             <TextView
               android:layout_height="wrap_content"
-              android:layout_width="150dp"
-              android:id="@+id/dBm_caption"
-              android:text="Background Logging:"
-              android:layout_gravity="center">
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/count_caption"
+              android:text="Count:" android:layout_width="58dp" android:layout_gravity="center_horizontal">
              </TextView>
-             <ToggleButton
-               android:text="Backgnd Log"
-               android:id="@+id/toggleBgLog"
-               android:layout_height="wrap_content"
-               android:layout_width="60dp"
-               android:layout_gravity="right"
-             >
-             </ToggleButton>
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/count"
+              android:text="0" android:layout_width="match_parent">
+             </TextView>
         </LinearLayout>
     </TableRow>
 </TableLayout>
