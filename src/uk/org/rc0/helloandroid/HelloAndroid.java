@@ -3,6 +3,8 @@ package uk.org.rc0.helloandroid;
 import android.app.Activity;
 import android.os.Bundle;
 import android.content.Context;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
@@ -14,6 +16,7 @@ import android.telephony.SignalStrength;
 import android.telephony.ServiceState;
 import android.telephony.gsm.GsmCellLocation;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 import java.lang.StringBuffer;
 import java.util.List;
 
@@ -44,6 +47,9 @@ public class HelloAndroid extends Activity {
   private TextView dBmText;
   private TextView neighborsText;
   private TextView countText;
+  private ToggleButton toggleButton;
+
+  private ComponentName myService;
 
   private LocationManager myLocationManager;
   private TelephonyManager myTelephonyManager;
@@ -64,6 +70,7 @@ public class HelloAndroid extends Activity {
       dBmText = (TextView) findViewById(R.id.dBm);
       neighborsText = (TextView) findViewById(R.id.neighbors);
       countText = (TextView) findViewById(R.id.count);
+      toggleButton = (ToggleButton) findViewById(R.id.toggleBgLog);
 
       lastCid = 0;
       lastLac = 0;
@@ -87,6 +94,7 @@ public class HelloAndroid extends Activity {
             PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
       myLocationManager.requestLocationUpdates(myProvider, 1500, 3, myLocationListener);
     }
+
   @Override
     public void onStop() {
       myTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_NONE);
@@ -94,11 +102,21 @@ public class HelloAndroid extends Activity {
       super.onStop();
     }
 
-//   @Override
-//     public void onPause() {
-//       myLocationManager.removeUpdates(myLocationListener);
-//       super.onStop();
-//     }
+    @Override
+    public void onResume () {
+      super.onResume();
+      Logger.do_logging = true;
+      myService = startService(new Intent(this, Logger.class));
+    }
+
+    @Override
+    public void onPause() {
+      if (toggleButton.isChecked()) {
+        Logger.do_logging = false;
+        stopService(new Intent(this, myService.getClass()));
+      }
+      super.onPause();
+    }
 
   private void updateDisplay() {
     if (validFix) {
@@ -120,7 +138,7 @@ public class HelloAndroid extends Activity {
     }
     String cidString = String.format("%c %d", lastNetworkType, lastCid);
     String lacString = String.format("%d", lastLac);
-    String dBmString = String.format("%d %c", lastdBm, lastState);
+    String dBmString = String.format("%d %c %d", lastdBm, lastState, Logger.xyz);
     cidText.setText(cidString);
     lacText.setText(lacString);
     dBmText.setText(dBmString);

@@ -8,9 +8,18 @@ public class Logger extends Service {
 
   private boolean is_running;
 
+  // -----------------
+  // Variables shared with the Activity
+  // -----------------
+  //
+  static public int xyz;
+  static public boolean do_logging;
+
   @Override
   public void onCreate() {
     is_running = false;
+    do_logging = false;
+    xyz = 5067;
   }
 
   @Override
@@ -19,6 +28,7 @@ public class Logger extends Service {
       // Start all the funky stuff
       is_running = true;
     }
+    xyz = 9034;
     return Service.START_STICKY;
   }
 
