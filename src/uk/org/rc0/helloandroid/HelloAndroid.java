@@ -151,8 +151,7 @@ public class HelloAndroid extends Activity {
   public class DisplayUpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-
-
+      CollectInfo();
     }
   }
 
