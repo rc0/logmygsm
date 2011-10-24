@@ -8,17 +8,8 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
-import android.telephony.TelephonyManager;
-import android.telephony.PhoneStateListener;
-import android.telephony.CellLocation;
-import android.telephony.NeighboringCellInfo;
-import android.telephony.SignalStrength;
-import android.telephony.ServiceState;
-import android.telephony.gsm.GsmCellLocation;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-import java.lang.StringBuffer;
-import java.util.List;
 
 public class HelloAndroid extends Activity {
 
@@ -31,12 +22,6 @@ public class HelloAndroid extends Activity {
   private double lastLon;
   private float  lastAcc;
   private long   lastFixMillis;
-
-  private char   lastNetworkType;
-  private char   lastState;
-  private int    lastCid;
-  private int    lastLac;
-  private int    lastdBm;
 
   private TextView latText;
   private TextView lonText;
@@ -52,7 +37,6 @@ public class HelloAndroid extends Activity {
   private ComponentName myService;
 
   private LocationManager myLocationManager;
-  private TelephonyManager myTelephonyManager;
 
   /** Called when the activity is first created. */
   @Override
@@ -72,13 +56,6 @@ public class HelloAndroid extends Activity {
       countText = (TextView) findViewById(R.id.count);
       toggleButton = (ToggleButton) findViewById(R.id.toggleBgLog);
 
-      lastCid = 0;
-      lastLac = 0;
-      lastdBm = 0;
-      lastNetworkType = '?';
-
-      String srvcName = Context.TELEPHONY_SERVICE;
-      myTelephonyManager = (TelephonyManager) getSystemService(srvcName);
       String context = Context.LOCATION_SERVICE;
       myLocationManager = (LocationManager) getSystemService(context);
       myProvider = LocationManager.GPS_PROVIDER;
@@ -87,17 +64,11 @@ public class HelloAndroid extends Activity {
   @Override
     public void onStart() {
       super.onStart();
-      myTelephonyManager.listen(myPhoneStateListener,
-            PhoneStateListener.LISTEN_CELL_LOCATION |
-            PhoneStateListener.LISTEN_SERVICE_STATE |
-            PhoneStateListener.LISTEN_SIGNAL_STRENGTHS |
-            PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
       myLocationManager.requestLocationUpdates(myProvider, 1500, 3, myLocationListener);
     }
 
   @Override
     public void onStop() {
-      myTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_NONE);
       myLocationManager.removeUpdates(myLocationListener);
       super.onStop();
     }
@@ -136,20 +107,13 @@ public class HelloAndroid extends Activity {
       accText.setText("???");
       ageText.setText("???");
     }
-    String cidString = String.format("%c %d", lastNetworkType, lastCid);
-    String lacString = String.format("%d", lastLac);
-    String dBmString = String.format("%d %c %d", lastdBm, lastState, Logger.xyz);
+    String cidString = String.format("%c %d", Logger.lastNetworkType, Logger.lastCid);
+    String lacString = String.format("%d", Logger.lastLac);
+    String dBmString = String.format("%d %c", Logger.lastdBm, Logger.lastState);
     cidText.setText(cidString);
     lacText.setText(lacString);
     dBmText.setText(dBmString);
 
-    List<NeighboringCellInfo> lnci = myTelephonyManager.getNeighboringCellInfo();
-    StringBuffer neighbors = new StringBuffer(128);
-    for (NeighboringCellInfo nci : lnci) {
-      String myText = String.format("%8d %8d %8d\n", nci.getCid(), nci.getLac(), nci.getRssi());
-      neighbors.append(myText);
-    }
-    neighborsText.setText(neighbors);
     String countString = String.format("%d", nReadings);
     countText.setText(countString);
   }
@@ -169,29 +133,8 @@ public class HelloAndroid extends Activity {
       }
       lastFixMillis = location.getTime();
     }
-
-    CellLocation cl = myTelephonyManager.getCellLocation();
-    if (cl == null) {
-      lastCid = 0;
-      lastLac = 0;
-    } else {
-      GsmCellLocation gsmLocation = (GsmCellLocation) cl;
-      lastCid = gsmLocation.getCid();
-      lastLac = gsmLocation.getLac();
-    }
     ++nReadings;
     updateDisplay();
-  };
-
-  private void handle_network_type(int network_type) {
-    switch (network_type) {
-      case TelephonyManager.NETWORK_TYPE_EDGE:    lastNetworkType = 'E'; break;
-      case TelephonyManager.NETWORK_TYPE_GPRS:    lastNetworkType = 'G'; break;
-      case TelephonyManager.NETWORK_TYPE_UMTS:    lastNetworkType = 'U'; break;
-      case TelephonyManager.NETWORK_TYPE_HSDPA:   lastNetworkType = 'H'; break;
-      case TelephonyManager.NETWORK_TYPE_UNKNOWN: lastNetworkType = '-'; break;
-      default:                                    lastNetworkType = '?'; break;
-    }
   };
 
   private final LocationListener myLocationListener = new LocationListener () {
@@ -212,37 +155,5 @@ public class HelloAndroid extends Activity {
 
   };
 
-  private final PhoneStateListener myPhoneStateListener = new PhoneStateListener () {
-
-    public void onCellLocationChanged(CellLocation location) {
-      CollectInfo();
-    };
-
-    public void onSignalStrengthsChanged(SignalStrength strength) {
-      int asu;
-      asu = strength.getGsmSignalStrength();
-      if (asu == 99) {
-        lastdBm = 0;
-      } else {
-        lastdBm = -113 + 2*asu;
-      }
-      CollectInfo();
-    };
-
-    public void onServiceStateChanged(ServiceState newState) {
-      switch (newState.getState()) {
-        case ServiceState.STATE_EMERGENCY_ONLY: lastState = 'E'; break;
-        case ServiceState.STATE_IN_SERVICE:     lastState = 'A'; break; // available
-        case ServiceState.STATE_OUT_OF_SERVICE: lastState = 'X'; break;
-        case ServiceState.STATE_POWER_OFF:      lastState = 'O'; break;
-        default:                                lastState = '?'; break;
-      }
-    };
-
-    public void onDataConnectionStateChanged(int state, int network_type) {
-      handle_network_type(network_type);
-    };
-
-  };
 
 }
