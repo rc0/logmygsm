@@ -2,9 +2,11 @@ package uk.org.rc0.helloandroid;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
@@ -35,6 +37,7 @@ public class HelloAndroid extends Activity {
   private ToggleButton toggleButton;
 
   private ComponentName myService;
+  private DisplayUpdateReceiver myReceiver;
 
   private LocationManager myLocationManager;
 
@@ -75,13 +78,18 @@ public class HelloAndroid extends Activity {
 
     @Override
     public void onResume () {
-      super.onResume();
       Logger.do_logging = true;
       myService = startService(new Intent(this, Logger.class));
+      IntentFilter filter;
+      filter = new IntentFilter(Logger.DISPLAY_UPDATE);
+      myReceiver = new DisplayUpdateReceiver();
+      registerReceiver(myReceiver, filter);
+      super.onResume();
     }
 
     @Override
     public void onPause() {
+      unregisterReceiver(myReceiver);
       if (toggleButton.isChecked()) {
         Logger.do_logging = false;
         stopService(new Intent(this, myService.getClass()));
@@ -136,6 +144,17 @@ public class HelloAndroid extends Activity {
     ++nReadings;
     updateDisplay();
   };
+
+  // --------------------------------------------------------------------------
+  //
+
+  public class DisplayUpdateReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+
+
+    }
+  }
 
   private final LocationListener myLocationListener = new LocationListener () {
     public void onLocationChanged(Location location) {

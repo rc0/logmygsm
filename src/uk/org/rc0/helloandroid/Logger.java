@@ -21,6 +21,8 @@ public class Logger extends Service {
   // Variables shared with the Activity
   // -----------------
   //
+  public static final String DISPLAY_UPDATE = "Display_Update_LogMyGSM";
+
   static public boolean do_logging;
 
   static public char   lastNetworkType;
@@ -69,6 +71,13 @@ public class Logger extends Service {
 
   // --------------------------------------------------------------------------------
 
+  private void updateDisplay() {
+    Intent intent = new Intent(DISPLAY_UPDATE);
+    sendBroadcast(intent);
+  }
+
+  // --------------------------------------------------------------------------------
+
   private final PhoneStateListener myPhoneStateListener = new PhoneStateListener () {
 
     public void onCellLocationChanged(CellLocation location) {
@@ -80,6 +89,7 @@ public class Logger extends Service {
         lastCid = gsmLocation.getCid();
         lastLac = gsmLocation.getLac();
       }
+      updateDisplay();
     };
 
     public void onSignalStrengthsChanged(SignalStrength strength) {
@@ -90,6 +100,7 @@ public class Logger extends Service {
       } else {
         lastdBm = -113 + 2*asu;
       }
+      updateDisplay();
     };
 
     public void onServiceStateChanged(ServiceState newState) {
@@ -100,6 +111,7 @@ public class Logger extends Service {
         case ServiceState.STATE_POWER_OFF:      lastState = 'O'; break;
         default:                                lastState = '?'; break;
       }
+      updateDisplay();
     };
 
     private void handle_network_type(int network_type) {
@@ -111,8 +123,8 @@ public class Logger extends Service {
         case TelephonyManager.NETWORK_TYPE_UNKNOWN: lastNetworkType = '-'; break;
         default:                                    lastNetworkType = '?'; break;
       }
+      updateDisplay();
     };
-
 
     public void onDataConnectionStateChanged(int state, int network_type) {
       handle_network_type(network_type);
