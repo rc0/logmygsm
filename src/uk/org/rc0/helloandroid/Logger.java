@@ -1,9 +1,13 @@
 package uk.org.rc0.helloandroid;
 
 import android.app.Service;
+import android.os.Bundle;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationListener;
 import android.telephony.TelephonyManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.CellLocation;
@@ -16,6 +20,7 @@ public class Logger extends Service {
   private boolean is_running;
 
   private TelephonyManager myTelephonyManager;
+  private LocationManager myLocationManager;
 
   // -----------------
   // Variables shared with the Activity
@@ -25,16 +30,28 @@ public class Logger extends Service {
 
   static public boolean do_logging;
 
+  // --- Telephony
   static public char   lastNetworkType;
   static public char   lastState;
   static public int    lastCid;
   static public int    lastLac;
   static public int    lastdBm;
 
+  // --- GPS
+  static public boolean validFix;
+  static public String myProvider;
+  static public int    nReadings;
+  static public double lastLat;
+  static public double lastLon;
+  static public float  lastAcc;
+  static public long   lastFixMillis;
+
   @Override
   public void onCreate() {
     is_running = false;
     do_logging = false;
+    myProvider = LocationManager.GPS_PROVIDER;
+    nReadings = 0;
   }
 
   @Override
@@ -53,6 +70,9 @@ public class Logger extends Service {
             PhoneStateListener.LISTEN_SERVICE_STATE |
             PhoneStateListener.LISTEN_SIGNAL_STRENGTHS |
             PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
+      String context = Context.LOCATION_SERVICE;
+      myLocationManager = (LocationManager) getSystemService(context);
+      myLocationManager.requestLocationUpdates(myProvider, 1000, 2, myLocationListener);
 
       is_running = true;
     }
@@ -67,6 +87,7 @@ public class Logger extends Service {
   @Override
   public void onDestroy() {
     myTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_NONE);
+    myLocationManager.removeUpdates(myLocationListener);
   }
 
   // --------------------------------------------------------------------------------
@@ -74,6 +95,16 @@ public class Logger extends Service {
   private void updateDisplay() {
     Intent intent = new Intent(DISPLAY_UPDATE);
     sendBroadcast(intent);
+  }
+
+  // --------------------------------------------------------------------------------
+
+  private void logToFile() {
+    if (do_logging) {
+      ++nReadings;
+
+
+    }
   }
 
   // --------------------------------------------------------------------------------
@@ -131,6 +162,44 @@ public class Logger extends Service {
     };
 
   };
+
+  // --------------------------------------------------------------------------------
+
+  private final LocationListener myLocationListener = new LocationListener () {
+    public void onLocationChanged(Location location) {
+      if (location == null) {
+        validFix = false;
+      } else {
+        validFix = true;
+        lastLat = location.getLatitude();
+        lastLon = location.getLongitude();
+        if (location.hasAccuracy()) {
+          lastAcc = location.getAccuracy();
+        } else {
+          lastAcc = 0.0f;
+        }
+        // lastFixMillis = location.getTime();
+        lastFixMillis = System.currentTimeMillis();
+        logToFile();
+      }
+      updateDisplay();
+    }
+
+    public void onProviderDisabled(String provider) {
+      validFix = false;
+      updateDisplay();
+    }
+
+    public void onProviderEnabled(String provider) {
+    }
+
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
+
+  };
+
+
+
 }
 
 

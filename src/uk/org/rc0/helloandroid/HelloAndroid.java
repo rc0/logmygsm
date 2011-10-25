@@ -7,23 +7,11 @@ import android.content.Context;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.Location;
-import android.location.LocationManager;
-import android.location.LocationListener;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
 public class HelloAndroid extends Activity {
 
-  private boolean validFix;
-  private String myProvider;
-
-  private int    nReadings;
-
-  private double lastLat;
-  private double lastLon;
-  private float  lastAcc;
-  private long   lastFixMillis;
 
   private TextView latText;
   private TextView lonText;
@@ -32,22 +20,18 @@ public class HelloAndroid extends Activity {
   private TextView cidText;
   private TextView lacText;
   private TextView dBmText;
-  private TextView neighborsText;
+  // private TextView neighborsText;
   private TextView countText;
   private ToggleButton toggleButton;
 
   private ComponentName myService;
   private DisplayUpdateReceiver myReceiver;
 
-  private LocationManager myLocationManager;
-
   /** Called when the activity is first created. */
   @Override
     public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.main);
-      nReadings = 0;
-      validFix = false;
       latText = (TextView) findViewById(R.id.latitude);
       lonText = (TextView) findViewById(R.id.longitude);
       accText = (TextView) findViewById(R.id.accuracy);
@@ -55,24 +39,18 @@ public class HelloAndroid extends Activity {
       cidText = (TextView) findViewById(R.id.cid);
       lacText = (TextView) findViewById(R.id.lac);
       dBmText = (TextView) findViewById(R.id.dBm);
-      neighborsText = (TextView) findViewById(R.id.neighbors);
+      // neighborsText = (TextView) findViewById(R.id.neighbors);
       countText = (TextView) findViewById(R.id.count);
       toggleButton = (ToggleButton) findViewById(R.id.toggleBgLog);
-
-      String context = Context.LOCATION_SERVICE;
-      myLocationManager = (LocationManager) getSystemService(context);
-      myProvider = LocationManager.GPS_PROVIDER;
     }
 
   @Override
     public void onStart() {
       super.onStart();
-      myLocationManager.requestLocationUpdates(myProvider, 1500, 3, myLocationListener);
     }
 
   @Override
     public void onStop() {
-      myLocationManager.removeUpdates(myLocationListener);
       super.onStop();
     }
 
@@ -98,12 +76,12 @@ public class HelloAndroid extends Activity {
     }
 
   private void updateDisplay() {
-    if (validFix) {
+    if (Logger.validFix) {
       long current_time = System.currentTimeMillis();
-      long age = (500 + current_time - lastFixMillis) / 1000;
-      String latString = String.format("%.6f", lastLat);
-      String lonString = String.format("%.6f", lastLon);
-      String accString = String.format("%.1f", lastAcc);
+      long age = (500 + current_time - Logger.lastFixMillis) / 1000;
+      String latString = String.format("%.6f", Logger.lastLat);
+      String lonString = String.format("%.6f", Logger.lastLon);
+      String accString = String.format("%.1f", Logger.lastAcc);
       String ageString = String.format("%d", age);
       latText.setText(latString);
       lonText.setText(lonString);
@@ -122,28 +100,9 @@ public class HelloAndroid extends Activity {
     lacText.setText(lacString);
     dBmText.setText(dBmString);
 
-    String countString = String.format("%d", nReadings);
+    String countString = String.format("%d", Logger.nReadings);
     countText.setText(countString);
   }
-
-  private void CollectInfo() {
-    Location location = myLocationManager.getLastKnownLocation(myProvider);
-    if (location == null) {
-      validFix = false;
-    } else {
-      validFix = true;
-      lastLat = location.getLatitude();
-      lastLon = location.getLongitude();
-      if (location.hasAccuracy()) {
-        lastAcc = location.getAccuracy();
-      } else {
-        lastAcc = 0.0f;
-      }
-      lastFixMillis = location.getTime();
-    }
-    ++nReadings;
-    updateDisplay();
-  };
 
   // --------------------------------------------------------------------------
   //
@@ -151,27 +110,8 @@ public class HelloAndroid extends Activity {
   public class DisplayUpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-      CollectInfo();
+      updateDisplay();
     }
   }
-
-  private final LocationListener myLocationListener = new LocationListener () {
-    public void onLocationChanged(Location location) {
-      CollectInfo();
-    }
-    public void onProviderDisabled(String provider) {
-      validFix = false;
-      CollectInfo();
-    }
-    public void onProviderEnabled(String provider) {
-      CollectInfo();
-    }
-
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-      CollectInfo();
-    }
-
-  };
-
 
 }
