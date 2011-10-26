@@ -83,7 +83,7 @@ public class HelloAndroid extends Activity {
       long age = (500 + current_time - Logger.lastFixMillis) / 1000;
       String latString = String.format("%.6f", Logger.lastLat);
       String lonString = String.format("%.6f", Logger.lastLon);
-      String accString = String.format("%d", Logger.lastAcc);
+      String accString = String.format("%dm", Logger.lastAcc);
       String ageString = String.format("%d", age);
       latText.setText(latString);
       lonText.setText(lonString);
