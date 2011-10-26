@@ -1,5 +1,8 @@
 package uk.org.rc0.helloandroid;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.os.Bundle;
 import android.content.Context;
@@ -17,18 +20,20 @@ import android.telephony.gsm.GsmCellLocation;
 
 public class Logger extends Service {
 
-  private boolean is_running;
+  static private boolean is_running = false;
+  static public boolean stop_tracing;
 
   private TelephonyManager myTelephonyManager;
   private LocationManager myLocationManager;
+  private NotificationManager myNotificationManager;
+  private Notification myNotification;
+  private int myNotificationRef = 1;
 
   // -----------------
   // Variables shared with the Activity
   // -----------------
   //
   public static final String DISPLAY_UPDATE = "Display_Update_LogMyGSM";
-
-  static public boolean do_logging;
 
   // --- Telephony
   static public char   lastNetworkType;
@@ -48,10 +53,10 @@ public class Logger extends Service {
 
   @Override
   public void onCreate() {
-    is_running = false;
-    do_logging = false;
+    stop_tracing = false;
     myProvider = LocationManager.GPS_PROVIDER;
     nReadings = 0;
+    myNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
   }
 
   @Override
@@ -65,16 +70,10 @@ public class Logger extends Service {
 
       String srvcName = Context.TELEPHONY_SERVICE;
       myTelephonyManager = (TelephonyManager) getSystemService(srvcName);
-      myTelephonyManager.listen(myPhoneStateListener,
-            PhoneStateListener.LISTEN_CELL_LOCATION |
-            PhoneStateListener.LISTEN_SERVICE_STATE |
-            PhoneStateListener.LISTEN_SIGNAL_STRENGTHS |
-            PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
       String context = Context.LOCATION_SERVICE;
       myLocationManager = (LocationManager) getSystemService(context);
-      myLocationManager.requestLocationUpdates(myProvider, 1000, 2, myLocationListener);
 
-      is_running = true;
+      startListening();
     }
     return Service.START_STICKY;
   }
@@ -86,8 +85,60 @@ public class Logger extends Service {
 
   @Override
   public void onDestroy() {
-    myTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_NONE);
-    myLocationManager.removeUpdates(myLocationListener);
+    stopListening();
+  }
+
+  // --------------------------------------------------------------------------------
+
+  private void startNotification() {
+    int icon = R.drawable.notification;
+    String notifyText = "Logger running";
+    long when = System.currentTimeMillis();
+    myNotification = new Notification(icon, notifyText, when);
+
+    Context context = getApplicationContext();
+    String expandedText = "(Extended status text)";
+    String expandedTitle = "GSM Logger running";
+    Intent intent = new Intent(this, HelloAndroid.class);
+    PendingIntent launchIntent = PendingIntent.getActivity(context, 0, intent, 0);
+    myNotification.setLatestEventInfo(context, expandedTitle, expandedText, launchIntent);
+
+    if (myNotificationManager != null) {
+      myNotificationManager.notify(myNotificationRef, myNotification);
+    }
+  }
+
+  private void stopNotification() {
+    if (myNotificationManager != null) {
+      myNotificationManager.cancel(myNotificationRef);
+    }
+  }
+
+  // --------------------------------------------------------------------------------
+
+  private void startListening() {
+    if (!is_running) {
+      is_running = true;
+      startNotification();
+      myTelephonyManager.listen(myPhoneStateListener,
+          PhoneStateListener.LISTEN_CELL_LOCATION |
+          PhoneStateListener.LISTEN_SERVICE_STATE |
+          PhoneStateListener.LISTEN_SIGNAL_STRENGTHS |
+          PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
+      myLocationManager.requestLocationUpdates(myProvider, 1000, 3, myLocationListener);
+    }
+  }
+
+  // --------------------------------------------------------------------------------
+
+  private void stopListening() {
+    if (is_running) {
+      myTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_NONE);
+      myLocationManager.removeUpdates(myLocationListener);
+      stopNotification();
+      is_running = false;
+      stopSelf();
+    }
   }
 
   // --------------------------------------------------------------------------------
@@ -95,16 +146,15 @@ public class Logger extends Service {
   private void updateDisplay() {
     Intent intent = new Intent(DISPLAY_UPDATE);
     sendBroadcast(intent);
+    if (stop_tracing) {
+      stopListening();
+    }
   }
 
   // --------------------------------------------------------------------------------
 
   private void logToFile() {
-    if (do_logging) {
-      ++nReadings;
-
-
-    }
+    ++nReadings;
   }
 
   // --------------------------------------------------------------------------------

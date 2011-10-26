@@ -56,7 +56,7 @@ public class HelloAndroid extends Activity {
 
     @Override
     public void onResume () {
-      Logger.do_logging = true;
+      Logger.stop_tracing = false;
       myService = startService(new Intent(this, Logger.class));
       IntentFilter filter;
       filter = new IntentFilter(Logger.DISPLAY_UPDATE);
@@ -69,7 +69,9 @@ public class HelloAndroid extends Activity {
     public void onPause() {
       unregisterReceiver(myReceiver);
       if (toggleButton.isChecked()) {
-        Logger.do_logging = false;
+        // We are going to keep the service alive as a background logger
+      } else {
+        Logger.stop_tracing = true;
         stopService(new Intent(this, myService.getClass()));
       }
       super.onPause();
