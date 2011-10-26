@@ -19,6 +19,7 @@ import android.telephony.SignalStrength;
 import android.telephony.ServiceState;
 import android.telephony.gsm.GsmCellLocation;
 import android.text.format.DateFormat;
+import android.widget.Toast;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -126,18 +127,26 @@ public class Logger extends Service {
   // --------------------------------------------------------------------------------
 
   private void openLog () {
+    String basePath = "/sdcard";
+    String ourDir = "LogMyGsm";
     CharSequence cs = DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis());
     String timedFileName = cs.toString();
+    String fullPath = basePath + "/" + ourDir + "/" + timedFileName;
+
     try {
-      File root = new File(Environment.getExternalStorageDirectory(), "LogMyGsm");
+      File root = new File(basePath, ourDir);
       if (!root.exists()) {
           root.mkdirs();
       }
       logfile = new File(root, timedFileName);
       logwriter = new FileWriter(logfile);
+      announce("Logging to " + fullPath);
     } catch (IOException e) {
       logfile = null;
       logwriter = null;
+    }
+    if (logwriter == null) {
+      announce("COULD NOT LOG TO " + fullPath);
     }
   }
 
@@ -152,12 +161,22 @@ public class Logger extends Service {
 
   private void closeLog() {
     if (logwriter != null) {
+      announce("Closing logfile");
       try {
         logwriter.flush();
         logwriter.close();
       } catch (IOException e) {
       }
     }
+  }
+
+  // --------------------------------------------------------------------------------
+
+  private void announce(String text) {
+    Context context = getApplicationContext();
+    int duration = Toast.LENGTH_SHORT;
+    Toast toast = Toast.makeText(context, text, duration);
+    toast.show();
   }
 
   // --------------------------------------------------------------------------------
