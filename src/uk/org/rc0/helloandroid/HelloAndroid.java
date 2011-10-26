@@ -20,7 +20,6 @@ public class HelloAndroid extends Activity {
   private TextView cidText;
   private TextView lacText;
   private TextView dBmText;
-  // private TextView neighborsText;
   private TextView countText;
   private ToggleButton toggleButton;
 
@@ -39,7 +38,6 @@ public class HelloAndroid extends Activity {
       cidText = (TextView) findViewById(R.id.cid);
       lacText = (TextView) findViewById(R.id.lac);
       dBmText = (TextView) findViewById(R.id.dBm);
-      // neighborsText = (TextView) findViewById(R.id.neighbors);
       countText = (TextView) findViewById(R.id.count);
       toggleButton = (ToggleButton) findViewById(R.id.toggleBgLog);
     }

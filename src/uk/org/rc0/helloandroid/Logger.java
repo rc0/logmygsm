@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Environment;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
@@ -104,6 +103,7 @@ public class Logger extends Service {
     String notifyText = "Logger running";
     long when = System.currentTimeMillis();
     myNotification = new Notification(icon, notifyText, when);
+    myNotification.flags |= Notification.FLAG_ONGOING_EVENT;
 
     Context context = getApplicationContext();
     String expandedText = "(Extended status text)";
@@ -130,7 +130,7 @@ public class Logger extends Service {
     String basePath = "/sdcard";
     String ourDir = "LogMyGsm";
     CharSequence cs = DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis());
-    String timedFileName = cs.toString();
+    String timedFileName = cs.toString() + ".log";
     String fullPath = basePath + "/" + ourDir + "/" + timedFileName;
 
     try {
@@ -174,7 +174,7 @@ public class Logger extends Service {
 
   private void announce(String text) {
     Context context = getApplicationContext();
-    int duration = Toast.LENGTH_SHORT;
+    int duration = Toast.LENGTH_LONG;
     Toast toast = Toast.makeText(context, text, duration);
     toast.show();
   }
