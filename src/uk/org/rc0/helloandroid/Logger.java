@@ -18,6 +18,7 @@ import android.telephony.CellLocation;
 import android.telephony.SignalStrength;
 import android.telephony.ServiceState;
 import android.telephony.gsm.GsmCellLocation;
+import android.text.format.DateFormat;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -55,7 +56,7 @@ public class Logger extends Service {
   static public int    nReadings;
   static public double lastLat;
   static public double lastLon;
-  static public float  lastAcc;
+  static public int    lastAcc;
   static public long   lastFixMillis;
 
   @Override
@@ -125,7 +126,8 @@ public class Logger extends Service {
   // --------------------------------------------------------------------------------
 
   private void openLog () {
-    String timedFileName = "changeme.log";
+    CharSequence cs = DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis());
+    String timedFileName = cs.toString();
     try {
       File root = new File(Environment.getExternalStorageDirectory(), "LogMyGsm");
       if (!root.exists()) {
@@ -201,6 +203,12 @@ public class Logger extends Service {
 
   private void logToFile() {
     ++nReadings;
+    String data = String.format("%12.7f %12.7f %3d %c %c %10d %10d %3d\n",
+        lastLat, lastLon, lastAcc,
+        lastState,
+        lastNetworkType, lastCid, lastLac,
+        lastdBm);
+    writeLog(data);
   }
 
   // --------------------------------------------------------------------------------
@@ -270,9 +278,9 @@ public class Logger extends Service {
         lastLat = location.getLatitude();
         lastLon = location.getLongitude();
         if (location.hasAccuracy()) {
-          lastAcc = location.getAccuracy();
+          lastAcc = (int)(0.5 + location.getAccuracy());
         } else {
-          lastAcc = 0.0f;
+          lastAcc = 0;
         }
         // lastFixMillis = location.getTime();
         lastFixMillis = System.currentTimeMillis();
