@@ -106,8 +106,21 @@ public class Logger extends Service {
     myNotification = new Notification(icon, notifyText, when);
     myNotification.flags |= Notification.FLAG_ONGOING_EVENT;
 
+    updateNotification();
+  }
+
+  private void stopNotification() {
+    if (myNotificationManager != null) {
+      myNotificationManager.cancel(myNotificationRef);
+    }
+  }
+
+  private void updateNotification() {
     Context context = getApplicationContext();
-    String expandedText = "(Extended status text)";
+    String expandedText = String.format("%c%d, %d dBm [%c], %d samples",
+        lastNetworkType, lastCid,
+        lastdBm, lastState,
+        nReadings);
     String expandedTitle = "GSM Logger running";
     Intent intent = new Intent(this, HelloAndroid.class);
     PendingIntent launchIntent = PendingIntent.getActivity(context, 0, intent, 0);
@@ -117,13 +130,6 @@ public class Logger extends Service {
       myNotificationManager.notify(myNotificationRef, myNotification);
     }
   }
-
-  private void stopNotification() {
-    if (myNotificationManager != null) {
-      myNotificationManager.cancel(myNotificationRef);
-    }
-  }
-
 
   // --------------------------------------------------------------------------------
 
@@ -212,6 +218,7 @@ public class Logger extends Service {
   // --------------------------------------------------------------------------------
 
   private void updateDisplay() {
+    updateNotification();
     Intent intent = new Intent(DISPLAY_UPDATE);
     sendBroadcast(intent);
     if (stop_tracing) {
