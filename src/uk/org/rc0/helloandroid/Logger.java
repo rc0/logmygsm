@@ -49,6 +49,7 @@ public class Logger extends Service {
   static public int    lastCid;
   static public int    lastLac;
   static public int    lastdBm;
+  static public int    lastBer;
 
   // --- GPS
   static public boolean validFix;
@@ -254,6 +255,7 @@ public class Logger extends Service {
       } else {
         lastdBm = -113 + 2*asu;
       }
+      lastBer = strength.getGsmBitErrorRate();
       updateDisplay();
     };
 

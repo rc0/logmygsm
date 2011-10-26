@@ -20,6 +20,7 @@ public class HelloAndroid extends Activity {
   private TextView cidText;
   private TextView lacText;
   private TextView dBmText;
+  private TextView berText;
   private TextView countText;
   private ToggleButton toggleButton;
 
@@ -38,6 +39,7 @@ public class HelloAndroid extends Activity {
       cidText = (TextView) findViewById(R.id.cid);
       lacText = (TextView) findViewById(R.id.lac);
       dBmText = (TextView) findViewById(R.id.dBm);
+      berText = (TextView) findViewById(R.id.ber);
       countText = (TextView) findViewById(R.id.count);
       toggleButton = (ToggleButton) findViewById(R.id.toggleBgLog);
     }
@@ -95,10 +97,12 @@ public class HelloAndroid extends Activity {
     }
     String cidString = String.format("%c %d", Logger.lastNetworkType, Logger.lastCid);
     String lacString = String.format("%d", Logger.lastLac);
-    String dBmString = String.format("%d %c", Logger.lastdBm, Logger.lastState);
+    String dBmString = String.format("%d [%c]", Logger.lastdBm, Logger.lastState);
+    String berString = String.format("%d", Logger.lastBer);
     cidText.setText(cidString);
     lacText.setText(lacString);
     dBmText.setText(dBmString);
+    berText.setText(berString);
 
     String countString = String.format("%d", Logger.nReadings);
     countText.setText(countString);
