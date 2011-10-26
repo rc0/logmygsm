@@ -4,10 +4,11 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.os.Bundle;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Environment;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
@@ -17,6 +18,9 @@ import android.telephony.CellLocation;
 import android.telephony.SignalStrength;
 import android.telephony.ServiceState;
 import android.telephony.gsm.GsmCellLocation;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Logger extends Service {
 
@@ -28,6 +32,9 @@ public class Logger extends Service {
   private NotificationManager myNotificationManager;
   private Notification myNotification;
   private int myNotificationRef = 1;
+
+  private File logfile;
+  private FileWriter logwriter;
 
   // -----------------
   // Variables shared with the Activity
@@ -114,12 +121,50 @@ public class Logger extends Service {
     }
   }
 
+
+  // --------------------------------------------------------------------------------
+
+  private void openLog () {
+    String timedFileName = "changeme.log";
+    try {
+      File root = new File(Environment.getExternalStorageDirectory(), "LogMyGsm");
+      if (!root.exists()) {
+          root.mkdirs();
+      }
+      logfile = new File(root, timedFileName);
+      logwriter = new FileWriter(logfile);
+    } catch (IOException e) {
+      logfile = null;
+      logwriter = null;
+    }
+  }
+
+  private void writeLog (String data) {
+    if (logwriter != null) {
+      try {
+        logwriter.append(data);
+      } catch (IOException e) {
+      }
+    }
+  }
+
+  private void closeLog() {
+    if (logwriter != null) {
+      try {
+        logwriter.flush();
+        logwriter.close();
+      } catch (IOException e) {
+      }
+    }
+  }
+
   // --------------------------------------------------------------------------------
 
   private void startListening() {
     if (!is_running) {
       is_running = true;
       startNotification();
+      openLog();
       myTelephonyManager.listen(myPhoneStateListener,
           PhoneStateListener.LISTEN_CELL_LOCATION |
           PhoneStateListener.LISTEN_SERVICE_STATE |
@@ -136,6 +181,7 @@ public class Logger extends Service {
       myTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_NONE);
       myLocationManager.removeUpdates(myLocationListener);
       stopNotification();
+      closeLog();
       is_running = false;
       stopSelf();
     }
