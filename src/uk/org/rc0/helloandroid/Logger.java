@@ -230,11 +230,22 @@ public class Logger extends Service {
 
   private void logToFile() {
     ++nReadings;
-    String data = String.format("%12.7f %12.7f %3d %c %c %10d %10d %3d\n",
+    CellLocation cell_loc = myTelephonyManager.getCellLocation();
+    int cid2;
+    int lac2;
+    if (cell_loc == null) {
+      cid2 = 0;
+      lac2 = 0;
+    } else {
+      GsmCellLocation gsm_loc = (GsmCellLocation) cell_loc;
+      cid2 = gsm_loc.getCid();
+      lac2 = gsm_loc.getLac();
+    }
+    String data = String.format("%12.7f %12.7f %3d %c %c %10d %10d %3d %10d %10d\n",
         lastLat, lastLon, lastAcc,
         lastState,
         lastNetworkType, lastCid, lastLac,
-        lastdBm);
+        lastdBm, cid2, lac2);
     writeLog(data);
   }
 
