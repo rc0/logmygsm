@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.location.GpsStatus;
+import android.location.GpsSatellite;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
@@ -22,6 +24,8 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.Iterable;
+import java.util.Iterator;
 
 public class Logger extends Service {
 
@@ -59,6 +63,12 @@ public class Logger extends Service {
   static public double lastLon;
   static public int    lastAcc;
   static public long   lastFixMillis;
+
+  // --- GPS fix info
+  static public int    last_n_sats;
+  static public int    last_fix_sats;
+  static public int    last_ephem_sats;
+  static public int    last_alman_sats;
 
   @Override
   public void onCreate() {
@@ -204,6 +214,7 @@ public class Logger extends Service {
           PhoneStateListener.LISTEN_SIGNAL_STRENGTHS |
           PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
       myLocationManager.requestLocationUpdates(myProvider, 1000, 3, myLocationListener);
+      myLocationManager.addGpsStatusListener(gpsListener);
     }
   }
 
@@ -212,6 +223,7 @@ public class Logger extends Service {
   private void stopListening() {
     if (is_running) {
       myTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_NONE);
+      myLocationManager.removeGpsStatusListener(gpsListener);
       myLocationManager.removeUpdates(myLocationListener);
       stopNotification();
       closeLog();
@@ -346,9 +358,40 @@ public class Logger extends Service {
 
   };
 
+  // --------------------------------------------------------------------------------
 
+  private final GpsStatus.Listener gpsListener = new GpsStatus.Listener () {
+
+    public void onGpsStatusChanged(int event) {
+      GpsStatus gpsStatus = myLocationManager.getGpsStatus(null);
+      switch (event) {
+        case GpsStatus.GPS_EVENT_FIRST_FIX:
+          break;
+        case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
+          Iterable<GpsSatellite> satellites = gpsStatus.getSatellites();
+          Iterator<GpsSatellite> sati = satellites.iterator();
+          last_n_sats = 0;
+          last_fix_sats = 0;
+          last_ephem_sats = 0;
+          last_alman_sats = 0;
+          while (sati.hasNext()) {
+            GpsSatellite sat = sati.next();
+            ++last_n_sats;
+            if (sat.usedInFix())         { ++last_fix_sats  ; }
+            else if (sat.hasEphemeris()) { ++last_ephem_sats; }
+            else if (sat.hasAlmanac())   { ++last_alman_sats; }
+          }
+          break;
+        case GpsStatus.GPS_EVENT_STARTED:
+          break;
+        case GpsStatus.GPS_EVENT_STOPPED:
+          break;
+      }
+
+    }
+
+  };
 
 }
-
 
 

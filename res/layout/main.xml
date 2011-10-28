@@ -102,7 +102,7 @@
               android:layout_height="wrap_content"
               android:textAppearance="?android:attr/textAppearanceMedium"
               android:id="@+id/age_caption"
-              android:text="AGE/s:" android:layout_width="58dp" android:layout_gravity="center_horizontal">
+              android:text="AGE:" android:layout_width="58dp" android:layout_gravity="center">
              </TextView>
             <TextView
               android:layout_height="wrap_content"
@@ -168,26 +168,6 @@
               android:textSize="32sp"
               android:textStyle="bold"
               android:id="@+id/dBm"
-              android:text="0" android:layout_width="match_parent">
-             </TextView>
-        </LinearLayout>
-    </TableRow>
-    <TableRow android:id="@+id/tableRow9" android:layout_width="match_parent" android:layout_height="wrap_content">
-        <LinearLayout
-          android:id="@+id/linearLayout9"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content">
-            <TextView
-              android:layout_height="wrap_content"
-              android:textAppearance="?android:attr/textAppearanceMedium"
-              android:id="@+id/ber_caption"
-              android:text="BER:" android:layout_width="58dp" android:layout_gravity="center">
-             </TextView>
-            <TextView
-              android:layout_height="wrap_content"
-              android:textSize="32sp"
-              android:textStyle="bold"
-              android:id="@+id/ber"
               android:text="0" android:layout_width="match_parent">
              </TextView>
         </LinearLayout>

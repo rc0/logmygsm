@@ -20,7 +20,6 @@ public class HelloAndroid extends Activity {
   private TextView cidText;
   private TextView lacText;
   private TextView dBmText;
-  private TextView berText;
   private TextView countText;
   private ToggleButton toggleButton;
 
@@ -39,7 +38,6 @@ public class HelloAndroid extends Activity {
       cidText = (TextView) findViewById(R.id.cid);
       lacText = (TextView) findViewById(R.id.lac);
       dBmText = (TextView) findViewById(R.id.dBm);
-      berText = (TextView) findViewById(R.id.ber);
       countText = (TextView) findViewById(R.id.count);
       toggleButton = (ToggleButton) findViewById(R.id.toggleBgLog);
     }
@@ -84,7 +82,9 @@ public class HelloAndroid extends Activity {
       String latString = String.format("%.6f", Logger.lastLat);
       String lonString = String.format("%.6f", Logger.lastLon);
       String accString = String.format("%dm", Logger.lastAcc);
-      String ageString = String.format("%d", age);
+      String ageString = String.format("%ds\n[ %dT / %dU / %dE / %dA ]",
+          age, Logger.last_n_sats, Logger.last_fix_sats,
+               Logger.last_ephem_sats, Logger.last_alman_sats);
       latText.setText(latString);
       lonText.setText(lonString);
       accText.setText(accString);
@@ -93,16 +93,14 @@ public class HelloAndroid extends Activity {
       latText.setText("???");
       lonText.setText("???");
       accText.setText("???");
-      ageText.setText("???");
+      ageText.setText("???\n[ ??? ]");
     }
     String cidString = String.format("%c %d", Logger.lastNetworkType, Logger.lastCid);
     String lacString = String.format("%d", Logger.lastLac);
     String dBmString = String.format("%d [%c]", Logger.lastdBm, Logger.lastState);
-    String berString = String.format("%d", Logger.lastBer);
     cidText.setText(cidString);
     lacText.setText(lacString);
     dBmText.setText(dBmString);
-    berText.setText(berString);
 
     String countString = String.format("%d", Logger.nReadings);
     countText.setText(countString);
