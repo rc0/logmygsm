@@ -123,6 +123,11 @@ public class Logger extends Service {
         nReadings);
     String expandedTitle = "GSM Logger running";
     Intent intent = new Intent(this, HelloAndroid.class);
+
+    // The next line is to stop Android from creating multiple activities - it
+    // jus thas to go back to the one it was using before
+    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
     PendingIntent launchIntent = PendingIntent.getActivity(context, 0, intent, 0);
     myNotification.setLatestEventInfo(context, expandedTitle, expandedText, launchIntent);
 
