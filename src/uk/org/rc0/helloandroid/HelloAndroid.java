@@ -20,6 +20,8 @@ public class HelloAndroid extends Activity {
   private TextView satText;
   private TextView cidText;
   private TextView lacText;
+  private TextView mccmncText;
+  private TextView operText;
   private TextView dBmText;
   private TextView countText;
   private ToggleButton toggleButton;
@@ -39,6 +41,8 @@ public class HelloAndroid extends Activity {
       satText = (TextView) findViewById(R.id.sat);
       cidText = (TextView) findViewById(R.id.cid);
       lacText = (TextView) findViewById(R.id.lac);
+      mccmncText = (TextView) findViewById(R.id.mccmnc);
+      operText = (TextView) findViewById(R.id.oper);
       dBmText = (TextView) findViewById(R.id.dBm);
       countText = (TextView) findViewById(R.id.count);
       toggleButton = (ToggleButton) findViewById(R.id.toggleBgLog);
@@ -100,10 +104,14 @@ public class HelloAndroid extends Activity {
         Logger.last_ephem_sats, Logger.last_alman_sats);
     String cidString = String.format("%c %d", Logger.lastNetworkType, Logger.lastCid);
     String lacString = String.format("%d", Logger.lastLac);
+    String mccmncString = String.format("%s", Logger.lastMccMnc);
+    String operString = String.format("%s", Logger.lastOperator);
     String dBmString = String.format("%d [%c]", Logger.lastdBm, Logger.lastState);
     satText.setText(satString);
     cidText.setText(cidString);
     lacText.setText(lacString);
+    mccmncText.setText(mccmncString);
+    operText.setText(operString);
     dBmText.setText(dBmString);
 
     String countString = String.format("%d", Logger.nReadings);

@@ -171,6 +171,44 @@
              </TextView>
         </LinearLayout>
     </TableRow>
+    <TableRow android:id="@+id/tableRow6A" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <LinearLayout
+          android:id="@+id/linearLayout6A"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content">
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/mccmnc_caption"
+              android:text="MCNC:" android:layout_width="58dp" android:layout_gravity="center">
+             </TextView>
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/mccmnc"
+              android:text="0" android:layout_width="match_parent">
+             </TextView>
+        </LinearLayout>
+    </TableRow>
+    <TableRow android:id="@+id/tableRow6B" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <LinearLayout
+          android:id="@+id/linearLayout6B"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content">
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/operator_caption"
+              android:text="OPER:" android:layout_width="58dp" android:layout_gravity="center">
+             </TextView>
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/oper"
+              android:text="0" android:layout_width="match_parent">
+             </TextView>
+        </LinearLayout>
+    </TableRow>
     <TableRow android:id="@+id/tableRow8" android:layout_width="match_parent" android:layout_height="wrap_content">
         <LinearLayout
           android:id="@+id/linearLayout8"

@@ -52,6 +52,8 @@ public class Logger extends Service {
   static public char   lastState;
   static public int    lastCid;
   static public int    lastLac;
+  static public String lastMccMnc;
+  static public String lastOperator;
   static public int    lastdBm;
   static public int    lastBer;
 
@@ -258,11 +260,13 @@ public class Logger extends Service {
       cid2 = gsm_loc.getCid();
       lac2 = gsm_loc.getLac();
     }
-    String data = String.format("%12.7f %12.7f %3d %c %c %10d %10d %3d %10d %10d\n",
+    String data = String.format("%12.7f %12.7f %3d %c %c %10d %10d %3d %s %10d %10d\n",
         lastLat, lastLon, lastAcc,
         lastState,
         lastNetworkType, lastCid, lastLac,
-        lastdBm, cid2, lac2);
+        lastdBm,
+        lastMccMnc,
+        cid2, lac2);
     writeLog(data);
   }
 
@@ -279,6 +283,8 @@ public class Logger extends Service {
         lastCid = gsmLocation.getCid();
         lastLac = gsmLocation.getLac();
       }
+      lastMccMnc = new String(myTelephonyManager.getNetworkOperator());
+      lastOperator = new String(myTelephonyManager.getNetworkOperatorName());
       updateDisplay();
     };
 
