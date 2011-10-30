@@ -12,9 +12,7 @@ import android.widget.ToggleButton;
 
 public class HelloAndroid extends Activity {
 
-
-  private TextView latText;
-  private TextView lonText;
+  private TextView llText;
   private TextView accText;
   private TextView ageText;
   private TextView satText;
@@ -34,8 +32,7 @@ public class HelloAndroid extends Activity {
     public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.main);
-      latText = (TextView) findViewById(R.id.latitude);
-      lonText = (TextView) findViewById(R.id.longitude);
+      llText = (TextView) findViewById(R.id.latlong);
       accText = (TextView) findViewById(R.id.accuracy);
       ageText = (TextView) findViewById(R.id.age);
       satText = (TextView) findViewById(R.id.sat);
@@ -85,17 +82,14 @@ public class HelloAndroid extends Activity {
     if (Logger.validFix) {
       long current_time = System.currentTimeMillis();
       long age = (500 + current_time - Logger.lastFixMillis) / 1000;
-      String latString = String.format("%.6f", Logger.lastLat);
-      String lonString = String.format("%.6f", Logger.lastLon);
+      String llString = String.format("%.6f / %.6f", Logger.lastLat, Logger.lastLon);
       String accString = String.format("%dm", Logger.lastAcc);
       String ageString = String.format("%ds", age);
-      latText.setText(latString);
-      lonText.setText(lonString);
+      llText.setText(llString);
       accText.setText(accString);
       ageText.setText(ageString);
     } else {
-      latText.setText("???");
-      lonText.setText("???");
+      llText.setText("??? / ???");
       accText.setText("???");
       ageText.setText("???");
     }
