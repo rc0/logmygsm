@@ -12,11 +12,13 @@ import android.widget.ToggleButton;
 
 public class HelloAndroid extends Activity {
 
-  private TextView llText;
+  private TextView latText;
+  private TextView lonText;
   private TextView accText;
   private TextView ageText;
   private TextView satText;
   private TextView cidText;
+  private TextView stateText;
   private TextView lacText;
   private TextView mccmncText;
   private TextView operText;
@@ -32,11 +34,13 @@ public class HelloAndroid extends Activity {
     public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.main);
-      llText = (TextView) findViewById(R.id.latlong);
+      latText = (TextView) findViewById(R.id.latitude);
+      lonText = (TextView) findViewById(R.id.longitude);
       accText = (TextView) findViewById(R.id.accuracy);
       ageText = (TextView) findViewById(R.id.age);
       satText = (TextView) findViewById(R.id.sat);
       cidText = (TextView) findViewById(R.id.cid);
+      stateText = (TextView) findViewById(R.id.state);
       lacText = (TextView) findViewById(R.id.lac);
       mccmncText = (TextView) findViewById(R.id.mccmnc);
       operText = (TextView) findViewById(R.id.oper);
@@ -82,27 +86,35 @@ public class HelloAndroid extends Activity {
     if (Logger.validFix) {
       long current_time = System.currentTimeMillis();
       long age = (500 + current_time - Logger.lastFixMillis) / 1000;
-      String llString = String.format("%.6f / %.6f", Logger.lastLat, Logger.lastLon);
+      String latString = String.format("%.6f", Logger.lastLat);
+      String lonString = String.format("%.6f", Logger.lastLon);
       String accString = String.format("%dm", Logger.lastAcc);
       String ageString = String.format("%ds", age);
-      llText.setText(llString);
+      latText.setText(latString);
+      lonText.setText(lonString);
       accText.setText(accString);
       ageText.setText(ageString);
     } else {
-      llText.setText("??? / ???");
+      latText.setText("???");
+      lonText.setText("???");
       accText.setText("???");
       ageText.setText("???");
     }
     String satString = String.format("%dT / %dU / %dE / %dA",
         Logger.last_n_sats, Logger.last_fix_sats,
         Logger.last_ephem_sats, Logger.last_alman_sats);
-    String cidString = String.format("%c %d", Logger.lastNetworkType, Logger.lastCid);
+    String cidString = String.format("%c%d",
+        Logger.lastNetworkType, Logger.lastCid);
+    String stateString = String.format("[%c]",
+        Logger.lastState);
     String lacString = String.format("%d", Logger.lastLac);
     String mccmncString = String.format("%s", Logger.lastMccMnc);
-    String operString = String.format("%s", Logger.lastOperator);
-    String dBmString = String.format("%d [%c]", Logger.lastdBm, Logger.lastState);
+    String operString = String.format("%s (%s)",
+        Logger.lastOperator, Logger.lastSimOperator);
+    String dBmString = String.format("%d", Logger.lastdBm);
     satText.setText(satString);
     cidText.setText(cidString);
+    stateText.setText(stateString);
     lacText.setText(lacString);
     mccmncText.setText(mccmncString);
     operText.setText(operString);

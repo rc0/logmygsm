@@ -54,6 +54,7 @@ public class Logger extends Service {
   static public int    lastLac;
   static public String lastMccMnc;
   static public String lastOperator;
+  static public String lastSimOperator;
   static public int    lastdBm;
   static public int    lastBer;
 
@@ -285,6 +286,7 @@ public class Logger extends Service {
       }
       lastMccMnc = new String(myTelephonyManager.getNetworkOperator());
       lastOperator = new String(myTelephonyManager.getNetworkOperatorName());
+      lastSimOperator = new String(myTelephonyManager.getSimOperatorName());
       updateDisplay();
     };
 
