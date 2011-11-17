@@ -146,7 +146,8 @@ public class Logger extends Service {
     myNotification.setLatestEventInfo(context, expandedTitle, expandedText, launchIntent);
 
     if (myNotificationManager != null) {
-      myNotificationManager.notify(myNotificationRef, myNotification);
+      startForeground(myNotificationRef, myNotification);
+      // myNotificationManager.notify(myNotificationRef, myNotification);
     }
   }
 
