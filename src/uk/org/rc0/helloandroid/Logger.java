@@ -130,11 +130,12 @@ public class Logger extends Service {
 
   private void updateNotification() {
     Context context = getApplicationContext();
-    String expandedText = String.format("%c%d, %d dBm [%c], %d samples",
+    String expandedText = String.format("%c%d, %ddBm/%c %dm %d/%d/%d/%d",
         lastNetworkType, lastCid,
         lastdBm, lastState,
-        nReadings);
-    String expandedTitle = "GSM Logger running";
+        lastAcc,
+        last_n_sats, last_fix_sats, last_ephem_sats, last_alman_sats);
+    String expandedTitle = String.format("GSM Logger running (%d)", nReadings);
     Intent intent = new Intent(this, HelloAndroid.class);
 
     // The next line is to stop Android from creating multiple activities - it
@@ -250,24 +251,12 @@ public class Logger extends Service {
 
   private void logToFile() {
     ++nReadings;
-    CellLocation cell_loc = myTelephonyManager.getCellLocation();
-    int cid2;
-    int lac2;
-    if (cell_loc == null) {
-      cid2 = 0;
-      lac2 = 0;
-    } else {
-      GsmCellLocation gsm_loc = (GsmCellLocation) cell_loc;
-      cid2 = gsm_loc.getCid();
-      lac2 = gsm_loc.getLac();
-    }
-    String data = String.format("%12.7f %12.7f %3d %c %c %10d %10d %3d %s %10d %10d\n",
+    String data = String.format("%12.7f %12.7f %3d %c %c %10d %10d %3d %s\n",
         lastLat, lastLon, lastAcc,
         lastState,
         lastNetworkType, lastCid, lastLac,
         lastdBm,
-        lastMccMnc,
-        cid2, lac2);
+        lastMccMnc);
     writeLog(data);
   }
 
