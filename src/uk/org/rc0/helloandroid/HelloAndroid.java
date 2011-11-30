@@ -67,6 +67,7 @@ public class HelloAndroid extends Activity {
       filter = new IntentFilter(Logger.DISPLAY_UPDATE);
       myReceiver = new DisplayUpdateReceiver();
       registerReceiver(myReceiver, filter);
+      updateDisplay();
       super.onResume();
     }
 
@@ -100,8 +101,8 @@ public class HelloAndroid extends Activity {
       accText.setText("???");
       ageText.setText("???");
     }
-    String satString = String.format("%dT / %dU / %dE / %dA",
-        Logger.last_n_sats, Logger.last_fix_sats,
+    String satString = String.format("%d -- %d - %d",
+        Logger.last_fix_sats,
         Logger.last_ephem_sats, Logger.last_alman_sats);
     String cidString = String.format("%c%d",
         Logger.lastNetworkType, Logger.lastCid);

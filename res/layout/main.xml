@@ -4,16 +4,6 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:weightSum="1">
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/CellStat"
-    />
 <LinearLayout
   android:id="@+id/linearLayout9"
   android:layout_width="match_parent"
@@ -69,13 +59,25 @@
               android:layout_height="wrap_content"
               android:textAppearance="?android:attr/textAppearanceMedium"
               android:id="@+id/sat_caption"
-              android:text="SAT:" android:layout_width="58dp" android:layout_gravity="center">
+              android:text="SAT:" android:layout_width="50px" android:layout_gravity="center">
              </TextView>
             <TextView
               android:layout_height="wrap_content"
               android:textAppearance="?android:attr/textAppearanceMedium"
               android:id="@+id/sat"
-              android:text="0" android:layout_width="match_parent">
+              android:text="0" android:layout_width="80px">
+             </TextView>
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/age_caption"
+              android:text="AGE:" android:layout_width="55px" android:layout_gravity="center">
+             </TextView>
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:id="@+id/age"
+              android:text="9999s" android:layout_width="55px">
              </TextView>
         </LinearLayout>
     </TableRow>
@@ -88,25 +90,25 @@
               android:layout_height="wrap_content"
               android:textAppearance="?android:attr/textAppearanceMedium"
               android:id="@+id/mccmnc_caption"
-              android:text="NET:" android:layout_width="60px" android:layout_gravity="center">
+              android:text="NET:" android:layout_width="50px" android:layout_gravity="center_horizontal">
              </TextView>
             <TextView
               android:layout_height="wrap_content"
               android:textAppearance="?android:attr/textAppearanceMedium"
               android:id="@+id/mccmnc"
-              android:text="0" android:layout_width="80px">
+              android:text="0" android:layout_width="70px">
              </TextView>
             <TextView
               android:layout_height="wrap_content"
               android:textAppearance="?android:attr/textAppearanceMedium"
-              android:id="@+id/age_caption"
-              android:text="AGE:" android:layout_width="50px" android:layout_gravity="center">
+              android:id="@+id/count_caption"
+              android:text="Count:" android:layout_width="55px" android:layout_gravity="center_horizontal">
              </TextView>
             <TextView
               android:layout_height="wrap_content"
               android:textAppearance="?android:attr/textAppearanceMedium"
-              android:id="@+id/age"
-              android:text="9999s" android:layout_width="50px">
+              android:id="@+id/count"
+              android:text="0" android:layout_width="55px">
              </TextView>
         </LinearLayout>
     </TableRow>
@@ -119,12 +121,14 @@
               android:layout_height="wrap_content"
               android:textAppearance="?android:attr/textAppearanceMedium"
               android:id="@+id/operator_caption"
+              android:textSize="16sp"
               android:text="OPER:" android:layout_width="58dp" android:layout_gravity="center">
              </TextView>
             <TextView
               android:layout_height="wrap_content"
               android:textAppearance="?android:attr/textAppearanceMedium"
               android:id="@+id/oper"
+              android:textSize="16sp"
               android:text="0" android:layout_width="match_parent">
              </TextView>
         </LinearLayout>
@@ -142,7 +146,7 @@
              </TextView>
             <TextView
               android:layout_height="wrap_content"
-              android:textSize="32sp"
+              android:textSize="24sp"
               android:textStyle="bold"
               android:id="@+id/lac"
               android:text="0" android:layout_width="match_parent">
@@ -162,14 +166,14 @@
              </TextView>
             <TextView
               android:layout_height="wrap_content"
-              android:textSize="32sp"
+              android:textSize="28sp"
               android:textStyle="bold"
               android:id="@+id/cid"
               android:text="U99999999" android:layout_width="150px">
              </TextView>
             <TextView
               android:layout_height="wrap_content"
-              android:textSize="32sp"
+              android:textSize="28sp"
               android:textStyle="bold"
               android:id="@+id/state"
               android:text="[X]" android:layout_width="40px">
@@ -189,7 +193,7 @@
              </TextView>
             <TextView
               android:layout_height="wrap_content"
-              android:textSize="32sp"
+              android:textSize="28sp"
               android:textStyle="bold"
               android:id="@+id/dBm"
               android:text="0" android:layout_width="60px">
@@ -202,29 +206,10 @@
              </TextView>
             <TextView
               android:layout_height="wrap_content"
-              android:textSize="32sp"
+              android:textSize="28sp"
               android:textStyle="bold"
               android:id="@+id/accuracy"
               android:text="0" android:layout_width="60px">
-             </TextView>
-        </LinearLayout>
-    </TableRow>
-    <TableRow android:id="@+id/tableRow10" android:layout_width="match_parent" android:layout_height="wrap_content">
-        <LinearLayout
-          android:id="@+id/linearLayout10"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content">
-            <TextView
-              android:layout_height="wrap_content"
-              android:textAppearance="?android:attr/textAppearanceMedium"
-              android:id="@+id/count_caption"
-              android:text="Count:" android:layout_width="58dp" android:layout_gravity="center_horizontal">
-             </TextView>
-            <TextView
-              android:layout_height="wrap_content"
-              android:textAppearance="?android:attr/textAppearanceMedium"
-              android:id="@+id/count"
-              android:text="0" android:layout_width="match_parent">
              </TextView>
         </LinearLayout>
     </TableRow>
