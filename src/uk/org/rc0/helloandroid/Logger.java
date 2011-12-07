@@ -44,6 +44,10 @@ public class Logger extends Service {
   private File rawfile;
   private FileWriter rawwriter;
 
+  // Start false, set it true once we've tried to open logfiles, following the
+  // first GPS position fix.
+  private boolean logging_is_active;
+
   // -----------------
   // Variables shared with the Activity
   // -----------------
@@ -94,6 +98,8 @@ public class Logger extends Service {
       lastLac = 0;
       lastdBm = 0;
       lastNetworkType = '?';
+
+      logging_is_active = false;
 
       String srvcName = Context.TELEPHONY_SERVICE;
       myTelephonyManager = (TelephonyManager) getSystemService(srvcName);
@@ -167,6 +173,7 @@ public class Logger extends Service {
 
     String rawFileName = "raw_" + cs.toString() + ".log";
 
+    logging_is_active = true;
     try {
       File root = new File(basePath, ourDir);
       if (!root.exists()) {
@@ -214,6 +221,9 @@ public class Logger extends Service {
       } catch (IOException e) {
       }
     }
+    logging_is_active = false;
+    logwriter = null;
+    rawwriter = null;
   }
 
   // --------------------------------------------------------------------------------
@@ -297,7 +307,7 @@ public class Logger extends Service {
     if (!is_running) {
       is_running = true;
       startNotification();
-      openLog();
+      // do this lazily now ...  openLog();
       myTelephonyManager.listen(myPhoneStateListener,
           PhoneStateListener.LISTEN_CELL_LOCATION |
           PhoneStateListener.LISTEN_SERVICE_STATE |
@@ -430,6 +440,9 @@ public class Logger extends Service {
         }
         // lastFixMillis = location.getTime();
         lastFixMillis = System.currentTimeMillis();
+        if (!logging_is_active) {
+          openLog();
+        }
         logToFile();
         logRawLocation();
       }
