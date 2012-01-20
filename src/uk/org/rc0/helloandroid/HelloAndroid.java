@@ -102,7 +102,6 @@ public class HelloAndroid extends Activity {
                 Logger.recent_cids[i].dbm);
             out.append(temp);
           } else {
-            age /= 60;
             String temp = String.format("%1c%9d %1c %3d:%02d %4ddBm\n",
                 Logger.recent_cids[i].network_type,
                 Logger.recent_cids[i].cid,
