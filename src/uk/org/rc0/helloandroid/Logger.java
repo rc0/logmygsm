@@ -435,6 +435,7 @@ public class Logger extends Service {
         lastdBm = -113 + 2*asu;
       }
       lastBer = strength.getGsmBitErrorRate();
+      logCellHistory();
       updateDisplay();
     };
 
