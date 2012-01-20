@@ -82,12 +82,35 @@ public class Logger extends Service {
   static public int    last_ephem_sats;
   static public int    last_alman_sats;
 
+  // --- CID history
+
+  public class RecentCID {
+    public int cid;
+    // Time this CID was last encountered
+    public long lastMillis;
+
+    public RecentCID() { cid = -1; }
+  };
+
+
+  static public final int MAX_RECENT = 8;
+  static public RecentCID[] recent_cids;
+
   @Override
   public void onCreate() {
     stop_tracing = false;
     myProvider = LocationManager.GPS_PROVIDER;
     nReadings = 0;
     myNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    init_recent_cids();
+  }
+
+  private void init_recent_cids() {
+    recent_cids = new RecentCID[MAX_RECENT];
+    for (int i=0; i<MAX_RECENT; i++) {
+      recent_cids[i] = new RecentCID();
+    }
+    // Test data
   }
 
   @Override
@@ -224,6 +247,30 @@ public class Logger extends Service {
     logging_is_active = false;
     logwriter = null;
     rawwriter = null;
+  }
+
+  // --------------------------------------------------------------------------------
+
+  private void logCellHistory() {
+    int match = -1;
+    for (int i=0; i<MAX_RECENT; i++) {
+      if (recent_cids[i].cid == lastCid) {
+        match = i;
+        break;
+      }
+    }
+    if (match == -1) {
+      match = MAX_RECENT - 1;
+    }
+    if (match > 0) {
+      for (int i=match; i>0; i--) {
+        recent_cids[i].cid = recent_cids[i-1].cid;
+        recent_cids[i].lastMillis = recent_cids[i-1].lastMillis;
+      }
+    }
+    // If match==0 we just overwrite the newest record anyway
+    recent_cids[0].cid = lastCid;
+    recent_cids[0].lastMillis = System.currentTimeMillis();
   }
 
   // --------------------------------------------------------------------------------
@@ -372,6 +419,7 @@ public class Logger extends Service {
       lastMccMnc = new String(myTelephonyManager.getNetworkOperator());
       lastOperator = new String(myTelephonyManager.getNetworkOperatorName());
       lastSimOperator = new String(myTelephonyManager.getSimOperatorName());
+      logCellHistory();
       logRawCell();
       updateDisplay();
     };

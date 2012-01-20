@@ -25,6 +25,7 @@ public class HelloAndroid extends Activity {
   private TextView dBmText;
   private TextView countText;
   private ToggleButton toggleButton;
+  private TextView cidHistoryText;
 
   private ComponentName myService;
   private DisplayUpdateReceiver myReceiver;
@@ -47,6 +48,7 @@ public class HelloAndroid extends Activity {
       dBmText = (TextView) findViewById(R.id.dBm);
       countText = (TextView) findViewById(R.id.count);
       toggleButton = (ToggleButton) findViewById(R.id.toggleBgLog);
+      cidHistoryText = (TextView) findViewById(R.id.cid_history);
     }
 
   @Override
@@ -83,9 +85,34 @@ public class HelloAndroid extends Activity {
       super.onPause();
     }
 
+  private void updateCidHistory(long current_time) {
+    StringBuffer out = new StringBuffer();
+    for (int i=0; i<Logger.MAX_RECENT; i++) {
+      if ((Logger.recent_cids != null) &&
+          (Logger.recent_cids[i] != null) &&
+          (Logger.recent_cids[i].cid >= 0)) {
+          long age = (500 + current_time - Logger.recent_cids[i].lastMillis) / 1000;
+          if (age < 1800) {
+            String temp = String.format("%9d %5ds\n",
+                Logger.recent_cids[i].cid,
+                age);
+            out.append(temp);
+          } else {
+            age /= 60;
+            String temp = String.format("%9d %5dm\n",
+                Logger.recent_cids[i].cid,
+                age);
+            out.append(temp);
+          }
+      }
+    }
+
+    cidHistoryText.setText(out);
+  }
+
   private void updateDisplay() {
+    long current_time = System.currentTimeMillis();
     if (Logger.validFix) {
-      long current_time = System.currentTimeMillis();
       long age = (500 + current_time - Logger.lastFixMillis) / 1000;
       String latString = String.format("%.6f", Logger.lastLat);
       String lonString = String.format("%.6f", Logger.lastLon);
@@ -123,6 +150,8 @@ public class HelloAndroid extends Activity {
 
     String countString = String.format("%d", Logger.nReadings);
     countText.setText(countString);
+
+    updateCidHistory(current_time);
   }
 
   // --------------------------------------------------------------------------

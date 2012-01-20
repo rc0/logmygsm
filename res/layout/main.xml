@@ -213,5 +213,20 @@
              </TextView>
         </LinearLayout>
     </TableRow>
+    <TableRow android:id="@+id/tableRow9" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <LinearLayout
+          android:id="@+id/linearLayout9"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content">
+            <TextView
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:typeface="monospace"
+              android:textSize="16sp"
+              android:id="@+id/cid_history"
+              android:text="dBm:" android:layout_width="match_parent">
+             </TextView>
+        </LinearLayout>
+    </TableRow>
 </TableLayout>
 </LinearLayout>
