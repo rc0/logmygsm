@@ -87,21 +87,29 @@ public class HelloAndroid extends Activity {
 
   private void updateCidHistory(long current_time) {
     StringBuffer out = new StringBuffer();
-    for (int i=0; i<Logger.MAX_RECENT; i++) {
+    // There's no point in showing the current cell as that's shown in other fields
+    for (int i=1; i<Logger.MAX_RECENT; i++) {
       if ((Logger.recent_cids != null) &&
           (Logger.recent_cids[i] != null) &&
           (Logger.recent_cids[i].cid >= 0)) {
           long age = (500 + current_time - Logger.recent_cids[i].lastMillis) / 1000;
-          if (age < 1800) {
-            String temp = String.format("%9d %5ds\n",
+          if (age < 60) {
+            String temp = String.format("%1c%9d %1c   0:%02d %4ddBm\n",
+                Logger.recent_cids[i].network_type,
                 Logger.recent_cids[i].cid,
-                age);
+                Logger.recent_cids[i].state,
+                age,
+                Logger.recent_cids[i].dbm);
             out.append(temp);
           } else {
             age /= 60;
-            String temp = String.format("%9d %5dm\n",
+            String temp = String.format("%1c%9d %1c %3d:%02d %4ddBm\n",
+                Logger.recent_cids[i].network_type,
                 Logger.recent_cids[i].cid,
-                age);
+                Logger.recent_cids[i].state,
+                age / 60,
+                age % 60,
+                Logger.recent_cids[i].dbm);
             out.append(temp);
           }
       }

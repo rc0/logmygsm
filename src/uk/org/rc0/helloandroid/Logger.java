@@ -86,6 +86,9 @@ public class Logger extends Service {
 
   public class RecentCID {
     public int cid;
+    public char network_type;
+    public char state;
+    public int dbm;
     // Time this CID was last encountered
     public long lastMillis;
 
@@ -265,11 +268,17 @@ public class Logger extends Service {
     if (match > 0) {
       for (int i=match; i>0; i--) {
         recent_cids[i].cid = recent_cids[i-1].cid;
+        recent_cids[i].network_type = recent_cids[i-1].network_type;
+        recent_cids[i].state = recent_cids[i-1].state;
+        recent_cids[i].dbm = recent_cids[i-1].dbm;
         recent_cids[i].lastMillis = recent_cids[i-1].lastMillis;
       }
     }
     // If match==0 we just overwrite the newest record anyway
     recent_cids[0].cid = lastCid;
+    recent_cids[0].network_type = lastNetworkType;
+    recent_cids[0].state = lastState;
+    recent_cids[0].dbm = lastdBm;
     recent_cids[0].lastMillis = System.currentTimeMillis();
   }
 
