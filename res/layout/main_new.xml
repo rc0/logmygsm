@@ -57,7 +57,7 @@
       </LinearLayout>
 
       <TextView
-        android:layout_height="wrap_content"
+        android:layout_height="120dp"
         android:layout_width="match_parent"
         android:id="@+id/cid_history"
         android:typeface="monospace"
@@ -65,6 +65,30 @@
         android:text="######## ##:##"
         android:gravity="left">
       </TextView>
+
+      <!-- The block around the background toggle caption + button -->
+      <LinearLayout
+        android:id="@+id/toggle_button_row9"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+          <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:id="@+id/dBm_caption"
+            android:text="B/g logging:"
+            android:layout_gravity="center">
+           </TextView>
+           <ToggleButton
+             android:text="Backgnd Log"
+             android:id="@+id/toggleBgLog"
+             android:layout_height="wrap_content"
+             android:layout_width="wrap_content"
+             android:layout_gravity="right"
+           >
+           </ToggleButton>
+      </LinearLayout>
+      <!-- The block around the background toggle caption + button -->
 
     </LinearLayout>
     <!-- The left 2/3 of the block -->
@@ -95,16 +119,6 @@
       <TextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:id="@+id/state"
-        android:typeface="monospace"
-        android:textSize="24sp"
-        android:text="####"
-        android:layout_gravity="center">
-      </TextView>
-
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
         android:id="@+id/lac"
         android:typeface="monospace"
         android:textSize="24sp"
@@ -125,16 +139,6 @@
       <TextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:id="@+id/oper"
-        android:typeface="monospace"
-        android:textSize="16sp"
-        android:text="########"
-        android:layout_gravity="center">
-      </TextView>
-
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
         android:id="@+id/handoffs"
         android:typeface="monospace"
         android:textSize="16sp"
@@ -145,7 +149,7 @@
       <TextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:id="@+id/longitude"
+        android:id="@+id/latitude"
         android:typeface="monospace"
         android:textSize="16sp"
         android:text="-###.####"
@@ -155,7 +159,7 @@
       <TextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:id="@+id/latitude"
+        android:id="@+id/longitude"
         android:typeface="monospace"
         android:textSize="16sp"
         android:text="-###.####"
@@ -199,29 +203,6 @@
   </LinearLayout>
   <!-- The block around the numeric table at the top -->
 
-  <!-- The block around the background toggle caption + button -->
-  <LinearLayout
-    android:id="@+id/toggle_button_row9"
-    android:orientation="horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="220dp"
-        android:id="@+id/dBm_caption"
-        android:text="Background Logging:"
-        android:layout_gravity="center">
-       </TextView>
-       <ToggleButton
-         android:text="Backgnd Log"
-         android:id="@+id/toggleBgLog"
-         android:layout_height="wrap_content"
-         android:layout_width="wrap_content"
-         android:layout_gravity="right"
-       >
-       </ToggleButton>
-  </LinearLayout>
-  <!-- The block around the background toggle caption + button -->
 
 </LinearLayout>
 <!-- The outermost vertical layout -->

@@ -22,7 +22,6 @@ public class HelloAndroid extends Activity {
   private TextView lacText;
   private TextView netTypeText;
   private TextView mccmncText;
-  private TextView operText;
   private TextView handoffText;
   private TextView dBmText;
   private TextView countText;
@@ -46,7 +45,6 @@ public class HelloAndroid extends Activity {
       lacText = (TextView) findViewById(R.id.lac);
       netTypeText = (TextView) findViewById(R.id.network_type);
       mccmncText = (TextView) findViewById(R.id.mccmnc);
-      operText = (TextView) findViewById(R.id.oper);
       handoffText = (TextView) findViewById(R.id.handoffs);
       dBmText = (TextView) findViewById(R.id.dBm);
       countText = (TextView) findViewById(R.id.count);
@@ -120,8 +118,8 @@ public class HelloAndroid extends Activity {
     long current_time = System.currentTimeMillis();
     if (Logger.validFix) {
       long age = (500 + current_time - Logger.lastFixMillis) / 1000;
-      String latString = String.format("%.4f", Logger.lastLat);
-      String lonString = String.format("%.4f", Logger.lastLon);
+      String latString = String.format("%+09.4f", Logger.lastLat);
+      String lonString = String.format("%+09.4f", Logger.lastLon);
       String accString = String.format("%dm", Logger.lastAcc);
       String ageString = String.format("%ds", age);
       latText.setText(latString);
@@ -141,9 +139,7 @@ public class HelloAndroid extends Activity {
         Logger.lastCid);
     String lacString = String.format("%d", Logger.lastLac);
     String mccmncString = String.format("%s", Logger.lastMccMnc);
-    String operString = String.format("%s\n%s",
-        Logger.lastOperator, Logger.lastSimOperator);
-    String handoffString = String.format("%dha",
+    String handoffString = String.format("%d ha",
         Logger.nHandoffs);
     String dBmString = String.format("%ddBm", Logger.lastdBm);
     satText.setText(satString);
@@ -161,11 +157,10 @@ public class HelloAndroid extends Activity {
     lacText.setText(lacString);
     netTypeText.setText(Logger.lastNetworkTypeLong);
     mccmncText.setText(mccmncString);
-    operText.setText(operString);
     handoffText.setText(handoffString);
     dBmText.setText(dBmString);
 
-    String countString = String.format("%dpt", Logger.nReadings);
+    String countString = String.format("%d pt", Logger.nReadings);
     countText.setText(countString);
 
     updateCidHistory(current_time);
