@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -18,10 +19,11 @@ public class HelloAndroid extends Activity {
   private TextView ageText;
   private TextView satText;
   private TextView cidText;
-  private TextView stateText;
   private TextView lacText;
+  private TextView netTypeText;
   private TextView mccmncText;
   private TextView operText;
+  private TextView handoffText;
   private TextView dBmText;
   private TextView countText;
   private ToggleButton toggleButton;
@@ -34,17 +36,18 @@ public class HelloAndroid extends Activity {
   @Override
     public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
-      setContentView(R.layout.main);
+      setContentView(R.layout.main_new);
       latText = (TextView) findViewById(R.id.latitude);
       lonText = (TextView) findViewById(R.id.longitude);
       accText = (TextView) findViewById(R.id.accuracy);
       ageText = (TextView) findViewById(R.id.age);
       satText = (TextView) findViewById(R.id.sat);
       cidText = (TextView) findViewById(R.id.cid);
-      stateText = (TextView) findViewById(R.id.state);
       lacText = (TextView) findViewById(R.id.lac);
+      netTypeText = (TextView) findViewById(R.id.network_type);
       mccmncText = (TextView) findViewById(R.id.mccmnc);
       operText = (TextView) findViewById(R.id.oper);
+      handoffText = (TextView) findViewById(R.id.handoffs);
       dBmText = (TextView) findViewById(R.id.dBm);
       countText = (TextView) findViewById(R.id.count);
       toggleButton = (ToggleButton) findViewById(R.id.toggleBgLog);
@@ -94,21 +97,17 @@ public class HelloAndroid extends Activity {
           (Logger.recent_cids[i].cid >= 0)) {
           long age = (500 + current_time - Logger.recent_cids[i].lastMillis) / 1000;
           if (age < 60) {
-            String temp = String.format("%1c%9d %1c   0:%02d %4ddBm\n",
-                Logger.recent_cids[i].network_type,
+            String temp = String.format("%8d  0:%02d %4d\n",
                 Logger.recent_cids[i].cid,
-                Logger.recent_cids[i].state,
                 age,
-                Logger.recent_cids[i].dbm);
+                Logger.recent_cids[i].handoff);
             out.append(temp);
           } else {
-            String temp = String.format("%1c%9d %1c %3d:%02d %4ddBm\n",
-                Logger.recent_cids[i].network_type,
+            String temp = String.format("%8d  %3d:%02d %4d\n",
                 Logger.recent_cids[i].cid,
-                Logger.recent_cids[i].state,
                 age / 60,
                 age % 60,
-                Logger.recent_cids[i].dbm);
+                Logger.recent_cids[i].handoff);
             out.append(temp);
           }
       }
@@ -121,8 +120,8 @@ public class HelloAndroid extends Activity {
     long current_time = System.currentTimeMillis();
     if (Logger.validFix) {
       long age = (500 + current_time - Logger.lastFixMillis) / 1000;
-      String latString = String.format("%.6f", Logger.lastLat);
-      String lonString = String.format("%.6f", Logger.lastLon);
+      String latString = String.format("%.4f", Logger.lastLat);
+      String lonString = String.format("%.4f", Logger.lastLon);
       String accString = String.format("%dm", Logger.lastAcc);
       String ageString = String.format("%ds", age);
       latText.setText(latString);
@@ -132,30 +131,41 @@ public class HelloAndroid extends Activity {
     } else {
       latText.setText("???");
       lonText.setText("???");
-      accText.setText("???");
-      ageText.setText("???");
+      accText.setText("?m");
+      ageText.setText("?s");
     }
-    String satString = String.format("%d -- %d - %d",
+    String satString = String.format("%d/%d/%d",
         Logger.last_fix_sats,
         Logger.last_ephem_sats, Logger.last_alman_sats);
-    String cidString = String.format("%c%d",
-        Logger.lastNetworkType, Logger.lastCid);
-    String stateString = String.format("[%c]",
-        Logger.lastState);
+    String cidString = String.format("%d",
+        Logger.lastCid);
     String lacString = String.format("%d", Logger.lastLac);
     String mccmncString = String.format("%s", Logger.lastMccMnc);
-    String operString = String.format("%s (%s)",
+    String operString = String.format("%s\n%s",
         Logger.lastOperator, Logger.lastSimOperator);
-    String dBmString = String.format("%d", Logger.lastdBm);
+    String handoffString = String.format("%dha",
+        Logger.nHandoffs);
+    String dBmString = String.format("%ddBm", Logger.lastdBm);
     satText.setText(satString);
+
     cidText.setText(cidString);
-    stateText.setText(stateString);
+    switch (Logger.lastState) {
+      case 'A':
+        cidText.setTextColor(Color.WHITE);
+        break;
+      default:
+        cidText.setTextColor(Color.RED);
+        break;
+    }
+
     lacText.setText(lacString);
+    netTypeText.setText(Logger.lastNetworkTypeLong);
     mccmncText.setText(mccmncString);
     operText.setText(operString);
+    handoffText.setText(handoffString);
     dBmText.setText(dBmString);
 
-    String countString = String.format("%d", Logger.nReadings);
+    String countString = String.format("%dpt", Logger.nReadings);
     countText.setText(countString);
 
     updateCidHistory(current_time);

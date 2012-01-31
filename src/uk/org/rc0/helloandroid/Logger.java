@@ -56,6 +56,7 @@ public class Logger extends Service {
 
   // --- Telephony
   static public char   lastNetworkType;
+  static public String lastNetworkTypeLong;
   static public int    lastNetworkTypeRaw;
   static public char   lastState;
   static public int    lastCid;
@@ -71,6 +72,7 @@ public class Logger extends Service {
   static public boolean validFix;
   static public String myProvider;
   static public int    nReadings;
+  static public int    nHandoffs;
   static public double lastLat;
   static public double lastLon;
   static public int    lastAcc;
@@ -89,6 +91,7 @@ public class Logger extends Service {
     public char network_type;
     public char state;
     public int dbm;
+    public int handoff;
     // Time this CID was last encountered
     public long lastMillis;
 
@@ -104,6 +107,7 @@ public class Logger extends Service {
     stop_tracing = false;
     myProvider = LocationManager.GPS_PROVIDER;
     nReadings = 0;
+    nHandoffs = 0;
     myNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     init_recent_cids();
   }
@@ -271,6 +275,7 @@ public class Logger extends Service {
         recent_cids[i].network_type = recent_cids[i-1].network_type;
         recent_cids[i].state = recent_cids[i-1].state;
         recent_cids[i].dbm = recent_cids[i-1].dbm;
+        recent_cids[i].handoff = recent_cids[i-1].handoff;
         recent_cids[i].lastMillis = recent_cids[i-1].lastMillis;
       }
     }
@@ -279,6 +284,7 @@ public class Logger extends Service {
     recent_cids[0].network_type = lastNetworkType;
     recent_cids[0].state = lastState;
     recent_cids[0].dbm = lastdBm;
+    recent_cids[0].handoff = nHandoffs;
     recent_cids[0].lastMillis = System.currentTimeMillis();
   }
 
@@ -417,14 +423,19 @@ public class Logger extends Service {
   private final PhoneStateListener myPhoneStateListener = new PhoneStateListener () {
 
     public void onCellLocationChanged(CellLocation location) {
+      int newCid;
       if (location == null) {
-        lastCid = 0;
+        newCid = 0;
         lastLac = 0;
       } else {
         GsmCellLocation gsmLocation = (GsmCellLocation) location;
-        lastCid = gsmLocation.getCid();
+        newCid = gsmLocation.getCid();
         lastLac = gsmLocation.getLac();
       }
+      if (newCid != lastCid) {
+        ++nHandoffs;
+      }
+      lastCid = newCid;
       lastMccMnc = new String(myTelephonyManager.getNetworkOperator());
       lastOperator = new String(myTelephonyManager.getNetworkOperatorName());
       lastSimOperator = new String(myTelephonyManager.getSimOperatorName());
@@ -462,12 +473,30 @@ public class Logger extends Service {
 
     private void handle_network_type(int network_type) {
       switch (network_type) {
-        case TelephonyManager.NETWORK_TYPE_EDGE:    lastNetworkType = 'E'; break;
-        case TelephonyManager.NETWORK_TYPE_GPRS:    lastNetworkType = 'G'; break;
-        case TelephonyManager.NETWORK_TYPE_UMTS:    lastNetworkType = 'U'; break;
-        case TelephonyManager.NETWORK_TYPE_HSDPA:   lastNetworkType = 'H'; break;
-        case TelephonyManager.NETWORK_TYPE_UNKNOWN: lastNetworkType = '-'; break;
-        default:                                    lastNetworkType = '?'; break;
+        case TelephonyManager.NETWORK_TYPE_GPRS:
+          lastNetworkType = 'G';
+          lastNetworkTypeLong = "GPRS";
+          break;
+        case TelephonyManager.NETWORK_TYPE_EDGE:
+          lastNetworkType = 'E';
+          lastNetworkTypeLong = "EDGE";
+          break;
+        case TelephonyManager.NETWORK_TYPE_UMTS:
+          lastNetworkType = 'U';
+          lastNetworkTypeLong = "UMTS";
+          break;
+        case TelephonyManager.NETWORK_TYPE_HSDPA:
+          lastNetworkType = 'H';
+          lastNetworkTypeLong = "HSDPA";
+          break;
+        case TelephonyManager.NETWORK_TYPE_UNKNOWN:
+          lastNetworkType = '-';
+          lastNetworkTypeLong = "----";
+          break;
+        default:
+          lastNetworkType = '?';
+          lastNetworkTypeLong = "????";
+          break;
       }
       lastNetworkTypeRaw = network_type;
       logRawNetworkType();

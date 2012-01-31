@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:weightSum="1">
+
+  <!-- The block around the numeric table at the top -->
+  <LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+    <!-- The left 2/3 of the block -->
+    <LinearLayout
+      android:orientation="vertical"
+      android:layout_gravity="left"
+      android:layout_width="210dp"
+      android:layout_height="wrap_content">
+
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/cid"
+        android:typeface="monospace"
+        android:textSize="32sp"
+        android:text="########"
+        android:gravity="center">
+      </TextView>
+
+      <!-- The vertical layout for the dBm/acc block -->
+      <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+          android:layout_height="wrap_content"
+          android:layout_width="130dp"
+          android:id="@+id/dBm"
+          android:typeface="monospace"
+          android:textSize="28sp"
+          android:text="-###dBm"
+          android:gravity="right">
+        </TextView>
+
+        <TextView
+          android:layout_height="wrap_content"
+          android:layout_width="80dp"
+          android:id="@+id/accuracy"
+          android:typeface="monospace"
+          android:textSize="28sp"
+          android:text="###m"
+          android:gravity="right">
+        </TextView>
+
+      </LinearLayout>
+
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/cid_history"
+        android:typeface="monospace"
+        android:textSize="16dp"
+        android:text="######## ##:##"
+        android:gravity="left">
+      </TextView>
+
+    </LinearLayout>
+    <!-- The left 2/3 of the block -->
+
+    <TextView
+      android:layout_width="15dp"
+      android:layout_height="fill_parent"
+      android:id="@+id/top_level_shim">
+    </TextView>
+
+    <!-- The right 2/3 of the block -->
+    <LinearLayout
+      android:orientation="vertical"
+      android:layout_gravity="right"
+      android:layout_width="120dp"
+      android:layout_height="wrap_content">
+
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/network_type"
+        android:typeface="monospace"
+        android:textSize="24sp"
+        android:text="####"
+        android:layout_gravity="center">
+      </TextView>
+
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/state"
+        android:typeface="monospace"
+        android:textSize="24sp"
+        android:text="####"
+        android:layout_gravity="center">
+      </TextView>
+
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/lac"
+        android:typeface="monospace"
+        android:textSize="24sp"
+        android:text="#####"
+        android:layout_gravity="center">
+      </TextView>
+
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/mccmnc"
+        android:typeface="monospace"
+        android:textSize="16sp"
+        android:text="#####"
+        android:layout_gravity="center">
+      </TextView>
+
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/oper"
+        android:typeface="monospace"
+        android:textSize="16sp"
+        android:text="########"
+        android:layout_gravity="center">
+      </TextView>
+
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/handoffs"
+        android:typeface="monospace"
+        android:textSize="16sp"
+        android:text="#####ha"
+        android:layout_gravity="center">
+      </TextView>
+
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/longitude"
+        android:typeface="monospace"
+        android:textSize="16sp"
+        android:text="-###.####"
+        android:layout_gravity="center">
+      </TextView>
+
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/latitude"
+        android:typeface="monospace"
+        android:textSize="16sp"
+        android:text="-###.####"
+        android:layout_gravity="center">
+      </TextView>
+
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/sat"
+        android:typeface="monospace"
+        android:textSize="16sp"
+        android:text="##-##-##"
+        android:layout_gravity="center">
+      </TextView>
+
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/age"
+        android:typeface="monospace"
+        android:textSize="16sp"
+        android:text="#####s"
+        android:layout_gravity="center">
+      </TextView>
+
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/count"
+        android:typeface="monospace"
+        android:textSize="16sp"
+        android:text="####"
+        android:layout_gravity="center">
+      </TextView>
+
+    </LinearLayout>
+    <!-- The right 2/3 of the block -->
+
+
+  </LinearLayout>
+  <!-- The block around the numeric table at the top -->
+
+  <!-- The block around the background toggle caption + button -->
+  <LinearLayout
+    android:id="@+id/toggle_button_row9"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="220dp"
+        android:id="@+id/dBm_caption"
+        android:text="Background Logging:"
+        android:layout_gravity="center">
+       </TextView>
+       <ToggleButton
+         android:text="Backgnd Log"
+         android:id="@+id/toggleBgLog"
+         android:layout_height="wrap_content"
+         android:layout_width="wrap_content"
+         android:layout_gravity="right"
+       >
+       </ToggleButton>
+  </LinearLayout>
+  <!-- The block around the background toggle caption + button -->
+
+</LinearLayout>
+<!-- The outermost vertical layout -->
+
