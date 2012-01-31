@@ -8,6 +8,8 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -175,5 +177,32 @@ public class HelloAndroid extends Activity {
       updateDisplay();
     }
   }
+
+  // --------------------------------------------------------------------------
+  //
+
+  private final int OPTION_BIBBLE = 1;
+  private final int OPTION_EXIT   = 2;
+
+  @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+      menu.add (Menu.NONE, OPTION_BIBBLE, Menu.NONE, "Bibble");
+      menu.add (Menu.NONE, OPTION_EXIT, Menu.NONE, "Exit");
+      return true;
+    }
+
+  @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+      switch (item.getItemId()) {
+        case OPTION_EXIT:
+          Logger.stop_tracing = true;
+          finish();
+          return true;
+        case OPTION_BIBBLE:
+          return true;
+        default:
+          return false;
+      }
+    }
 
 }
