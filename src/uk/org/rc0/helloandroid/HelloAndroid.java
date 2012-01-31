@@ -95,7 +95,7 @@ public class HelloAndroid extends Activity {
           (Logger.recent_cids[i].cid >= 0)) {
           long age = (500 + current_time - Logger.recent_cids[i].lastMillis) / 1000;
           if (age < 60) {
-            String temp = String.format("%8d  0:%02d %4d\n",
+            String temp = String.format("%8d    0:%02d %4d\n",
                 Logger.recent_cids[i].cid,
                 age,
                 Logger.recent_cids[i].handoff);
