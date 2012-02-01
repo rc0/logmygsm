@@ -179,6 +179,12 @@
   </LinearLayout>
   <!-- The block around the numeric table at the top -->
 
+  <TextView
+    android:layout_height="10dp"
+    android:layout_width="fill_parent"
+    android:id="@+id/shim_over_map">
+  </TextView>
+
   <uk.org.rc0.helloandroid.Map
     android:id="@+id/map"
     android:layout_width="fill_parent"
