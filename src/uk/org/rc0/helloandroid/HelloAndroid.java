@@ -4,14 +4,12 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 public class HelloAndroid extends Activity {
 
@@ -27,10 +25,8 @@ public class HelloAndroid extends Activity {
   private TextView handoffText;
   private TextView dBmText;
   private TextView countText;
-  private ToggleButton toggleButton;
   private TextView cidHistoryText;
 
-  private ComponentName myService;
   private DisplayUpdateReceiver myReceiver;
 
   /** Called when the activity is first created. */
@@ -50,7 +46,6 @@ public class HelloAndroid extends Activity {
       handoffText = (TextView) findViewById(R.id.handoffs);
       dBmText = (TextView) findViewById(R.id.dBm);
       countText = (TextView) findViewById(R.id.count);
-      toggleButton = (ToggleButton) findViewById(R.id.toggleBgLog);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
     }
 
@@ -67,7 +62,7 @@ public class HelloAndroid extends Activity {
     @Override
     public void onResume () {
       Logger.stop_tracing = false;
-      myService = startService(new Intent(this, Logger.class));
+      startService(new Intent(this, Logger.class));
       IntentFilter filter;
       filter = new IntentFilter(Logger.DISPLAY_UPDATE);
       myReceiver = new DisplayUpdateReceiver();
@@ -79,12 +74,6 @@ public class HelloAndroid extends Activity {
     @Override
     public void onPause() {
       unregisterReceiver(myReceiver);
-      if (toggleButton.isChecked()) {
-        // We are going to keep the service alive as a background logger
-      } else {
-        Logger.stop_tracing = true;
-        stopService(new Intent(this, myService.getClass()));
-      }
       super.onPause();
     }
 
