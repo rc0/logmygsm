@@ -105,12 +105,23 @@ public class HelloAndroid extends Activity {
     cidHistoryText.setText(out);
   }
 
+  private boolean bad_cid(int cid) {
+    switch (cid) {
+      case 50594049:
+        return true;
+      case 0:
+        return true;
+      default:
+        return false;
+    }
+  }
+
   private void updateDisplay() {
     long current_time = System.currentTimeMillis();
     if (Logger.validFix) {
       long age = (500 + current_time - Logger.lastFixMillis) / 1000;
-      String latString = String.format("%+09.4f", Logger.lastLat);
-      String lonString = String.format("%+09.4f", Logger.lastLon);
+      String latString = String.format("%+9.4f", Logger.lastLat);
+      String lonString = String.format("%+9.4f", Logger.lastLon);
       String accString = String.format("%dm", Logger.lastAcc);
       String ageString = String.format("%ds", age);
       latText.setText(latString);
@@ -138,7 +149,11 @@ public class HelloAndroid extends Activity {
     cidText.setText(cidString);
     switch (Logger.lastState) {
       case 'A':
-        cidText.setTextColor(Color.WHITE);
+        if (bad_cid(Logger.lastCid)) {
+          cidText.setTextColor(Color.RED);
+        } else {
+          cidText.setTextColor(Color.WHITE);
+        }
         break;
       default:
         cidText.setTextColor(Color.RED);
