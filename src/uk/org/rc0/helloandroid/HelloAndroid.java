@@ -123,16 +123,23 @@ public class HelloAndroid extends Activity {
       String latString = String.format("%+9.4f", Logger.lastLat);
       String lonString = String.format("%+9.4f", Logger.lastLon);
       String accString = String.format("%dm", Logger.lastAcc);
-      String ageString = String.format("%ds", age);
       latText.setText(latString);
       lonText.setText(lonString);
       accText.setText(accString);
+      String ageString;
+      if (age < 90) {
+        ageString = String.format("%2ds %03d", age, Logger.lastBearing);
+      } else if (age < 90*60) {
+        ageString = String.format("%2dm %03d", age/60, Logger.lastBearing);
+      } else {
+        ageString = String.format("%2dh %03d", age/3600, Logger.lastBearing);
+      }
       ageText.setText(ageString);
     } else {
       latText.setText("???");
       lonText.setText("???");
       accText.setText("?m");
-      ageText.setText("?s");
+      ageText.setText("??? ???");
     }
     String satString = String.format("%d/%d/%d",
         Logger.last_fix_sats,
