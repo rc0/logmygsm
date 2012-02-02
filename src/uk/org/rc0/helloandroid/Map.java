@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Color;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 
 public class Map extends View {
@@ -72,6 +73,37 @@ public class Map extends View {
     }
   };
 
+  private void render_tile(Canvas canvas, int x01, int y01, int tile_x, int tile_y) {
+    int xl = (256*x01);
+    int xr = (256*(1+x01));
+    int yt = (256*y01);
+    int yb = (256*(1+y01));
+
+    String filename = null;
+    switch (generation) {
+      case GEN_2G:
+        filename = String.format("/sdcard/Maverick/tiles/Custom 2/%d/%d/%d.png.tile",
+            zoom, tile_x+x01, tile_y+y01);
+        break;
+      case GEN_3G:
+        filename = String.format("/sdcard/Maverick/tiles/Custom 3/%d/%d/%d.png.tile",
+            zoom, tile_x+x01, tile_y+y01);
+        break;
+    }
+    File file = new File(filename);
+    if (file.exists()) {
+      Bitmap bm = BitmapFactory.decodeFile(filename);
+      Rect src = new Rect(0, 0, 256, 256);
+      Rect dest = new Rect(xl, yt, 256, 256);
+      canvas.drawBitmap(bm, null, dest, null);
+    } else {
+      Paint p = new Paint();
+      p.setColor(Color.GRAY);
+      canvas.drawRect(xl, yt, xr, yb, p);
+    }
+
+  }
+
   private void rebuild_cache(Slip28 pos, int width, int height) {
     int dx, dy;
     z22 = zoom;
@@ -85,13 +117,10 @@ public class Map extends View {
     // corner of the viewport
     tile22 = Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888);
     Canvas my_canv = new Canvas(tile22);
-    Paint my_paint = new Paint();
-    my_paint.setColor(Color.rgb(255,0,0));
-    my_canv.drawRect(0.0f, 0.0f, 256.0f, 256.0f, my_paint);
-    my_canv.drawRect(256.0f, 256.0f, 512.0f, 512.0f, my_paint);
-    my_paint.setColor(Color.rgb(0,255,0));
-    my_canv.drawRect(256.0f, 0.0f, 512.0f, 256.0f, my_paint);
-    my_canv.drawRect(0.0f, 256.0f, 256.0f, 512.0f, my_paint);
+    render_tile(my_canv, 0, 0, dx, dy);
+    render_tile(my_canv, 0, 1, dx, dy);
+    render_tile(my_canv, 1, 0, dx, dy);
+    render_tile(my_canv, 1, 1, dx, dy);
     ul22 = new Slip28(dx << (28 - zoom), dy << (28 - zoom));
   }
 
@@ -135,18 +164,6 @@ public class Map extends View {
 
   }
 
-  private void render_tile(Canvas canvas, int zoom, int tile_x, int tile_y, int subtile_x, int subtile_y) {
-    String filename = String.format("/sdcard/Maverick/tiles/Custom 2/%d/%d/%d.png.tile", zoom, tile_x, tile_y);
-    File file = new File(filename);
-    if (file.exists()) {
-      String foo2 = String.format("Tile found on SD card");
-      canvas.drawText(foo2, 10, 120, my_paint);
-    } else {
-      String foo2 = String.format("No tile on SD card");
-      canvas.drawText(foo2, 10, 120, my_paint);
-    }
-  }
-
   public void toggle_2g3g() {
     switch (generation) {
       case GEN_2G:
@@ -156,6 +173,9 @@ public class Map extends View {
         generation = Generation.GEN_2G;
         break;
     }
+    // force map rebuild
+    tile22 = null;
+    invalidate();
   }
 
   public void update_map() {
