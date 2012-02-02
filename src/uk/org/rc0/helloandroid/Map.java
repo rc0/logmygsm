@@ -124,29 +124,36 @@ public class Map extends View {
   }
 
   private void draw_crosshair(Canvas c, int w, int h) {
-    int len = 16;
+    int len1 = 8;
+    int len2 = 64;
     float x0, x1, x2, x3, xc;
     float y0, y1, y2, y3, yc;
-    x0 = (float)(w/2 - len/2 - len);
-    x1 = (float)(w/2 - len/2);
+    x0 = (float)(w/2 - len1 - len2);
+    x1 = (float)(w/2 - len1);
     xc = (float)(w/2);
-    x2 = (float)(w/2 + len/2);
-    x3 = (float)(w/2 + len/2 + len);
-    y0 = (float)(h/2 - len/2 - len);
-    y1 = (float)(h/2 - len/2);
+    x2 = (float)(w/2 + len1);
+    x3 = (float)(w/2 + len1 + len2);
+    y0 = (float)(h/2 - len1 - len2);
+    y1 = (float)(h/2 - len1);
     yc = (float)(h/2);
-    y2 = (float)(h/2 + len/2);
-    y3 = (float)(h/2 + len/2 + len);
+    y2 = (float)(h/2 + len1);
+    y3 = (float)(h/2 + len1 + len2);
     c.drawLine(x0, yc, x1, yc, red_paint);
     c.drawLine(x2, yc, x3, yc, red_paint);
     c.drawLine(xc, y0, xc, y1, red_paint);
     c.drawLine(xc, y2, xc, y3, red_paint);
+
+    c.drawCircle(xc, yc, 3.0f*len2, red_paint);
   }
 
   private void update_map(Canvas canvas, Slip28 pos) {
     // Decide if we have to rebuild the tile22 cache
     int width = getWidth();
     int height = getHeight();
+    if (height > 240) {
+      // Avoid the viewport height getting bigger than the size of a tile - for now
+      height = 240;
+    }
     int dx, dy;
     if (tile22 == null) {
       rebuild_cache(pos, width, height);
@@ -200,6 +207,22 @@ public class Map extends View {
 
   public void update_map() {
     invalidate();
+  }
+
+  public void zoom_out() {
+    if (zoom > 9) {
+      zoom--;
+      tile22 = null;
+      invalidate();
+    }
+  }
+
+  public void zoom_in() {
+    if (zoom < 16) {
+      zoom++;
+      tile22 = null;
+      invalidate();
+    }
   }
 
   @Override

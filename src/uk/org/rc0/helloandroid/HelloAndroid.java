@@ -196,12 +196,16 @@ public class HelloAndroid extends Activity {
   // --------------------------------------------------------------------------
   //
 
-  private final int OPTION_TOGGLE = 1;
-  private final int OPTION_EXIT   = 2;
+  private final int OPTION_TOGGLE   = 1;
+  private final int OPTION_ZOOM_OUT = 2;
+  private final int OPTION_ZOOM_IN  = 3;
+  private final int OPTION_EXIT     = 4;
 
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
       menu.add (Menu.NONE, OPTION_TOGGLE, Menu.NONE, "Toggle 2D/3D");
+      menu.add (Menu.NONE, OPTION_ZOOM_OUT, Menu.NONE, "Zoom Out");
+      menu.add (Menu.NONE, OPTION_ZOOM_IN, Menu.NONE, "Zoom In");
       menu.add (Menu.NONE, OPTION_EXIT, Menu.NONE, "Exit");
       return true;
     }
@@ -212,6 +216,12 @@ public class HelloAndroid extends Activity {
         case OPTION_EXIT:
           Logger.stop_tracing = true;
           finish();
+          return true;
+        case OPTION_ZOOM_OUT:
+          mMap.zoom_out();
+          return true;
+        case OPTION_ZOOM_IN:
+          mMap.zoom_in();
           return true;
         case OPTION_TOGGLE:
           mMap.toggle_2g3g();
