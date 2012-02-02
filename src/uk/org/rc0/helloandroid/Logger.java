@@ -76,7 +76,7 @@ public class Logger extends Service {
   static public double lastLat;
   static public double lastLon;
   static public int    lastAcc;
-  static public float  lastBearing;
+  static public int    lastBearing;
   static public float  lastSpeed;
   static public long   lastFixMillis;
 
@@ -522,7 +522,7 @@ public class Logger extends Service {
         validFix = true;
         lastLat = location.getLatitude();
         lastLon = location.getLongitude();
-        lastBearing = location.getBearing();
+        lastBearing = (int) location.getBearing();
         lastSpeed = location.getSpeed();
         if (location.hasAccuracy()) {
           lastAcc = (int)(0.5 + location.getAccuracy());

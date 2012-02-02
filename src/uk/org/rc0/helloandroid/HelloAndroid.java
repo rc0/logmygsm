@@ -29,6 +29,8 @@ public class HelloAndroid extends Activity {
 
   private DisplayUpdateReceiver myReceiver;
 
+  private Map mMap;
+
   /** Called when the activity is first created. */
   @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,7 @@ public class HelloAndroid extends Activity {
       dBmText = (TextView) findViewById(R.id.dBm);
       countText = (TextView) findViewById(R.id.count);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
+      mMap = (Map) findViewById(R.id.map);
     }
 
   @Override
@@ -177,6 +180,7 @@ public class HelloAndroid extends Activity {
     countText.setText(countString);
 
     updateCidHistory(current_time);
+    mMap.update_map();
   }
 
   // --------------------------------------------------------------------------
@@ -192,12 +196,12 @@ public class HelloAndroid extends Activity {
   // --------------------------------------------------------------------------
   //
 
-  private final int OPTION_BIBBLE = 1;
+  private final int OPTION_TOGGLE = 1;
   private final int OPTION_EXIT   = 2;
 
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-      menu.add (Menu.NONE, OPTION_BIBBLE, Menu.NONE, "Bibble");
+      menu.add (Menu.NONE, OPTION_TOGGLE, Menu.NONE, "Toggle 2D/3D");
       menu.add (Menu.NONE, OPTION_EXIT, Menu.NONE, "Exit");
       return true;
     }
@@ -209,7 +213,8 @@ public class HelloAndroid extends Activity {
           Logger.stop_tracing = true;
           finish();
           return true;
-        case OPTION_BIBBLE:
+        case OPTION_TOGGLE:
+          mMap.toggle_2g3g();
           return true;
         default:
           return false;
