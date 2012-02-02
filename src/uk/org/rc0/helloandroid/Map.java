@@ -14,7 +14,7 @@ import android.graphics.Rect;
 
 public class Map extends View {
 
-  private final Paint my_paint;
+  private final Paint red_paint;
   private final Paint grey_paint;
 
   private int zoom;
@@ -40,9 +40,9 @@ public class Map extends View {
     generation = Generation.GEN_2G;
     tile22 = null;
 
-    my_paint = new Paint();
-    my_paint.setStrokeWidth(2);
-    my_paint.setColor(Color.RED);
+    red_paint = new Paint();
+    red_paint.setStrokeWidth(1);
+    red_paint.setColor(Color.RED);
 
     grey_paint = new Paint();
     grey_paint.setStrokeWidth(2);
@@ -93,8 +93,7 @@ public class Map extends View {
     File file = new File(filename);
     if (file.exists()) {
       Bitmap bm = BitmapFactory.decodeFile(filename);
-      Rect src = new Rect(0, 0, 256, 256);
-      Rect dest = new Rect(xl, yt, 256, 256);
+      Rect dest = new Rect(xl, yt, xr, yb);
       canvas.drawBitmap(bm, null, dest, null);
     } else {
       Paint p = new Paint();
@@ -122,6 +121,26 @@ public class Map extends View {
     render_tile(my_canv, 1, 0, dx, dy);
     render_tile(my_canv, 1, 1, dx, dy);
     ul22 = new Slip28(dx << (28 - zoom), dy << (28 - zoom));
+  }
+
+  private void draw_crosshair(Canvas c, int w, int h) {
+    int len = 16;
+    float x0, x1, x2, x3, xc;
+    float y0, y1, y2, y3, yc;
+    x0 = (float)(w/2 - len/2 - len);
+    x1 = (float)(w/2 - len/2);
+    xc = (float)(w/2);
+    x2 = (float)(w/2 + len/2);
+    x3 = (float)(w/2 + len/2 + len);
+    y0 = (float)(h/2 - len/2 - len);
+    y1 = (float)(h/2 - len/2);
+    yc = (float)(h/2);
+    y2 = (float)(h/2 + len/2);
+    y3 = (float)(h/2 + len/2 + len);
+    c.drawLine(x0, yc, x1, yc, red_paint);
+    c.drawLine(x2, yc, x3, yc, red_paint);
+    c.drawLine(xc, y0, xc, y1, red_paint);
+    c.drawLine(xc, y2, xc, y3, red_paint);
   }
 
   private void update_map(Canvas canvas, Slip28 pos) {
@@ -162,6 +181,7 @@ public class Map extends View {
     Rect dest = new Rect(0, 0, width, height);
     canvas.drawBitmap(tile22, src, dest, null);
 
+    draw_crosshair(canvas, width, height);
   }
 
   public void toggle_2g3g() {
@@ -184,32 +204,14 @@ public class Map extends View {
 
   @Override
   protected void onDraw(Canvas canvas) {
-    int width = getWidth();
-    int height = getHeight();
-    int cwidth = canvas.getWidth();
-    int cheight = canvas.getHeight();
-
-    // String foo = String.format("w=%d h=%d cw=%d ch=%d",
-    //     width, height,
-    //     cwidth, cheight);
-    // canvas.drawText(foo, 10, 40, my_paint);
 
     if (Logger.validFix) {
       Slip28 pos = new Slip28(Logger.lastLat, Logger.lastLon);
       update_map(canvas, pos);
-      // int tile_x, tile_y, subtile_x, subtile_y;
-      // tile_x = pos.X >> (28 - zoom);
-      // tile_y = pos.Y >> (28 - zoom);
-      // subtile_x = (pos.X >> (28 - (zoom+8))) & 0xff;
-      // subtile_y = (pos.Y >> (28 - (zoom+8))) & 0xff;
-      // String foo2 = String.format("%d/%d/%d.png.tile at %d,%d",
-      //     zoom, tile_x, tile_y, subtile_x, subtile_y);
-      // canvas.drawText(foo2, 10, 80, my_paint);
-      // render_tile(canvas, zoom, tile_x, tile_y, subtile_x, subtile_y);
     } else {
       canvas.drawColor(Color.rgb(40,40,40));
       String foo2 = String.format("No fix");
-      canvas.drawText(foo2, 10, 80, my_paint);
+      canvas.drawText(foo2, 10, 80, red_paint);
     }
 
   }
