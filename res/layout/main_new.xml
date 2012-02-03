@@ -57,11 +57,11 @@
       </LinearLayout>
 
       <TextView
-        android:layout_height="140dp"
+        android:layout_height="125dp"
         android:layout_width="match_parent"
         android:id="@+id/cid_history"
         android:typeface="monospace"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:text="######## ##:##"
         android:gravity="left">
       </TextView>
@@ -85,9 +85,9 @@
       <TextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:id="@+id/network_type"
+        android:id="@+id/net_mcc"
         android:typeface="monospace"
-        android:textSize="24sp"
+        android:textSize="16sp"
         android:text="####"
         android:layout_gravity="center">
       </TextView>
@@ -95,17 +95,7 @@
       <TextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:id="@+id/lac"
-        android:typeface="monospace"
-        android:textSize="24sp"
-        android:text="#####"
-        android:layout_gravity="center">
-      </TextView>
-
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/mccmnc"
+        android:id="@+id/lac_mnc"
         android:typeface="monospace"
         android:textSize="16sp"
         android:text="#####"

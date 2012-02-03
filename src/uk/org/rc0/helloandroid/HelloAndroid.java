@@ -19,9 +19,8 @@ public class HelloAndroid extends Activity {
   private TextView ageText;
   private TextView satText;
   private TextView cidText;
-  private TextView lacText;
-  private TextView netTypeText;
-  private TextView mccmncText;
+  private TextView lacmncText;
+  private TextView netmccText;
   private TextView handoffText;
   private TextView dBmText;
   private TextView countText;
@@ -42,9 +41,8 @@ public class HelloAndroid extends Activity {
       ageText = (TextView) findViewById(R.id.age);
       satText = (TextView) findViewById(R.id.sat);
       cidText = (TextView) findViewById(R.id.cid);
-      lacText = (TextView) findViewById(R.id.lac);
-      netTypeText = (TextView) findViewById(R.id.network_type);
-      mccmncText = (TextView) findViewById(R.id.mccmnc);
+      netmccText = (TextView) findViewById(R.id.net_mcc);
+      lacmncText = (TextView) findViewById(R.id.lac_mnc);
       handoffText = (TextView) findViewById(R.id.handoffs);
       dBmText = (TextView) findViewById(R.id.dBm);
       countText = (TextView) findViewById(R.id.count);
@@ -149,8 +147,21 @@ public class HelloAndroid extends Activity {
         Logger.last_ephem_sats, Logger.last_alman_sats);
     String cidString = String.format("%d",
         Logger.lastCid);
-    String lacString = String.format("%d", Logger.lastLac);
-    String mccmncString = String.format("%s", Logger.lastMccMnc);
+
+    String mnc_string;
+    String mcc_string;
+    if ((Logger.lastMccMnc != null) &&
+        (Logger.lastMccMnc.length() == 5)) {
+      mnc_string = Logger.lastMccMnc.substring(3, 5);
+      mcc_string = Logger.lastMccMnc.substring(0, 3);
+    } else {
+      mnc_string = "";
+      mcc_string = "";
+    }
+    String lacmncString = String.format("%5d %3s",
+        Logger.lastLac, mnc_string);
+    String netmccString = String.format("%5s %3s",
+        Logger.lastNetworkTypeLong, mcc_string);
     String handoffString = String.format("%d ha",
         Logger.nHandoffs);
     String dBmString = String.format("%ddBm", Logger.lastdBm);
@@ -170,9 +181,8 @@ public class HelloAndroid extends Activity {
         break;
     }
 
-    lacText.setText(lacString);
-    netTypeText.setText(Logger.lastNetworkTypeLong);
-    mccmncText.setText(mccmncString);
+    lacmncText.setText(lacmncString);
+    netmccText.setText(netmccString);
     handoffText.setText(handoffString);
     dBmText.setText(dBmString);
 

@@ -15,6 +15,7 @@ import android.graphics.Rect;
 public class Map extends View {
 
   private final Paint red_paint;
+  private final Paint red_stroke_paint;
   private final Paint grey_paint;
 
   private int zoom;
@@ -43,6 +44,11 @@ public class Map extends View {
     red_paint = new Paint();
     red_paint.setStrokeWidth(1);
     red_paint.setColor(Color.RED);
+
+    red_stroke_paint = new Paint();
+    red_stroke_paint.setStrokeWidth(1);
+    red_stroke_paint.setColor(Color.RED);
+    red_stroke_paint.setStyle(Paint.Style.STROKE);
 
     grey_paint = new Paint();
     grey_paint.setStrokeWidth(2);
@@ -143,7 +149,7 @@ public class Map extends View {
     c.drawLine(xc, y0, xc, y1, red_paint);
     c.drawLine(xc, y2, xc, y3, red_paint);
 
-    c.drawCircle(xc, yc, 3.0f*len2, red_paint);
+    c.drawCircle(xc, yc, 3.0f*len1, red_stroke_paint);
   }
 
   private void update_map(Canvas canvas, Slip28 pos) {
