@@ -132,6 +132,7 @@ public class Map extends View {
   private void draw_crosshair(Canvas c, int w, int h) {
     int len1 = 8;
     int len2 = 64;
+    int len3 = 3 * len1;
     float x0, x1, x2, x3, xc;
     float y0, y1, y2, y3, yc;
     x0 = (float)(w/2 - len1 - len2);
@@ -149,7 +150,7 @@ public class Map extends View {
     c.drawLine(xc, y0, xc, y1, red_paint);
     c.drawLine(xc, y2, xc, y3, red_paint);
 
-    c.drawCircle(xc, yc, 3.0f*len1, red_stroke_paint);
+    c.drawCircle(xc, yc, len3, red_stroke_paint);
   }
 
   private void update_map(Canvas canvas, Slip28 pos) {

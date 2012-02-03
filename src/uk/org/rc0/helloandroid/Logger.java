@@ -213,7 +213,7 @@ public class Logger extends Service {
       }
       logfile = new File(root, timedFileName);
       logwriter = new FileWriter(logfile);
-      announce("Logging to " + fullPath);
+      announce("Opened logfile");
 
       rawfile = new File(root, rawFileName);
       rawwriter = new FileWriter(rawfile);
