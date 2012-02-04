@@ -124,9 +124,6 @@ public class HelloAndroid extends Activity {
       String latString = String.format("%+9.4f", Logger.lastLat);
       String lonString = String.format("%+9.4f", Logger.lastLon);
       String accString = String.format("%dm", Logger.lastAcc);
-      latText.setText(latString);
-      lonText.setText(lonString);
-      accText.setText(accString);
       String ageString;
       if (age < 90) {
         ageString = String.format("%2ds %03d", age, Logger.lastBearing);
@@ -135,12 +132,23 @@ public class HelloAndroid extends Activity {
       } else {
         ageString = String.format("%2dh %03d", age/3600, Logger.lastBearing);
       }
+      latText.setText(latString);
+      lonText.setText(lonString);
+      accText.setText(accString);
       ageText.setText(ageString);
+      latText.setTextColor(Color.WHITE);
+      lonText.setTextColor(Color.WHITE);
+      accText.setTextColor(Color.WHITE);
+      ageText.setTextColor(Color.WHITE);
     } else {
-      latText.setText("???");
-      lonText.setText("???");
-      accText.setText("?m");
-      ageText.setText("??? ???");
+      latText.setText("GPS?");
+      lonText.setText("GPS?");
+      accText.setText("GPS?");
+      ageText.setText("GPS?");
+      latText.setTextColor(Color.RED);
+      lonText.setTextColor(Color.RED);
+      accText.setTextColor(Color.RED);
+      ageText.setTextColor(Color.RED);
     }
     String satString = String.format("%d/%d/%d",
         Logger.last_fix_sats,
@@ -206,14 +214,18 @@ public class HelloAndroid extends Activity {
   // --------------------------------------------------------------------------
   //
 
-  private final int OPTION_TOGGLE   = 1;
-  private final int OPTION_ZOOM_OUT = 2;
-  private final int OPTION_ZOOM_IN  = 3;
-  private final int OPTION_EXIT     = 4;
+  private final int OPTION_MAP_2G   = 1;
+  private final int OPTION_MAP_3G   = 2;
+  private final int OPTION_MAP_OS   = 3;
+  private final int OPTION_ZOOM_OUT = 4;
+  private final int OPTION_ZOOM_IN  = 5;
+  private final int OPTION_EXIT     = 6;
 
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-      menu.add (Menu.NONE, OPTION_TOGGLE, Menu.NONE, "Toggle 2D/3D");
+      menu.add (Menu.NONE, OPTION_MAP_2G, Menu.NONE, "2G map");
+      menu.add (Menu.NONE, OPTION_MAP_3G, Menu.NONE, "3G map");
+      menu.add (Menu.NONE, OPTION_MAP_OS, Menu.NONE, "OS map");
       menu.add (Menu.NONE, OPTION_ZOOM_OUT, Menu.NONE, "Zoom Out");
       menu.add (Menu.NONE, OPTION_ZOOM_IN, Menu.NONE, "Zoom In");
       menu.add (Menu.NONE, OPTION_EXIT, Menu.NONE, "Exit");
@@ -233,8 +245,14 @@ public class HelloAndroid extends Activity {
         case OPTION_ZOOM_IN:
           mMap.zoom_in();
           return true;
-        case OPTION_TOGGLE:
-          mMap.toggle_2g3g();
+        case OPTION_MAP_2G:
+          mMap.select_map_source(Map.Map_Source.MAP_2G);
+          return true;
+        case OPTION_MAP_3G:
+          mMap.select_map_source(Map.Map_Source.MAP_3G);
+          return true;
+        case OPTION_MAP_OS:
+          mMap.select_map_source(Map.Map_Source.MAP_OS);
           return true;
         default:
           return false;

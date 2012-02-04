@@ -5,6 +5,7 @@ import java.lang.Math;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.MotionEvent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Color;
@@ -16,12 +17,13 @@ public class Map extends View {
 
   private final Paint red_paint;
   private final Paint red_stroke_paint;
+  private final Paint button_stroke_paint;
   private final Paint grey_paint;
 
   private int zoom;
 
-  static private enum Generation {
-    GEN_2G, GEN_3G
+  static public enum Map_Source {
+    MAP_2G, MAP_3G, MAP_OS
   }
 
   // Cache of 2x2 tiles containing the region around the viewport
@@ -30,15 +32,14 @@ public class Map extends View {
   private int z22;
 
   // --------------------------------------------------------------------------
-  
 
-  private Generation generation;
+
+  private Map_Source map_source;
 
   public Map(Context context, AttributeSet attrs) {
     super(context, attrs);
 
-    // Eventually, this should be keyed from the network we're getting tower readings of?
-    generation = Generation.GEN_2G;
+    map_source = Map_Source.MAP_2G;
     tile22 = null;
 
     red_paint = new Paint();
@@ -50,11 +51,22 @@ public class Map extends View {
     red_stroke_paint.setColor(Color.RED);
     red_stroke_paint.setStyle(Paint.Style.STROKE);
 
+    button_stroke_paint = new Paint();
+    button_stroke_paint.setStrokeWidth(2);
+    button_stroke_paint.setColor(Color.BLACK);
+    button_stroke_paint.setStyle(Paint.Style.STROKE);
+
     grey_paint = new Paint();
     grey_paint.setStrokeWidth(2);
     grey_paint.setColor(Color.GRAY);
 
     zoom = 14;
+
+    //setOnTouchListener(new View.OnTouchListener() {
+    //  @Override public boolean onTouch(View v, MotionEvent event) {
+    //    return false;
+    //  }
+    //} );
   }
 
   public class Slip28 {
@@ -70,8 +82,8 @@ public class Map extends View {
       y = Math.log(Math.tan(yy) + 1.0/Math.cos(yy));
       XX = 0.5 * (1.0 + x/Math.PI);
       YY = 0.5 * (1.0 - y/Math.PI);
-      X = (int) Math.round(XX * scale28);
-      Y = (int) Math.round(YY * scale28);
+      X = (int) Math.floor(XX * scale28);
+      Y = (int) Math.floor(YY * scale28);
     }
     public Slip28(int x, int y) {
       X = x;
@@ -86,13 +98,17 @@ public class Map extends View {
     int yb = (256*(1+y01));
 
     String filename = null;
-    switch (generation) {
-      case GEN_2G:
+    switch (map_source) {
+      case MAP_2G:
         filename = String.format("/sdcard/Maverick/tiles/Custom 2/%d/%d/%d.png.tile",
             zoom, tile_x+x01, tile_y+y01);
         break;
-      case GEN_3G:
+      case MAP_3G:
         filename = String.format("/sdcard/Maverick/tiles/Custom 3/%d/%d/%d.png.tile",
+            zoom, tile_x+x01, tile_y+y01);
+        break;
+      case MAP_OS:
+        filename = String.format("/sdcard/Maverick/tiles/Ordnance Survey Explorer Maps (UK)/%d/%d/%d.png.tile",
             zoom, tile_x+x01, tile_y+y01);
         break;
     }
@@ -153,6 +169,46 @@ public class Map extends View {
     c.drawCircle(xc, yc, len3, red_stroke_paint);
   }
 
+  private static final int button_half_line = 12;
+  private static final int button_radius = 16;
+  private static final int button_size = 40;
+
+  private void draw_buttons(Canvas c, int w, int h) {
+    int button_offset = button_radius + (button_radius >> 1);
+    // draw minus
+    c.drawCircle(button_offset, button_offset, button_radius, button_stroke_paint);
+    c.drawLine(button_offset - button_half_line, button_offset,
+        button_offset + button_half_line, button_offset,
+        button_stroke_paint);
+    // draw plus
+    c.drawCircle(w - button_offset, button_offset, button_radius, button_stroke_paint);
+    c.drawLine(w - button_offset - button_half_line, button_offset,
+        w - button_offset + button_half_line, button_offset,
+        button_stroke_paint);
+    c.drawLine(w - button_offset, button_offset - button_half_line,
+        w - button_offset, button_offset + button_half_line,
+        button_stroke_paint);
+  }
+
+  @Override public boolean onTouchEvent(MotionEvent event) {
+    float x = event.getX();
+    float y = event.getY();
+
+    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+      if (y < button_size) {
+        if (x < button_size) {
+          zoom_out();
+          return true;
+        } else if (x > (getWidth() - button_size)) {
+          zoom_in();
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+
   private void update_map(Canvas canvas, Slip28 pos) {
     // Decide if we have to rebuild the tile22 cache
     int width = getWidth();
@@ -196,17 +252,11 @@ public class Map extends View {
     canvas.drawBitmap(tile22, src, dest, null);
 
     draw_crosshair(canvas, width, height);
+    draw_buttons(canvas, width, height);
   }
 
-  public void toggle_2g3g() {
-    switch (generation) {
-      case GEN_2G:
-        generation = Generation.GEN_3G;
-        break;
-      case GEN_3G:
-        generation = Generation.GEN_2G;
-        break;
-    }
+  public void select_map_source(Map_Source which) {
+    map_source = which;
     // force map rebuild
     tile22 = null;
     invalidate();
