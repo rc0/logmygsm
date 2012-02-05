@@ -48,6 +48,12 @@ public class HelloAndroid extends Activity {
       countText = (TextView) findViewById(R.id.count);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
       mMap = (Map) findViewById(R.id.map);
+      mMap.restore_state(savedInstanceState);
+    }
+
+  @Override
+    public void onSaveInstanceState(Bundle icicle) {
+      mMap.save_state(icicle);
     }
 
   @Override
@@ -216,19 +222,17 @@ public class HelloAndroid extends Activity {
 
   private final int OPTION_MAP_2G   = 1;
   private final int OPTION_MAP_3G   = 2;
-  private final int OPTION_MAP_OS   = 3;
-  private final int OPTION_ZOOM_OUT = 4;
-  private final int OPTION_ZOOM_IN  = 5;
+  private final int OPTION_MAP_OSM  = 3;
+  private final int OPTION_MAP_OS   = 4;
   private final int OPTION_EXIT     = 6;
 
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-      menu.add (Menu.NONE, OPTION_MAP_2G, Menu.NONE, "2G map");
-      menu.add (Menu.NONE, OPTION_MAP_3G, Menu.NONE, "3G map");
-      menu.add (Menu.NONE, OPTION_MAP_OS, Menu.NONE, "OS map");
-      menu.add (Menu.NONE, OPTION_ZOOM_OUT, Menu.NONE, "Zoom Out");
-      menu.add (Menu.NONE, OPTION_ZOOM_IN, Menu.NONE, "Zoom In");
-      menu.add (Menu.NONE, OPTION_EXIT, Menu.NONE, "Exit");
+      menu.add (Menu.NONE, OPTION_MAP_2G,  Menu.NONE, "2G map");
+      menu.add (Menu.NONE, OPTION_MAP_3G,  Menu.NONE, "3G map");
+      menu.add (Menu.NONE, OPTION_MAP_OSM, Menu.NONE, "OSM map");
+      menu.add (Menu.NONE, OPTION_MAP_OS,  Menu.NONE, "OS map");
+      menu.add (Menu.NONE, OPTION_EXIT,    Menu.NONE, "Exit");
       return true;
     }
 
@@ -239,17 +243,14 @@ public class HelloAndroid extends Activity {
           Logger.stop_tracing = true;
           finish();
           return true;
-        case OPTION_ZOOM_OUT:
-          mMap.zoom_out();
-          return true;
-        case OPTION_ZOOM_IN:
-          mMap.zoom_in();
-          return true;
         case OPTION_MAP_2G:
           mMap.select_map_source(Map.Map_Source.MAP_2G);
           return true;
         case OPTION_MAP_3G:
           mMap.select_map_source(Map.Map_Source.MAP_3G);
+          return true;
+        case OPTION_MAP_OSM:
+          mMap.select_map_source(Map.Map_Source.MAP_OSM);
           return true;
         case OPTION_MAP_OS:
           mMap.select_map_source(Map.Map_Source.MAP_OS);

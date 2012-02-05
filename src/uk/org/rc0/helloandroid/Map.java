@@ -3,6 +3,7 @@ package uk.org.rc0.helloandroid;
 import java.io.File;
 import java.lang.Math;
 import android.content.Context;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.MotionEvent;
@@ -23,13 +24,15 @@ public class Map extends View {
   private int zoom;
 
   static public enum Map_Source {
-    MAP_2G, MAP_3G, MAP_OS
+    MAP_2G, MAP_3G, MAP_OSM, MAP_OS
   }
 
   // Cache of 2x2 tiles containing the region around the viewport
   private Bitmap tile22;
   private Slip28 ul22;
   private int z22;
+
+  private Slip28 last_pos;
 
   // --------------------------------------------------------------------------
 
@@ -61,12 +64,8 @@ public class Map extends View {
     grey_paint.setColor(Color.GRAY);
 
     zoom = 14;
+    last_pos = null;
 
-    //setOnTouchListener(new View.OnTouchListener() {
-    //  @Override public boolean onTouch(View v, MotionEvent event) {
-    //    return false;
-    //  }
-    //} );
   }
 
   public class Slip28 {
@@ -91,6 +90,8 @@ public class Map extends View {
     }
   };
 
+  // Main drawing routines...
+
   private void render_tile(Canvas canvas, int x01, int y01, int tile_x, int tile_y) {
     int xl = (256*x01);
     int xr = (256*(1+x01));
@@ -105,6 +106,10 @@ public class Map extends View {
         break;
       case MAP_3G:
         filename = String.format("/sdcard/Maverick/tiles/Custom 3/%d/%d/%d.png.tile",
+            zoom, tile_x+x01, tile_y+y01);
+        break;
+      case MAP_OSM:
+        filename = String.format("/sdcard/Maverick/tiles/mapnik/%d/%d/%d.png.tile",
             zoom, tile_x+x01, tile_y+y01);
         break;
       case MAP_OS:
@@ -190,6 +195,140 @@ public class Map extends View {
         button_stroke_paint);
   }
 
+  private void update_map(Canvas canvas) {
+    // Decide if we have to rebuild the tile22 cache
+    int width = getWidth();
+    int height = getHeight();
+    if (height > 240) {
+      // Avoid the viewport height getting bigger than the size of a tile - for now
+      height = 240;
+    }
+    int dx, dy;
+    if (tile22 == null) {
+      rebuild_cache(last_pos, width, height);
+      dx = (last_pos.X - ul22.X) >> (28 - (z22 + 8));
+      dy = (last_pos.Y - ul22.Y) >> (28 - (z22 + 8));
+      // dx, dy are now the delta from the current position (centre viewport)
+      // away from the top left of the 2x2 tile cache, in pixels
+      dx -= (width >> 1);
+      dy -= (height >> 1);
+    } else {
+      dx = (last_pos.X - ul22.X) >> (28 - (z22 + 8));
+      dy = (last_pos.Y - ul22.Y) >> (28 - (z22 + 8));
+      // dx, dy are now the delta from the current position (centre viewport)
+      // away from the top left of the 2x2 tile cache, in pixels
+      dx -= (width >> 1);
+      dy -= (height >> 1);
+      // Now correspond to top left-hand corner
+      if ((dx >= 0) && ((dx + width) < 512) &&
+          (dy >= 0) && ((dy + height) < 512)) {
+      } else {
+        rebuild_cache(last_pos, width, height);
+        dx = (last_pos.X - ul22.X) >> (28 - (z22 + 8));
+        dy = (last_pos.Y - ul22.Y) >> (28 - (z22 + 8));
+        // dx, dy are now the delta from the current position (centre viewport)
+        // away from the top left of the 2x2 tile cache, in pixels
+        dx -= (width >> 1);
+        dy -= (height >> 1);
+      }
+    }
+
+    Rect src = new Rect(dx, dy, dx+width, dy+height);
+    Rect dest = new Rect(0, 0, width, height);
+    canvas.drawBitmap(tile22, src, dest, null);
+
+    draw_crosshair(canvas, width, height);
+    draw_buttons(canvas, width, height);
+  }
+
+  // Interface with main UI activity
+
+  public void update_map() {
+    invalidate();
+  }
+
+  public void select_map_source(Map_Source which) {
+    map_source = which;
+    // force map rebuild
+    tile22 = null;
+    invalidate();
+  }
+
+  // Save/restore state in bundle
+  //
+
+  static final String ZOOM_KEY      = "LogMyGsm_Map_Zoom";
+  static final String LAST_X_KEY    = "LogMyGsm_Last_X";
+  static final String LAST_Y_KEY    = "LogMyGsm_Last_Y";
+  static final String WHICH_MAP_KEY = "LogMyGsm_Which_Map";
+
+  public void save_state(Bundle icicle) {
+    icicle.putInt(ZOOM_KEY, zoom);
+    if (last_pos != null) {
+      icicle.putInt(LAST_X_KEY, last_pos.X);
+      icicle.putInt(LAST_Y_KEY, last_pos.Y);
+    }
+    switch (map_source) {
+      case MAP_2G:
+        icicle.putInt(WHICH_MAP_KEY, 1);
+        break;
+      case MAP_3G:
+        icicle.putInt(WHICH_MAP_KEY, 2);
+        break;
+      case MAP_OSM:
+        icicle.putInt(WHICH_MAP_KEY, 3);
+        break;
+      case MAP_OS:
+        icicle.putInt(WHICH_MAP_KEY, 4);
+        break;
+    }
+  }
+
+  public void restore_state(Bundle icicle) {
+    if (icicle != null) {
+      if (icicle.containsKey(ZOOM_KEY)) {
+        zoom = icicle.getInt(ZOOM_KEY);
+      }
+      if (icicle.containsKey(LAST_X_KEY) && icicle.containsKey(LAST_Y_KEY)) {
+        last_pos = new Slip28(icicle.getInt(LAST_X_KEY), icicle.getInt(LAST_Y_KEY));
+      }
+      if (icicle.containsKey(WHICH_MAP_KEY)) {
+        switch (icicle.getInt(WHICH_MAP_KEY)) {
+          case 1:
+            map_source = Map_Source.MAP_2G;
+            break;
+          case 2:
+            map_source = Map_Source.MAP_3G;
+            break;
+          case 3:
+            map_source = Map_Source.MAP_OSM;
+            break;
+          default:
+            map_source = Map_Source.MAP_OS;
+            break;
+        }
+      }
+    }
+  }
+
+  // Local UI callbacks
+
+  public void zoom_out() {
+    if (zoom > 9) {
+      zoom--;
+      tile22 = null;
+      invalidate();
+    }
+  }
+
+  public void zoom_in() {
+    if (zoom < 16) {
+      zoom++;
+      tile22 = null;
+      invalidate();
+    }
+  }
+
   @Override public boolean onTouchEvent(MotionEvent event) {
     float x = event.getX();
     float y = event.getY();
@@ -208,92 +347,21 @@ public class Map extends View {
     return false;
   }
 
-
-  private void update_map(Canvas canvas, Slip28 pos) {
-    // Decide if we have to rebuild the tile22 cache
-    int width = getWidth();
-    int height = getHeight();
-    if (height > 240) {
-      // Avoid the viewport height getting bigger than the size of a tile - for now
-      height = 240;
-    }
-    int dx, dy;
-    if (tile22 == null) {
-      rebuild_cache(pos, width, height);
-      dx = (pos.X - ul22.X) >> (28 - (z22 + 8));
-      dy = (pos.Y - ul22.Y) >> (28 - (z22 + 8));
-      // dx, dy are now the delta from the current position (centre viewport)
-      // away from the top left of the 2x2 tile cache, in pixels
-      dx -= (width >> 1);
-      dy -= (height >> 1);
-    } else {
-      dx = (pos.X - ul22.X) >> (28 - (z22 + 8));
-      dy = (pos.Y - ul22.Y) >> (28 - (z22 + 8));
-      // dx, dy are now the delta from the current position (centre viewport)
-      // away from the top left of the 2x2 tile cache, in pixels
-      dx -= (width >> 1);
-      dy -= (height >> 1);
-      // Now correspond to top left-hand corner
-      if ((dx >= 0) && ((dx + width) < 512) &&
-          (dy >= 0) && ((dy + height) < 512)) {
-      } else {
-        rebuild_cache(pos, width, height);
-        dx = (pos.X - ul22.X) >> (28 - (z22 + 8));
-        dy = (pos.Y - ul22.Y) >> (28 - (z22 + 8));
-        // dx, dy are now the delta from the current position (centre viewport)
-        // away from the top left of the 2x2 tile cache, in pixels
-        dx -= (width >> 1);
-        dy -= (height >> 1);
-      }
-    }
-
-    Rect src = new Rect(dx, dy, dx+width, dy+height);
-    Rect dest = new Rect(0, 0, width, height);
-    canvas.drawBitmap(tile22, src, dest, null);
-
-    draw_crosshair(canvas, width, height);
-    draw_buttons(canvas, width, height);
-  }
-
-  public void select_map_source(Map_Source which) {
-    map_source = which;
-    // force map rebuild
-    tile22 = null;
-    invalidate();
-  }
-
-  public void update_map() {
-    invalidate();
-  }
-
-  public void zoom_out() {
-    if (zoom > 9) {
-      zoom--;
-      tile22 = null;
-      invalidate();
-    }
-  }
-
-  public void zoom_in() {
-    if (zoom < 16) {
-      zoom++;
-      tile22 = null;
-      invalidate();
-    }
-  }
+  // Called by framework
 
   @Override
   protected void onDraw(Canvas canvas) {
 
     if (Logger.validFix) {
-      Slip28 pos = new Slip28(Logger.lastLat, Logger.lastLon);
-      update_map(canvas, pos);
-    } else {
+      last_pos = new Slip28(Logger.lastLat, Logger.lastLon);
+    }
+    if (last_pos == null) {
       canvas.drawColor(Color.rgb(40,40,40));
       String foo2 = String.format("No fix");
       canvas.drawText(foo2, 10, 80, red_paint);
+    } else {
+      update_map(canvas);
     }
-
   }
 }
 
