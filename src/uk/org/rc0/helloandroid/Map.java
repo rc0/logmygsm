@@ -375,6 +375,7 @@ public class Map extends View {
           display_pos = actual_pos;
           is_dragged = false;
           invalidate();
+          return true;
         }
       }
       // Not inside the zoom buttons - initiate drag
@@ -387,7 +388,7 @@ public class Map extends View {
         invalidate();
         return true;
       }
-    } 
+    }
     return false;
   }
 
