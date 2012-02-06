@@ -33,7 +33,12 @@ public class Map extends View {
   // The zoom level of the current tile cache
   private int z22;
 
-  private Slip28 last_pos;
+  // the GPS fix from the logger
+  private Slip28 actual_pos;
+  // the location at the centre of the screen - may be != actual_pos if is_dragged is true.
+  private Slip28 display_pos;
+  // Set to true if we've off-centred the map
+  private boolean is_dragged;
 
   // --------------------------------------------------------------------------
 
@@ -65,8 +70,8 @@ public class Map extends View {
     grey_paint.setColor(Color.GRAY);
 
     zoom = 14;
-    last_pos = null;
-
+    actual_pos = null;
+    display_pos = null;
   }
 
   public class Slip28 {
@@ -88,6 +93,10 @@ public class Map extends View {
     public Slip28(int x, int y) {
       X = x;
       Y = y;
+    }
+    public Slip28(Slip28 orig) {
+      X = orig.X;
+      Y = orig.Y;
     }
   };
 
@@ -206,16 +215,16 @@ public class Map extends View {
     }
     int dx, dy;
     if (tile22 == null) {
-      rebuild_cache(last_pos, width, height);
-      dx = (last_pos.X - ul22.X) >> (28 - (z22 + 8));
-      dy = (last_pos.Y - ul22.Y) >> (28 - (z22 + 8));
+      rebuild_cache(display_pos, width, height);
+      dx = (display_pos.X - ul22.X) >> (28 - (z22 + 8));
+      dy = (display_pos.Y - ul22.Y) >> (28 - (z22 + 8));
       // dx, dy are now the delta from the current position (centre viewport)
       // away from the top left of the 2x2 tile cache, in pixels
       dx -= (width >> 1);
       dy -= (height >> 1);
     } else {
-      dx = (last_pos.X - ul22.X) >> (28 - (z22 + 8));
-      dy = (last_pos.Y - ul22.Y) >> (28 - (z22 + 8));
+      dx = (display_pos.X - ul22.X) >> (28 - (z22 + 8));
+      dy = (display_pos.Y - ul22.Y) >> (28 - (z22 + 8));
       // dx, dy are now the delta from the current position (centre viewport)
       // away from the top left of the 2x2 tile cache, in pixels
       dx -= (width >> 1);
@@ -224,9 +233,9 @@ public class Map extends View {
       if ((dx >= 0) && ((dx + width) < 512) &&
           (dy >= 0) && ((dy + height) < 512)) {
       } else {
-        rebuild_cache(last_pos, width, height);
-        dx = (last_pos.X - ul22.X) >> (28 - (z22 + 8));
-        dy = (last_pos.Y - ul22.Y) >> (28 - (z22 + 8));
+        rebuild_cache(display_pos, width, height);
+        dx = (display_pos.X - ul22.X) >> (28 - (z22 + 8));
+        dy = (display_pos.Y - ul22.Y) >> (28 - (z22 + 8));
         // dx, dy are now the delta from the current position (centre viewport)
         // away from the top left of the 2x2 tile cache, in pixels
         dx -= (width >> 1);
@@ -245,7 +254,19 @@ public class Map extends View {
   // Interface with main UI activity
 
   public void update_map() {
-    invalidate();
+    if (Logger.validFix) {
+      actual_pos = new Slip28(Logger.lastLat, Logger.lastLon);
+    } else {
+      // keep old fix - should be clear to user that fix is stale
+      // from red 'GPS?' captions elsewhere
+    }
+    // If we've a valid GPS position and we're not dragged, ripple it through
+    // to screen immediately
+    if (((actual_pos != null) &&
+         ((display_pos == null) || !is_dragged))) {
+      display_pos = new Slip28(actual_pos);
+      invalidate();
+    }
   }
 
   public void select_map_source(Map_Source which) {
@@ -265,9 +286,9 @@ public class Map extends View {
 
   public void save_state(Bundle icicle) {
     icicle.putInt(ZOOM_KEY, zoom);
-    if (last_pos != null) {
-      icicle.putInt(LAST_X_KEY, last_pos.X);
-      icicle.putInt(LAST_Y_KEY, last_pos.Y);
+    if (display_pos != null) {
+      icicle.putInt(LAST_X_KEY, display_pos.X);
+      icicle.putInt(LAST_Y_KEY, display_pos.Y);
     }
     switch (map_source) {
       case MAP_2G:
@@ -291,7 +312,7 @@ public class Map extends View {
         zoom = icicle.getInt(ZOOM_KEY);
       }
       if (icicle.containsKey(LAST_X_KEY) && icicle.containsKey(LAST_Y_KEY)) {
-        last_pos = new Slip28(icicle.getInt(LAST_X_KEY), icicle.getInt(LAST_Y_KEY));
+        display_pos = new Slip28(icicle.getInt(LAST_X_KEY), icicle.getInt(LAST_Y_KEY));
       }
       if (icicle.containsKey(WHICH_MAP_KEY)) {
         switch (icicle.getInt(WHICH_MAP_KEY)) {
@@ -330,19 +351,6 @@ public class Map extends View {
     }
   }
 
-  private class DragStart {
-    public int X;
-    public int Y;
-    public Slip28 start_pos;
-    public DragStart(int x, int y, Slip28 sp) {
-      X = x;
-      Y = y;
-      start_pos = sp;
-    }
-  }
-
-  private DragStart drag_start;
-
   @Override public boolean onTouchEvent(MotionEvent event) {
     float x = event.getX();
     float y = event.getY();
@@ -357,29 +365,29 @@ public class Map extends View {
           return true;
         }
       }
-      // Not inside the zoom buttons - initiate drag
-      if (last_pos != null) {
-        drag_start = new DragStart((int) x, (int) y, last_pos);
-      } else {
-        drag_start = null;
+      // Hit on the centre cross-hair region to re-centre the map on the GPS fix
+      if ((y > ((getHeight() - button_size)>>1)) &&
+          (y < ((getHeight() + button_size)>>1)) &&
+          (x > ((getWidth()  - button_size)>>1)) &&
+          (x < ((getWidth()  + button_size)>>1))) {
+        // If (actual_pos == null) here, it means no GPS fix; refuse to drop the display position then
+        if (actual_pos != null) {
+          display_pos = actual_pos;
+          is_dragged = false;
+          invalidate();
+        }
       }
-      return true;
-    } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-      if (drag_start != null) {
-        int dx = drag_start.X - (int) x;
-        int dy = drag_start.Y - (int) y;
-        last_pos.X = drag_start.start_pos.X + (dx << (28 - (z22+8)));
-        last_pos.Y = drag_start.start_pos.Y + (dy << (28 - (z22+8)));
+      // Not inside the zoom buttons - initiate drag
+      if (display_pos != null) {
+        int dx = (int) x - (getWidth() >> 1);
+        int dy = (int) y - (getHeight() >> 1);
+        display_pos.X += (dx << (28 - (z22+8)));
+        display_pos.Y += (dy << (28 - (z22+8)));
+        is_dragged = true;
         invalidate();
         return true;
       }
-    } else if (event.getAction() == MotionEvent.ACTION_UP) {
-      drag_start = null;
-      return true;
-    } else if (event.getAction() == MotionEvent.ACTION_CANCEL) {
-      drag_start = null;
-      return true;
-    }
+    } 
     return false;
   }
 
@@ -388,10 +396,7 @@ public class Map extends View {
   @Override
   protected void onDraw(Canvas canvas) {
 
-    if (Logger.validFix) {
-      last_pos = new Slip28(Logger.lastLat, Logger.lastLon);
-    }
-    if (last_pos == null) {
+    if (display_pos == null) {
       canvas.drawColor(Color.rgb(40,40,40));
       String foo2 = String.format("No fix");
       canvas.drawText(foo2, 10, 80, red_paint);
