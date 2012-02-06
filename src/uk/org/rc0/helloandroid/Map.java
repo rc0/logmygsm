@@ -174,32 +174,34 @@ public class Map extends View {
   }
 
   private void draw_crosshair(Canvas c, int w, int h) {
-    float len1 = 8.0f;
-    float len2 = 64.0f;
-    float x0, x1, x2, x3, xc;
-    float y0, y1, y2, y3, yc;
-    xc = (float)(w/2);
-    yc = (float)(h/2);
-    // If we're dragged, offset the position
-    if ((actual_pos != null) && is_dragged) {
-      // if actual_pos is non-null, display_pos has to be
-      int dx = (actual_pos.X - display_pos.X) >> (28 - (zoom+8));
-      int dy = (actual_pos.Y - display_pos.Y) >> (28 - (zoom+8));
-      xc += (float) dx;
-      yc += (float) dy;
+    final float len1 = 8.0f;
+    final float len2 = 64.0f;
+    if (actual_pos != null) {
+      float x0, x1, x2, x3, xc;
+      float y0, y1, y2, y3, yc;
+      xc = (float)(w/2);
+      yc = (float)(h/2);
+      // If we're dragged, offset the position
+      if (is_dragged) {
+        // if actual_pos is non-null, display_pos has to be
+        int dx = (actual_pos.X - display_pos.X) >> (28 - (zoom+8));
+        int dy = (actual_pos.Y - display_pos.Y) >> (28 - (zoom+8));
+        xc += (float) dx;
+        yc += (float) dy;
+      }
+      x0 = xc - (len1 + len2);
+      x1 = xc - (len1);
+      x2 = xc + (len1);
+      x3 = xc + (len1 + len2);
+      y0 = yc - (len1 + len2);
+      y1 = yc - (len1);
+      y2 = yc + (len1);
+      y3 = yc + (len1 + len2);
+      c.drawLine(x0, yc, x1, yc, red_paint);
+      c.drawLine(x2, yc, x3, yc, red_paint);
+      c.drawLine(xc, y0, xc, y1, red_paint);
+      c.drawLine(xc, y2, xc, y3, red_paint);
     }
-    x0 = xc - (len1 + len2);
-    x1 = xc - (len1);
-    x2 = xc + (len1);
-    x3 = xc + (len1 + len2);
-    y0 = yc - (len1 + len2);
-    y1 = yc - (len1);
-    y2 = yc + (len1);
-    y3 = yc + (len1 + len2);
-    c.drawLine(x0, yc, x1, yc, red_paint);
-    c.drawLine(x2, yc, x3, yc, red_paint);
-    c.drawLine(xc, y0, xc, y1, red_paint);
-    c.drawLine(xc, y2, xc, y3, red_paint);
   }
 
   private void draw_centre_circle(Canvas c, int w, int h) {
@@ -270,17 +272,13 @@ public class Map extends View {
   public void update_map() {
     if (Logger.validFix) {
       actual_pos = new Slip28(Logger.lastLat, Logger.lastLon);
+      if ((display_pos == null) || !is_dragged) {
+        display_pos = new Slip28(actual_pos);
+      }
     } else {
-      // keep old fix - should be clear to user that fix is stale
-      // from red 'GPS?' captions elsewhere
+      actual_pos = null;
     }
-    // If we've a valid GPS position and we're not dragged, ripple it through
-    // to screen immediately
-    if (((actual_pos != null) &&
-         ((display_pos == null) || !is_dragged))) {
-      display_pos = new Slip28(actual_pos);
-      invalidate();
-    }
+    invalidate();
   }
 
   public void select_map_source(Map_Source which) {
