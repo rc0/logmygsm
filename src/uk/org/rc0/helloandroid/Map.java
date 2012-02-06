@@ -21,8 +21,6 @@ public class Map extends View {
   private final Paint button_stroke_paint;
   private final Paint grey_paint;
 
-  private int zoom;
-
   static public enum Map_Source {
     MAP_2G, MAP_3G, MAP_OSM, MAP_OS
   }
@@ -30,8 +28,8 @@ public class Map extends View {
   // Cache of 2x2 tiles containing the region around the viewport
   private Bitmap tile22;
   private Slip28 ul22;
-  // The zoom level of the current tile cache
-  private int z22;
+  // The current level of the current tile cache
+  private int zoom;
 
   // the GPS fix from the logger
   private Slip28 actual_pos;
@@ -98,11 +96,30 @@ public class Map extends View {
       X = orig.X;
       Y = orig.Y;
     }
-  };
+  }
+
+  public class PixelXY {
+    public int X;
+    public int Y;
+
+    public PixelXY(Slip28 pos, Slip28 base, int width, int height) {
+      X = (pos.X - base.X) >> (28 - (zoom+8));
+      X -= (width >> 1);
+      Y = (pos.Y - base.Y) >> (28 - (zoom+8));
+      Y -= (height >> 1);
+    }
+
+    public PixelXY(Slip28 pos, int width, int height) {
+      X = pos.X >> (28 - (zoom+8));
+      X -= (width >> 1);
+      Y = pos.Y >> (28 - (zoom+8));
+      Y -= (height >> 1);
+    }
+  }
 
   // Main drawing routines...
 
-  private void render_tile(Canvas canvas, int x01, int y01, int tile_x, int tile_y) {
+  private void render_tile(Canvas canvas, int z, int tile_x, int tile_y, int x01, int y01) {
     int xl = (256*x01);
     int xr = (256*(1+x01));
     int yt = (256*y01);
@@ -112,19 +129,19 @@ public class Map extends View {
     switch (map_source) {
       case MAP_2G:
         filename = String.format("/sdcard/Maverick/tiles/Custom 2/%d/%d/%d.png.tile",
-            zoom, tile_x+x01, tile_y+y01);
+            z, tile_x+x01, tile_y+y01);
         break;
       case MAP_3G:
         filename = String.format("/sdcard/Maverick/tiles/Custom 3/%d/%d/%d.png.tile",
-            zoom, tile_x+x01, tile_y+y01);
+            z, tile_x+x01, tile_y+y01);
         break;
       case MAP_OSM:
         filename = String.format("/sdcard/Maverick/tiles/mapnik/%d/%d/%d.png.tile",
-            zoom, tile_x+x01, tile_y+y01);
+            z, tile_x+x01, tile_y+y01);
         break;
       case MAP_OS:
         filename = String.format("/sdcard/Maverick/tiles/Ordnance Survey Explorer Maps (UK)/%d/%d/%d.png.tile",
-            zoom, tile_x+x01, tile_y+y01);
+            z, tile_x+x01, tile_y+y01);
         break;
     }
     File file = new File(filename);
@@ -141,23 +158,19 @@ public class Map extends View {
   }
 
   private void rebuild_cache(Slip28 pos, int width, int height) {
-    int dx, dy;
-    z22 = zoom;
-    dx = pos.X >> (28 - (z22 + 8));
-    dy = pos.Y >> (28 - (z22 + 8));
-    dx -= (width >> 1);
-    dy -= (height >> 1);
-    dx >>= 8;
-    dy >>= 8;
+    int tile_x, tile_y;
+    PixelXY pix = new PixelXY(pos, width, height);
+    tile_x = pix.X >> 8;
+    tile_y = pix.Y >> 8;
     // dx, dy are now the tile x,y coords of the tile containing left hand
     // corner of the viewport
     tile22 = Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888);
     Canvas my_canv = new Canvas(tile22);
-    render_tile(my_canv, 0, 0, dx, dy);
-    render_tile(my_canv, 0, 1, dx, dy);
-    render_tile(my_canv, 1, 0, dx, dy);
-    render_tile(my_canv, 1, 1, dx, dy);
-    ul22 = new Slip28(dx << (28 - zoom), dy << (28 - zoom));
+    render_tile(my_canv, zoom, tile_x, tile_y, 0, 0);
+    render_tile(my_canv, zoom, tile_x, tile_y, 0, 1);
+    render_tile(my_canv, zoom, tile_x, tile_y, 1, 0);
+    render_tile(my_canv, zoom, tile_x, tile_y, 1, 1);
+    ul22 = new Slip28(tile_x << (28 - zoom), tile_y << (28 - zoom));
   }
 
   private void draw_crosshair(Canvas c, int w, int h) {
@@ -228,37 +241,22 @@ public class Map extends View {
       // Avoid the viewport height getting bigger than the size of a tile - for now
       height = 240;
     }
-    int dx, dy;
+    PixelXY pix;
     if (tile22 == null) {
       rebuild_cache(display_pos, width, height);
-      dx = (display_pos.X - ul22.X) >> (28 - (z22 + 8));
-      dy = (display_pos.Y - ul22.Y) >> (28 - (z22 + 8));
-      // dx, dy are now the delta from the current position (centre viewport)
-      // away from the top left of the 2x2 tile cache, in pixels
-      dx -= (width >> 1);
-      dy -= (height >> 1);
+      pix = new PixelXY(display_pos, ul22, width, height);
     } else {
-      dx = (display_pos.X - ul22.X) >> (28 - (z22 + 8));
-      dy = (display_pos.Y - ul22.Y) >> (28 - (z22 + 8));
-      // dx, dy are now the delta from the current position (centre viewport)
-      // away from the top left of the 2x2 tile cache, in pixels
-      dx -= (width >> 1);
-      dy -= (height >> 1);
+      pix = new PixelXY(display_pos, ul22, width, height);
       // Now correspond to top left-hand corner
-      if ((dx >= 0) && ((dx + width) < 512) &&
-          (dy >= 0) && ((dy + height) < 512)) {
+      if ((pix.X >= 0) && ((pix.X + width) < 512) &&
+          (pix.Y >= 0) && ((pix.Y + height) < 512)) {
       } else {
         rebuild_cache(display_pos, width, height);
-        dx = (display_pos.X - ul22.X) >> (28 - (z22 + 8));
-        dy = (display_pos.Y - ul22.Y) >> (28 - (z22 + 8));
-        // dx, dy are now the delta from the current position (centre viewport)
-        // away from the top left of the 2x2 tile cache, in pixels
-        dx -= (width >> 1);
-        dy -= (height >> 1);
+        pix = new PixelXY(display_pos, ul22, width, height);
       }
     }
 
-    Rect src = new Rect(dx, dy, dx+width, dy+height);
+    Rect src = new Rect(pix.X, pix.Y, pix.X + width, pix.Y + height);
     Rect dest = new Rect(0, 0, width, height);
     canvas.drawBitmap(tile22, src, dest, null);
 
@@ -398,8 +396,8 @@ public class Map extends View {
       if (display_pos != null) {
         int dx = (int) x - (getWidth() >> 1);
         int dy = (int) y - (getHeight() >> 1);
-        display_pos.X += (dx << (28 - (z22+8)));
-        display_pos.Y += (dy << (28 - (z22+8)));
+        display_pos.X += (dx << (28 - (zoom+8)));
+        display_pos.Y += (dy << (28 - (zoom+8)));
         is_dragged = true;
         invalidate();
         return true;
