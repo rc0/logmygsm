@@ -30,6 +30,7 @@ public class Map extends View {
   // Cache of 2x2 tiles containing the region around the viewport
   private Bitmap tile22;
   private Slip28 ul22;
+  // The zoom level of the current tile cache
   private int z22;
 
   private Slip28 last_pos;
@@ -329,6 +330,19 @@ public class Map extends View {
     }
   }
 
+  private class DragStart {
+    public int X;
+    public int Y;
+    public Slip28 start_pos;
+    public DragStart(int x, int y, Slip28 sp) {
+      X = x;
+      Y = y;
+      start_pos = sp;
+    }
+  }
+
+  private DragStart drag_start;
+
   @Override public boolean onTouchEvent(MotionEvent event) {
     float x = event.getX();
     float y = event.getY();
@@ -343,6 +357,28 @@ public class Map extends View {
           return true;
         }
       }
+      // Not inside the zoom buttons - initiate drag
+      if (last_pos != null) {
+        drag_start = new DragStart((int) x, (int) y, last_pos);
+      } else {
+        drag_start = null;
+      }
+      return true;
+    } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+      if (drag_start != null) {
+        int dx = drag_start.X - (int) x;
+        int dy = drag_start.Y - (int) y;
+        last_pos.X = drag_start.start_pos.X + (dx << (28 - (z22+8)));
+        last_pos.Y = drag_start.start_pos.Y + (dy << (28 - (z22+8)));
+        invalidate();
+        return true;
+      }
+    } else if (event.getAction() == MotionEvent.ACTION_UP) {
+      drag_start = null;
+      return true;
+    } else if (event.getAction() == MotionEvent.ACTION_CANCEL) {
+      drag_start = null;
+      return true;
     }
     return false;
   }
