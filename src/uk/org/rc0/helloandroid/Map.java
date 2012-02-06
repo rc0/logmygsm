@@ -161,26 +161,41 @@ public class Map extends View {
   }
 
   private void draw_crosshair(Canvas c, int w, int h) {
-    int len1 = 8;
-    int len2 = 64;
-    int len3 = 3 * len1;
+    float len1 = 8.0f;
+    float len2 = 64.0f;
     float x0, x1, x2, x3, xc;
     float y0, y1, y2, y3, yc;
-    x0 = (float)(w/2 - len1 - len2);
-    x1 = (float)(w/2 - len1);
     xc = (float)(w/2);
-    x2 = (float)(w/2 + len1);
-    x3 = (float)(w/2 + len1 + len2);
-    y0 = (float)(h/2 - len1 - len2);
-    y1 = (float)(h/2 - len1);
     yc = (float)(h/2);
-    y2 = (float)(h/2 + len1);
-    y3 = (float)(h/2 + len1 + len2);
+    // If we're dragged, offset the position
+    if ((actual_pos != null) && is_dragged) {
+      // if actual_pos is non-null, display_pos has to be
+      int dx = (actual_pos.X - display_pos.X) >> (28 - (zoom+8));
+      int dy = (actual_pos.Y - display_pos.Y) >> (28 - (zoom+8));
+      xc += (float) dx;
+      yc += (float) dy;
+    }
+    x0 = xc - (len1 + len2);
+    x1 = xc - (len1);
+    x2 = xc + (len1);
+    x3 = xc + (len1 + len2);
+    y0 = yc - (len1 + len2);
+    y1 = yc - (len1);
+    y2 = yc + (len1);
+    y3 = yc + (len1 + len2);
     c.drawLine(x0, yc, x1, yc, red_paint);
     c.drawLine(x2, yc, x3, yc, red_paint);
     c.drawLine(xc, y0, xc, y1, red_paint);
     c.drawLine(xc, y2, xc, y3, red_paint);
+  }
 
+  private void draw_centre_circle(Canvas c, int w, int h) {
+    float len1 = 8.0f;
+    float len3 = 3.0f * len1;
+    float xc;
+    float yc;
+    xc = (float)(w/2);
+    yc = (float)(h/2);
     c.drawCircle(xc, yc, len3, red_stroke_paint);
   }
 
@@ -248,6 +263,7 @@ public class Map extends View {
     canvas.drawBitmap(tile22, src, dest, null);
 
     draw_crosshair(canvas, width, height);
+    draw_centre_circle(canvas, width, height);
     draw_buttons(canvas, width, height);
   }
 
