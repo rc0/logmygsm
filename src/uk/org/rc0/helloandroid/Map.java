@@ -1,10 +1,14 @@
 package uk.org.rc0.helloandroid;
 
 import java.io.File;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.Integer;
 import java.lang.Math;
+import java.lang.NumberFormatException;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -352,11 +356,27 @@ public class Map extends View {
 
   private void restore_from_file() {
     File file = new File("/sdcard/LogMyGsm/prefs/prefs.txt");
+    // defaults in case of strife
+    display_pos = null;
+    zoom = 14;
     if (file.exists()) {
-
-    } else {
+      try {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        String line;
+        line = br.readLine();
+        zoom = Integer.parseInt(line);
+        int x, y;
+        line = br.readLine();
+        x = Integer.parseInt(line);
+        line = br.readLine();
+        y = Integer.parseInt(line);
+        // If we survive unexcepted to here we parsed the file OK
+        display_pos = new Slip28(x, y);
+        br.close();
+      } catch (IOException e) {
+      } catch (NumberFormatException n) {
+      }
     }
-
   }
 
   public void save_state_to_file() {
