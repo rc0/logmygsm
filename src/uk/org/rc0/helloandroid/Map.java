@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.lang.Integer;
 import java.lang.Math;
 import java.lang.NumberFormatException;
+import java.util.ArrayList;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -25,6 +26,7 @@ public class Map extends View {
 
   private final Paint red_paint;
   private final Paint red_stroke_paint;
+  private final Paint trail_paint;
   private final Paint button_stroke_paint;
   private final Paint grey_paint;
 
@@ -37,6 +39,8 @@ public class Map extends View {
   private Slip28 ul22;
   // The current level of the current tile cache
   private int zoom;
+  private int tile_shift;
+  private int pixel_shift;
 
   // the GPS fix from the logger
   private Slip28 actual_pos;
@@ -44,6 +48,8 @@ public class Map extends View {
   private Slip28 display_pos;
   // Set to true if we've off-centred the map
   private boolean is_dragged;
+
+  private Trail mTrail;
 
   // --------------------------------------------------------------------------
 
@@ -65,6 +71,10 @@ public class Map extends View {
     red_stroke_paint.setColor(Color.RED);
     red_stroke_paint.setStyle(Paint.Style.STROKE);
 
+    trail_paint = new Paint();
+    trail_paint.setColor(Color.argb(160, 255, 0, 170));
+    trail_paint.setStyle(Paint.Style.FILL);
+
     button_stroke_paint = new Paint();
     button_stroke_paint.setStrokeWidth(2);
     button_stroke_paint.setColor(Color.BLACK);
@@ -77,13 +87,16 @@ public class Map extends View {
     zoom = 14;
     actual_pos = null;
     display_pos = null;
+
+    mTrail = new Trail();
   }
 
   public class Slip28 {
     public int X;
     public int Y;
 
-    public final double scale28 = 268435456.0;
+    // public final double scale28 = 268435456.0;
+    public final double scale28 = (double)(1<<28);
 
     public Slip28(double lat, double lon) {
       double x, yy, y, XX, YY;
@@ -110,16 +123,16 @@ public class Map extends View {
     public int Y;
 
     public PixelXY(Slip28 pos, Slip28 base, int width, int height) {
-      X = (pos.X - base.X) >> (28 - (zoom+8));
+      X = (pos.X - base.X) >> pixel_shift;
       X -= (width >> 1);
-      Y = (pos.Y - base.Y) >> (28 - (zoom+8));
+      Y = (pos.Y - base.Y) >> pixel_shift;
       Y -= (height >> 1);
     }
 
     public PixelXY(Slip28 pos, int width, int height) {
-      X = pos.X >> (28 - (zoom+8));
+      X = pos.X >> pixel_shift;
       X -= (width >> 1);
-      Y = pos.Y >> (28 - (zoom+8));
+      Y = pos.Y >> pixel_shift;
       Y -= (height >> 1);
     }
   }
@@ -177,7 +190,7 @@ public class Map extends View {
     render_tile(my_canv, zoom, tile_x, tile_y, 0, 1);
     render_tile(my_canv, zoom, tile_x, tile_y, 1, 0);
     render_tile(my_canv, zoom, tile_x, tile_y, 1, 1);
-    ul22 = new Slip28(tile_x << (28 - zoom), tile_y << (28 - zoom));
+    ul22 = new Slip28(tile_x << tile_shift, tile_y << tile_shift);
   }
 
   private void draw_crosshair(Canvas c, int w, int h) {
@@ -191,8 +204,8 @@ public class Map extends View {
       // If we're dragged, offset the position
       if (is_dragged) {
         // if actual_pos is non-null, display_pos has to be
-        int dx = (actual_pos.X - display_pos.X) >> (28 - (zoom+8));
-        int dy = (actual_pos.Y - display_pos.Y) >> (28 - (zoom+8));
+        int dx = (actual_pos.X - display_pos.X) >> pixel_shift;
+        int dy = (actual_pos.Y - display_pos.Y) >> pixel_shift;
         xc += (float) dx;
         yc += (float) dy;
       }
@@ -272,6 +285,7 @@ public class Map extends View {
     draw_crosshair(canvas, width, height);
     draw_centre_circle(canvas, width, height);
     draw_buttons(canvas, width, height);
+    mTrail.render(canvas, width, height);
   }
 
   // Interface with main UI activity
@@ -282,6 +296,7 @@ public class Map extends View {
       if ((display_pos == null) || !is_dragged) {
         display_pos = new Slip28(actual_pos);
       }
+      mTrail.add_point(actual_pos);
     } else {
       actual_pos = null;
     }
@@ -325,10 +340,16 @@ public class Map extends View {
     }
   }
 
+  private void setZoom(int z) {
+    zoom = z;
+    tile_shift = (28 - z);
+    pixel_shift = (28 - (z+8));
+  }
+
   public void restore_state(Bundle icicle) {
     if (icicle != null) {
       if (icicle.containsKey(ZOOM_KEY)) {
-        zoom = icicle.getInt(ZOOM_KEY);
+        setZoom(icicle.getInt(ZOOM_KEY));
       }
       if (icicle.containsKey(LAST_X_KEY) && icicle.containsKey(LAST_Y_KEY)) {
         display_pos = new Slip28(icicle.getInt(LAST_X_KEY), icicle.getInt(LAST_Y_KEY));
@@ -358,13 +379,13 @@ public class Map extends View {
     File file = new File("/sdcard/LogMyGsm/prefs/prefs.txt");
     // defaults in case of strife
     display_pos = null;
-    zoom = 14;
+    setZoom(14);
     if (file.exists()) {
       try {
         BufferedReader br = new BufferedReader(new FileReader(file));
         String line;
         line = br.readLine();
-        zoom = Integer.parseInt(line);
+        setZoom(Integer.parseInt(line));
         int x, y;
         line = br.readLine();
         x = Integer.parseInt(line);
@@ -399,9 +420,13 @@ public class Map extends View {
 
   // Local UI callbacks
 
+  public void clear_trail() {
+    mTrail.clear();
+  }
+
   public void zoom_out() {
     if (zoom > 9) {
-      zoom--;
+      setZoom(zoom - 1);
       tile22 = null;
       invalidate();
     }
@@ -409,7 +434,7 @@ public class Map extends View {
 
   public void zoom_in() {
     if (zoom < 16) {
-      zoom++;
+      setZoom(zoom + 1);
       tile22 = null;
       invalidate();
     }
@@ -446,8 +471,8 @@ public class Map extends View {
       if (display_pos != null) {
         int dx = (int) x - (getWidth() >> 1);
         int dy = (int) y - (getHeight() >> 1);
-        display_pos.X += (dx << (28 - (zoom+8)));
-        display_pos.Y += (dy << (28 - (zoom+8)));
+        display_pos.X += (dx << pixel_shift);
+        display_pos.Y += (dy << pixel_shift);
         is_dragged = true;
         invalidate();
         return true;
@@ -469,5 +494,78 @@ public class Map extends View {
       update_map(canvas);
     }
   }
+
+  // Trail history
+
+  private class Trail {
+    private ArrayList<Slip28> trail;
+    private Slip28 last_point;
+
+    public Trail() {
+      trail = new ArrayList<Slip28> ();
+      last_point = null;
+    }
+
+    private static final int splot_gap = 10;
+    private static final float splot_radius = 3.0f;
+
+    // TODO : implement icicle save/restore
+
+    // TODO : implement persistent file save/restore
+
+    // Skip points that are too close together to ever be visible on the map display
+    public void add_point(Slip28 p) {
+      boolean do_add = true;
+      if (last_point != null) {
+        // 4 is (28 - (16+8)), i.e. the pixel size at the highest zoom level.
+        // Also, round it.
+        int sx = (((p.X - last_point.X) >> 3) + 1) >> 1;
+        int sy = (((p.Y - last_point.Y) >> 3) + 1) >> 1;
+        int manhattan = Math.abs(sx) + Math.abs(sy);
+        if (manhattan < splot_gap) {
+          do_add = false;
+        }
+      }
+      if (do_add) {
+        trail.add(new Slip28(p));
+        last_point = new Slip28(p);
+      }
+    }
+
+    public void clear() {
+      trail = new ArrayList<Slip28> ();
+      last_point = null;
+    }
+
+    // This is crude and inefficient.
+    // It needs to be broken into 2 parts. First, we should render the bulk of
+    // the trail onto the 2x2 tile cache when we rebuild that.  Then, the
+    // newest points are rendered straight onto the UI canvas during each
+    // onDraw().  This will need 2 lists to be maintained.
+    public void render(Canvas c, int w, int h) {
+      int sz = trail.size();
+      int last_x = 0, last_y = 0;
+      for (int i=0; i<sz; i++) {
+        Slip28 p = trail.get(i);
+        int sx = ((p.X - display_pos.X) >> pixel_shift) + (w>>1);
+        int sy = ((p.Y - display_pos.Y) >> pixel_shift) + (h>>1);
+        boolean do_add = true;
+        if (i > 0) {
+          int manhattan = Math.abs(sx - last_x) + Math.abs(sy - last_y);
+          if (manhattan < splot_gap) {
+            do_add = false;
+          }
+        }
+        if (do_add) {
+          c.drawCircle((float)sx, (float)sy, splot_radius, trail_paint);
+        }
+
+        last_x = sx;
+        last_y = sy;
+      }
+    }
+  }
 }
+
+// vim:et:sw=2:sts=2
 

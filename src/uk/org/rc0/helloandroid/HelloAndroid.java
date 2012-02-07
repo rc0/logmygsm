@@ -224,6 +224,7 @@ public class HelloAndroid extends Activity {
   private final int OPTION_MAP_3G   = 2;
   private final int OPTION_MAP_OSM  = 3;
   private final int OPTION_MAP_OS   = 4;
+  private final int OPTION_CLEAR_TRAIL = 5;
   private final int OPTION_EXIT     = 6;
 
   @Override
@@ -232,6 +233,7 @@ public class HelloAndroid extends Activity {
       menu.add (Menu.NONE, OPTION_MAP_3G,  Menu.NONE, "3G map");
       menu.add (Menu.NONE, OPTION_MAP_OSM, Menu.NONE, "OSM map");
       menu.add (Menu.NONE, OPTION_MAP_OS,  Menu.NONE, "OS map");
+      menu.add (Menu.NONE, OPTION_CLEAR_TRAIL,  Menu.NONE, "Clear trail");
       menu.add (Menu.NONE, OPTION_EXIT,    Menu.NONE, "Exit");
       return true;
     }
@@ -243,6 +245,9 @@ public class HelloAndroid extends Activity {
           Logger.stop_tracing = true;
           mMap.save_state_to_file();
           finish();
+          return true;
+        case OPTION_CLEAR_TRAIL:
+          mMap.clear_trail();
           return true;
         case OPTION_MAP_2G:
           mMap.select_map_source(Map.Map_Source.MAP_2G);
