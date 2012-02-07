@@ -1,6 +1,9 @@
 package uk.org.rc0.helloandroid;
 
 import java.io.File;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.Math;
 import android.content.Context;
 import android.os.Bundle;
@@ -341,6 +344,35 @@ public class Map extends View {
             map_source = Map_Source.MAP_OS;
             break;
         }
+      }
+    } else {
+      restore_from_file();
+    }
+  }
+
+  private void restore_from_file() {
+    File file = new File("/sdcard/LogMyGsm/prefs/prefs.txt");
+    if (file.exists()) {
+
+    } else {
+    }
+
+  }
+
+  public void save_state_to_file() {
+    if (display_pos != null) {
+      File dir = new File("/sdcard/LogMyGsm/prefs");
+      if (!dir.exists()) {
+        dir.mkdirs();
+      }
+      File file = new File(dir, "prefs.txt");
+      try {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+        bw.write(String.format("%d\n", zoom));
+        bw.write(String.format("%d\n", display_pos.X));
+        bw.write(String.format("%d\n", display_pos.Y));
+        bw.close();
+      } catch (IOException e) {
       }
     }
   }

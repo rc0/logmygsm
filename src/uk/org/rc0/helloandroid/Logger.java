@@ -198,7 +198,7 @@ public class Logger extends Service {
 
   private void openLog () {
     String basePath = "/sdcard";
-    String ourDir = "LogMyGsm";
+    String ourDir = "LogMyGsm/logs";
     CharSequence cs = DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis());
     String timedFileName = cs.toString() + ".log";
     String fullPath = basePath + "/" + ourDir + "/" + timedFileName;

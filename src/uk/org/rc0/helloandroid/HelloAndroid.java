@@ -241,6 +241,7 @@ public class HelloAndroid extends Activity {
       switch (item.getItemId()) {
         case OPTION_EXIT:
           Logger.stop_tracing = true;
+          mMap.save_state_to_file();
           finish();
           return true;
         case OPTION_MAP_2G:
