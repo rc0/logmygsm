@@ -339,7 +339,7 @@ public class Map extends View {
         icicle.putInt(WHICH_MAP_KEY, 4);
         break;
     }
-    // mTrail.save_state();
+    mTrail.save_state(icicle);
   }
 
   private void setZoom(int z) {
@@ -372,10 +372,11 @@ public class Map extends View {
             break;
         }
       }
+      mTrail.restore_state(icicle);
     } else {
       restore_from_file();
+      mTrail.restore_state_from_file();
     }
-    // mTrail.restore_state();
   }
 
   private void restore_from_file() {
@@ -401,7 +402,6 @@ public class Map extends View {
       } catch (NumberFormatException n) {
       }
     }
-    // mTrail.restore_state();
   }
 
   public void save_state_to_file() {
@@ -419,8 +419,8 @@ public class Map extends View {
         bw.close();
       } catch (IOException e) {
       }
+      mTrail.save_state_to_file();
     }
-    // mTrail.save_state();
   }
 
   // Local UI callbacks
@@ -517,6 +517,14 @@ public class Map extends View {
       y_old = null;
     }
 
+    private void init() {
+      recent = new ArrayList<Slip28> ();
+      last_point = null;
+      n_old = 0;
+      x_old = null;
+      y_old = null;
+    }
+
     private static final int splot_gap = 10;
     private static final float splot_radius = 4.0f;
 
@@ -524,8 +532,35 @@ public class Map extends View {
     // Just save/restore through file - it might be a huge hunk of data.
     // (Threading issues??)
 
+    static final String N_TRAIL_KEY = "LogMyGsm_Trail_N";
+    static final String X_TRAIL_KEY = "LogMyGsm_Trail_X";
+    static final String Y_TRAIL_KEY = "LogMyGsm_Trail_Y";
+
+    public void save_state(Bundle icicle) {
+      gather();
+      icicle.putInt(N_TRAIL_KEY, n_old);
+      if (n_old > 0) {
+        icicle.putIntArray(X_TRAIL_KEY, x_old);
+        icicle.putIntArray(Y_TRAIL_KEY, y_old);
+      }
+    }
+
+    public void restore_state(Bundle icicle) {
+      if (icicle != null) {
+        n_old = icicle.getInt(N_TRAIL_KEY);
+        if (n_old > 0) {
+          x_old = icicle.getIntArray(X_TRAIL_KEY);
+          y_old = icicle.getIntArray(Y_TRAIL_KEY);
+        }
+      } else {
+        init();
+      }
+      tile22 = null;
+      invalidate();
+    }
+
     // TODO : implement persistent file save/restore
-    public void save_state() {
+    public void save_state_to_file() {
       gather();
 
       File dir = new File("/sdcard/LogMyGsm/prefs");
@@ -545,8 +580,8 @@ public class Map extends View {
       }
     }
 
-    public void restore_state() {
-      File file = new File("/sdcard/LogMyGsm/prefs/prefs.txt");
+    public void restore_state_from_file() {
+      File file = new File("/sdcard/LogMyGsm/prefs/trail.txt");
       boolean failed = false;
       if (file.exists()) {
         try {
@@ -572,9 +607,9 @@ public class Map extends View {
         failed = true;
       }
       if (failed) {
-        n_old = 0;
-        x_old = null;
-        y_old = null;
+        init();
+      } else {
+        tile22 = null;
       }
     }
 
