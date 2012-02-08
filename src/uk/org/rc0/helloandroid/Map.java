@@ -191,6 +191,7 @@ public class Map extends View {
     render_tile(my_canv, zoom, tile_x, tile_y, 1, 0);
     render_tile(my_canv, zoom, tile_x, tile_y, 1, 1);
     ul22 = new Slip28(tile_x << tile_shift, tile_y << tile_shift);
+    // mTrail.render_old(my_canv);
   }
 
   private void draw_crosshair(Canvas c, int w, int h) {
@@ -285,7 +286,7 @@ public class Map extends View {
     draw_crosshair(canvas, width, height);
     draw_centre_circle(canvas, width, height);
     draw_buttons(canvas, width, height);
-    mTrail.render(canvas, width, height);
+    mTrail.render_recent(canvas, width, height);
   }
 
   // Interface with main UI activity
@@ -338,6 +339,7 @@ public class Map extends View {
         icicle.putInt(WHICH_MAP_KEY, 4);
         break;
     }
+    // mTrail.save_state();
   }
 
   private void setZoom(int z) {
@@ -373,6 +375,7 @@ public class Map extends View {
     } else {
       restore_from_file();
     }
+    // mTrail.restore_state();
   }
 
   private void restore_from_file() {
@@ -398,6 +401,7 @@ public class Map extends View {
       } catch (NumberFormatException n) {
       }
     }
+    // mTrail.restore_state();
   }
 
   public void save_state_to_file() {
@@ -416,6 +420,7 @@ public class Map extends View {
       } catch (IOException e) {
       }
     }
+    // mTrail.save_state();
   }
 
   // Local UI callbacks
@@ -498,20 +503,80 @@ public class Map extends View {
   // Trail history
 
   private class Trail {
-    private ArrayList<Slip28> trail;
+    private ArrayList<Slip28> recent;
     private Slip28 last_point;
+    private int n_old;
+    private int[] x_old;
+    private int[] y_old;
 
     public Trail() {
-      trail = new ArrayList<Slip28> ();
+      recent = new ArrayList<Slip28> ();
       last_point = null;
+      n_old = 0;
+      x_old = null;
+      y_old = null;
     }
 
     private static final int splot_gap = 10;
     private static final float splot_radius = 3.0f;
 
     // TODO : implement icicle save/restore
+    // Just save/restore through file - it might be a huge hunk of data.
+    // (Threading issues??)
 
     // TODO : implement persistent file save/restore
+    public void save_state() {
+      // gather();
+
+      File dir = new File("/sdcard/LogMyGsm/prefs");
+      if (!dir.exists()) {
+        dir.mkdirs();
+      }
+      File file = new File(dir, "trail.txt");
+      try {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+        bw.write(String.format("%d\n", n_old));
+        for (int i=0; i < n_old; i++) {
+          bw.write(String.format("%d\n", x_old[i]));
+          bw.write(String.format("%d\n", y_old[i]));
+        }
+        bw.close();
+      } catch (IOException e) {
+      }
+    }
+
+    public void restore_state() {
+      File file = new File("/sdcard/LogMyGsm/prefs/prefs.txt");
+      boolean failed = false;
+      if (file.exists()) {
+        try {
+          BufferedReader br = new BufferedReader(new FileReader(file));
+          String line;
+          line = br.readLine();
+          n_old = Integer.parseInt(line);
+          x_old = new int[n_old];
+          y_old = new int[n_old];
+          for (int i = 0; i < n_old; i++) {
+            line = br.readLine();
+            x_old[i] = Integer.parseInt(line);
+            line = br.readLine();
+            y_old[i] = Integer.parseInt(line);
+          }
+          br.close();
+        } catch (IOException e) {
+          failed = true;
+        } catch (NumberFormatException n) {
+          failed = true;
+        }
+      } else {
+        failed = true;
+      }
+      if (failed) {
+        n_old = 0;
+        x_old = null;
+        y_old = null;
+      }
+    }
 
     // Skip points that are too close together to ever be visible on the map display
     public void add_point(Slip28 p) {
@@ -527,14 +592,66 @@ public class Map extends View {
         }
       }
       if (do_add) {
-        trail.add(new Slip28(p));
+        recent.add(new Slip28(p));
         last_point = new Slip28(p);
       }
     }
 
     public void clear() {
-      trail = new ArrayList<Slip28> ();
+      recent = new ArrayList<Slip28> ();
       last_point = null;
+      n_old = 0;
+      x_old = null;
+      y_old = null;
+    }
+
+    private void gather() {
+      // accumulate the 'recent' history onto the 'old' arrays
+      int n_recent = recent.size();
+      if (n_recent > 0) {
+
+        // TODO : if n_old is too large, do some data reduction here (either
+        // thin out the old stuff, or toss the earlier half of it)
+        int n_new = n_old + n_recent;
+
+        int [] x_new = new int[n_new];
+        System.arraycopy(x_old, 0, x_new, 0, n_old);
+        int [] y_new = new int[n_new];
+        System.arraycopy(y_old, 0, y_new, 0, n_old);
+        for (int i = 0; i<n_recent; i++) {
+          x_new[i + n_old] = recent.get(i).X;
+          y_new[i + n_old] = recent.get(i).Y;
+        }
+
+        n_old = n_new;
+        x_old = x_new;
+        y_old = y_new;
+        recent = new ArrayList<Slip28> ();
+        // leave last_point alone
+      }
+    }
+
+    public void render_old(Canvas c) {
+      int last_x = 0, last_y = 0;
+
+      //gather();
+
+      for (int i=0; i<n_old; i++) {
+        int sx = ((x_old[i] - ul22.X) >> pixel_shift);
+        int sy = ((y_old[i] - ul22.Y) >> pixel_shift);
+        boolean do_add = true;
+        if (i > 0) {
+          int manhattan = Math.abs(sx - last_x) + Math.abs(sy - last_y);
+          if (manhattan < splot_gap) {
+            do_add = false;
+          }
+        }
+        if (do_add) {
+          c.drawCircle((float)sx, (float)sy, splot_radius, trail_paint);
+          last_x = sx;
+          last_y = sy;
+        }
+      }
     }
 
     // This is crude and inefficient.
@@ -542,11 +659,12 @@ public class Map extends View {
     // the trail onto the 2x2 tile cache when we rebuild that.  Then, the
     // newest points are rendered straight onto the UI canvas during each
     // onDraw().  This will need 2 lists to be maintained.
-    public void render(Canvas c, int w, int h) {
-      int sz = trail.size();
+    public void render_recent(Canvas c, int w, int h) {
+      int sz = recent.size();
+      // guaranteed to be initialised properly on first point
       int last_x = 0, last_y = 0;
       for (int i=0; i<sz; i++) {
-        Slip28 p = trail.get(i);
+        Slip28 p = recent.get(i);
         int sx = ((p.X - display_pos.X) >> pixel_shift) + (w>>1);
         int sy = ((p.Y - display_pos.Y) >> pixel_shift) + (h>>1);
         boolean do_add = true;
@@ -558,10 +676,10 @@ public class Map extends View {
         }
         if (do_add) {
           c.drawCircle((float)sx, (float)sy, splot_radius, trail_paint);
+          last_x = sx;
+          last_y = sy;
         }
 
-        last_x = sx;
-        last_y = sy;
       }
     }
   }
