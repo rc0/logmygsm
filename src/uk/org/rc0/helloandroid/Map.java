@@ -26,6 +26,7 @@ public class Map extends View {
 
   private final Paint red_paint;
   private final Paint red_stroke_paint;
+  private final Paint red_double_stroke_paint;
   private final Paint trail_paint;
   private final Paint button_stroke_paint;
   private final Paint grey_paint;
@@ -70,6 +71,11 @@ public class Map extends View {
     red_stroke_paint.setStrokeWidth(1);
     red_stroke_paint.setColor(Color.RED);
     red_stroke_paint.setStyle(Paint.Style.STROKE);
+
+    red_double_stroke_paint = new Paint();
+    red_double_stroke_paint.setStrokeWidth(2);
+    red_double_stroke_paint.setColor(Color.RED);
+    red_double_stroke_paint.setStyle(Paint.Style.STROKE);
 
     trail_paint = new Paint();
     trail_paint.setColor(Color.argb(144, 255, 0, 150));
@@ -194,9 +200,11 @@ public class Map extends View {
     mTrail.render_old(my_canv);
   }
 
+  final static float LEN1 = 8.0f;
+  final static float LEN2 = 64.0f;
+  final static float LEN3 = 3.0f * LEN1;
+
   private void draw_crosshair(Canvas c, int w, int h) {
-    final float len1 = 8.0f;
-    final float len2 = 64.0f;
     if (actual_pos != null) {
       float x0, x1, x2, x3, xc;
       float y0, y1, y2, y3, yc;
@@ -210,14 +218,14 @@ public class Map extends View {
         xc += (float) dx;
         yc += (float) dy;
       }
-      x0 = xc - (len1 + len2);
-      x1 = xc - (len1);
-      x2 = xc + (len1);
-      x3 = xc + (len1 + len2);
-      y0 = yc - (len1 + len2);
-      y1 = yc - (len1);
-      y2 = yc + (len1);
-      y3 = yc + (len1 + len2);
+      x0 = xc - (LEN1 + LEN2);
+      x1 = xc - (LEN1);
+      x2 = xc + (LEN1);
+      x3 = xc + (LEN1 + LEN2);
+      y0 = yc - (LEN1 + LEN2);
+      y1 = yc - (LEN1);
+      y2 = yc + (LEN1);
+      y3 = yc + (LEN1 + LEN2);
       c.drawLine(x0, yc, x1, yc, red_paint);
       c.drawLine(x2, yc, x3, yc, red_paint);
       c.drawLine(xc, y0, xc, y1, red_paint);
@@ -226,13 +234,27 @@ public class Map extends View {
   }
 
   private void draw_centre_circle(Canvas c, int w, int h) {
-    float len1 = 8.0f;
-    float len3 = 3.0f * len1;
     float xc;
     float yc;
     xc = (float)(w/2);
     yc = (float)(h/2);
-    c.drawCircle(xc, yc, len3, red_stroke_paint);
+    c.drawCircle(xc, yc, LEN3, red_stroke_paint);
+  }
+
+  public void draw_bearing(Canvas c, int w, int h) {
+    if (Logger.validFix) {
+      c.save();
+      c.rotate((float) Logger.lastBearing, (w>>1), (h>>1));
+      float xl = (float)(w>>1) - (1.0f*LEN1);
+      float xc = (float)(w>>1);
+      float xr = (float)(w>>1) + (1.0f*LEN1);
+      float yb = (float)(h>>1) - (LEN3 + (0.5f*LEN1));
+      float yt = (float)(h>>1) - (LEN3 + (2.5f*LEN1));
+      c.drawLine(xc, yt, xl, yb, red_double_stroke_paint);
+      c.drawLine(xc, yt, xr, yb, red_double_stroke_paint);
+      c.drawLine(xl, yb, xr, yb, red_double_stroke_paint);
+      c.restore();
+    }
   }
 
   private static final int button_half_line = 12;
@@ -286,6 +308,7 @@ public class Map extends View {
     draw_crosshair(canvas, width, height);
     draw_centre_circle(canvas, width, height);
     draw_buttons(canvas, width, height);
+    draw_bearing(canvas, width, height);
     mTrail.render_recent(canvas, width, height);
   }
 
