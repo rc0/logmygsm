@@ -191,7 +191,7 @@ public class Map extends View {
     render_tile(my_canv, zoom, tile_x, tile_y, 1, 0);
     render_tile(my_canv, zoom, tile_x, tile_y, 1, 1);
     ul22 = new Slip28(tile_x << tile_shift, tile_y << tile_shift);
-    // mTrail.render_old(my_canv);
+    mTrail.render_old(my_canv);
   }
 
   private void draw_crosshair(Canvas c, int w, int h) {
@@ -526,7 +526,7 @@ public class Map extends View {
 
     // TODO : implement persistent file save/restore
     public void save_state() {
-      // gather();
+      gather();
 
       File dir = new File("/sdcard/LogMyGsm/prefs");
       if (!dir.exists()) {
@@ -615,10 +615,12 @@ public class Map extends View {
         int n_new = n_old + n_recent;
 
         int [] x_new = new int[n_new];
-        System.arraycopy(x_old, 0, x_new, 0, n_old);
         int [] y_new = new int[n_new];
-        System.arraycopy(y_old, 0, y_new, 0, n_old);
-        for (int i = 0; i<n_recent; i++) {
+        if (n_old > 0) {
+          System.arraycopy(x_old, 0, x_new, 0, n_old);
+          System.arraycopy(y_old, 0, y_new, 0, n_old);
+        }
+        for (int i = 0; i < n_recent; i++) {
           x_new[i + n_old] = recent.get(i).X;
           y_new[i + n_old] = recent.get(i).Y;
         }
@@ -628,13 +630,15 @@ public class Map extends View {
         y_old = y_new;
         recent = new ArrayList<Slip28> ();
         // leave last_point alone
+      } else {
+        // leave 'old' arrays as they were
       }
     }
 
     public void render_old(Canvas c) {
       int last_x = 0, last_y = 0;
 
-      //gather();
+      gather();
 
       for (int i=0; i<n_old; i++) {
         int sx = ((x_old[i] - ul22.X) >> pixel_shift);
