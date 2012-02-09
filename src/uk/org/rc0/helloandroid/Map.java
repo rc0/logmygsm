@@ -78,7 +78,7 @@ public class Map extends View {
     red_double_stroke_paint.setStyle(Paint.Style.STROKE);
 
     trail_paint = new Paint();
-    trail_paint.setColor(Color.argb(144, 255, 0, 150));
+    trail_paint.setColor(Color.argb(112, 255, 0, 130));
     trail_paint.setStyle(Paint.Style.FILL);
 
     button_stroke_paint = new Paint();
@@ -249,7 +249,7 @@ public class Map extends View {
       float xc = (float)(w>>1);
       float xr = (float)(w>>1) + (1.0f*LEN1);
       float yb = (float)(h>>1) - (LEN3 + (0.5f*LEN1));
-      float yt = (float)(h>>1) - (LEN3 + (2.5f*LEN1));
+      float yt = (float)(h>>1) - (LEN3 + (3.5f*LEN1));
       c.drawLine(xc, yt, xl, yb, red_double_stroke_paint);
       c.drawLine(xc, yt, xr, yb, red_double_stroke_paint);
       c.drawLine(xl, yb, xr, yb, red_double_stroke_paint);
@@ -548,8 +548,8 @@ public class Map extends View {
       y_old = null;
     }
 
-    private static final int splot_gap = 10;
-    private static final float splot_radius = 4.0f;
+    private static final int splot_gap = 12;
+    private static final float splot_radius = 3.0f;
 
     // TODO : implement icicle save/restore
     // Just save/restore through file - it might be a huge hunk of data.
