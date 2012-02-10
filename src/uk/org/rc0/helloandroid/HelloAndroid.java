@@ -250,16 +250,16 @@ public class HelloAndroid extends Activity {
           mMap.clear_trail();
           return true;
         case OPTION_MAP_2G:
-          mMap.select_map_source(Map.Map_Source.MAP_2G);
+          mMap.select_map_source(Map.MAP_2G);
           return true;
         case OPTION_MAP_3G:
-          mMap.select_map_source(Map.Map_Source.MAP_3G);
+          mMap.select_map_source(Map.MAP_3G);
           return true;
         case OPTION_MAP_OSM:
-          mMap.select_map_source(Map.Map_Source.MAP_OSM);
+          mMap.select_map_source(Map.MAP_OSM);
           return true;
         case OPTION_MAP_OS:
-          mMap.select_map_source(Map.Map_Source.MAP_OS);
+          mMap.select_map_source(Map.MAP_OS);
           return true;
         default:
           return false;

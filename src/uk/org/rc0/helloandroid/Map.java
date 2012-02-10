@@ -31,9 +31,10 @@ public class Map extends View {
   private final Paint button_stroke_paint;
   private final Paint grey_paint;
 
-  static public enum Map_Source {
-    MAP_2G, MAP_3G, MAP_OSM, MAP_OS
-  }
+  static final public int MAP_2G  = 100;
+  static final public int MAP_3G  = 101;
+  static final public int MAP_OSM = 102;
+  static final public int MAP_OS  = 103;
 
   // Cache of 2x2 tiles containing the region around the viewport
   private Bitmap tile22;
@@ -55,12 +56,12 @@ public class Map extends View {
   // --------------------------------------------------------------------------
 
 
-  private Map_Source map_source;
+  private int map_source;
 
   public Map(Context context, AttributeSet attrs) {
     super(context, attrs);
 
-    map_source = Map_Source.MAP_2G;
+    map_source = MAP_2G;
     tile22 = null;
 
     red_paint = new Paint();
@@ -327,7 +328,7 @@ public class Map extends View {
     invalidate();
   }
 
-  public void select_map_source(Map_Source which) {
+  public void select_map_source(int which) {
     map_source = which;
     // force map rebuild
     tile22 = null;
@@ -348,20 +349,7 @@ public class Map extends View {
       icicle.putInt(LAST_X_KEY, display_pos.X);
       icicle.putInt(LAST_Y_KEY, display_pos.Y);
     }
-    switch (map_source) {
-      case MAP_2G:
-        icicle.putInt(WHICH_MAP_KEY, 1);
-        break;
-      case MAP_3G:
-        icicle.putInt(WHICH_MAP_KEY, 2);
-        break;
-      case MAP_OSM:
-        icicle.putInt(WHICH_MAP_KEY, 3);
-        break;
-      case MAP_OS:
-        icicle.putInt(WHICH_MAP_KEY, 4);
-        break;
-    }
+    icicle.putInt(WHICH_MAP_KEY, map_source);
     mTrail.save_state(icicle);
   }
 
@@ -380,20 +368,7 @@ public class Map extends View {
         display_pos = new Slip28(icicle.getInt(LAST_X_KEY), icicle.getInt(LAST_Y_KEY));
       }
       if (icicle.containsKey(WHICH_MAP_KEY)) {
-        switch (icicle.getInt(WHICH_MAP_KEY)) {
-          case 1:
-            map_source = Map_Source.MAP_2G;
-            break;
-          case 2:
-            map_source = Map_Source.MAP_3G;
-            break;
-          case 3:
-            map_source = Map_Source.MAP_OSM;
-            break;
-          default:
-            map_source = Map_Source.MAP_OS;
-            break;
-        }
+        map_source = icicle.getInt(WHICH_MAP_KEY);
       }
       mTrail.restore_state(icicle);
     } else {
@@ -407,6 +382,7 @@ public class Map extends View {
     // defaults in case of strife
     display_pos = null;
     setZoom(14);
+    map_source = MAP_2G;
     if (file.exists()) {
       try {
         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -420,6 +396,8 @@ public class Map extends View {
         y = Integer.parseInt(line);
         // If we survive unexcepted to here we parsed the file OK
         display_pos = new Slip28(x, y);
+        line = br.readLine();
+        map_source = Integer.parseInt(line);
         br.close();
       } catch (IOException e) {
       } catch (NumberFormatException n) {
@@ -439,6 +417,7 @@ public class Map extends View {
         bw.write(String.format("%d\n", zoom));
         bw.write(String.format("%d\n", display_pos.X));
         bw.write(String.format("%d\n", display_pos.Y));
+        bw.write(String.format("%d\n", map_source));
         bw.close();
       } catch (IOException e) {
       }
