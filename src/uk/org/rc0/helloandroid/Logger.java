@@ -19,11 +19,7 @@ import android.telephony.CellLocation;
 import android.telephony.SignalStrength;
 import android.telephony.ServiceState;
 import android.telephony.gsm.GsmCellLocation;
-import android.text.format.DateFormat;
 import android.widget.Toast;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.Iterable;
 import java.util.Iterator;
 
@@ -38,15 +34,10 @@ public class Logger extends Service {
   private Notification myNotification;
   private int myNotificationRef = 1;
 
-  private File logfile;
-  private FileWriter logwriter;
-
-  private File rawfile;
-  private FileWriter rawwriter;
-
-  // Start false, set it true once we've tried to open logfiles, following the
-  // first GPS position fix.
-  private boolean logging_is_active;
+  // mainlog is null until we've got the first GPS fix - so we don't open the
+  // logfile needlessly.
+  private Backend mainlog;
+  private RawLogger rawlog;
 
   // -----------------
   // Variables shared with the Activity
@@ -131,7 +122,7 @@ public class Logger extends Service {
       lastdBm = 0;
       lastNetworkType = '?';
 
-      logging_is_active = false;
+      rawlog = new RawLogger();
 
       String srvcName = Context.TELEPHONY_SERVICE;
       myTelephonyManager = (TelephonyManager) getSystemService(srvcName);
@@ -196,70 +187,6 @@ public class Logger extends Service {
 
   // --------------------------------------------------------------------------------
 
-  private void openLog () {
-    String basePath = "/sdcard";
-    String ourDir = "LogMyGsm/logs";
-    CharSequence cs = DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis());
-    String timedFileName = cs.toString() + ".log";
-    String fullPath = basePath + "/" + ourDir + "/" + timedFileName;
-
-    String rawFileName = "raw_" + cs.toString() + ".log";
-
-    logging_is_active = true;
-    try {
-      File root = new File(basePath, ourDir);
-      if (!root.exists()) {
-          root.mkdirs();
-      }
-      logfile = new File(root, timedFileName);
-      logwriter = new FileWriter(logfile);
-      announce("Opened logfile");
-
-      rawfile = new File(root, rawFileName);
-      rawwriter = new FileWriter(rawfile);
-    } catch (IOException e) {
-      logfile = null;
-      logwriter = null;
-      rawfile = null;
-      rawwriter = null;
-    }
-    if (logwriter == null) {
-      announce("COULD NOT LOG TO " + fullPath);
-    }
-  }
-
-  private void writeLog (String data) {
-    if (logwriter != null) {
-      try {
-        logwriter.append(data);
-      } catch (IOException e) {
-      }
-    }
-  }
-
-  private void closeLog() {
-    if (logwriter != null) {
-      announce("Closing logfile");
-      try {
-        logwriter.flush();
-        logwriter.close();
-      } catch (IOException e) {
-      }
-    }
-    if (rawwriter != null) {
-      try {
-        rawwriter.flush();
-        rawwriter.close();
-      } catch (IOException e) {
-      }
-    }
-    logging_is_active = false;
-    logwriter = null;
-    rawwriter = null;
-  }
-
-  // --------------------------------------------------------------------------------
-
   private void logCellHistory() {
     int match = -1;
     for (int i=0; i<MAX_RECENT; i++) {
@@ -292,86 +219,10 @@ public class Logger extends Service {
 
   // --------------------------------------------------------------------------------
 
-  private void writeRaw(String tag, String data) {
-    if (rawwriter != null) {
-      try {
-        long now = System.currentTimeMillis();
-        long seconds = now / 1000;
-        long millis = now % 1000;
-        String all = String.format("%10d.%03d %2s %s\n",
-            seconds, millis,
-            tag, data);
-        //String all = String.format("%2s %s\n", 
-        //    tag, data);
-        rawwriter.append(all);
-      } catch (IOException e) {
-      }
-    }
-  }
-
-  private void logRawCell() {
-    String data = String.format("%10d %10d %s",
-        lastCid, lastLac,
-        lastMccMnc);
-    writeRaw("CL", data);
-  }
-
-  private void logRawASU() {
-    String data = String.format("%d", lastASU);
-    writeRaw("AS", data);
-  }
-
-  private void logRawServiceState() {
-    String data = String.format("%c", lastState);
-    writeRaw("ST", data);
-  }
-
-  private void logRawNetworkType() {
-    String data = String.format("%c %d", lastNetworkType, lastNetworkTypeRaw);
-    writeRaw("NT", data);
-  }
-
-  private void logRawBadLocation() {
-    writeRaw("LB", "-- bad --");
-  }
-
-  private void logRawLocation() {
-    String data = String.format("%12.7f %12.7f %3d",
-        lastLat, lastLon, lastAcc);
-    writeRaw("LC", data);
-  }
-
-  private void logRawLocationDisabled() {
-    writeRaw("LD", "-- disabled --");
-  }
-
-  private void logRawLocationEnabled() {
-    writeRaw("LE", "-- enabled --");
-  }
-
-  private void logRawLocationStatus() {
-    // This seems to log every second - very wasteful!
-    //String data = String.format("%d %d %d %d",
-    //    last_n_sats, last_fix_sats, last_ephem_sats, last_alman_sats);
-    //writeRaw("LS", data);
-  }
-
-  // --------------------------------------------------------------------------------
-
-  private void announce(String text) {
-    Context context = getApplicationContext();
-    int duration = Toast.LENGTH_LONG;
-    Toast toast = Toast.makeText(context, text, duration);
-    toast.show();
-  }
-
-  // --------------------------------------------------------------------------------
-
   private void startListening() {
     if (!is_running) {
       is_running = true;
       startNotification();
-      // do this lazily now ...  openLog();
       myTelephonyManager.listen(myPhoneStateListener,
           PhoneStateListener.LISTEN_CELL_LOCATION |
           PhoneStateListener.LISTEN_SERVICE_STATE |
@@ -390,8 +241,14 @@ public class Logger extends Service {
       myLocationManager.removeGpsStatusListener(gpsListener);
       myLocationManager.removeUpdates(myLocationListener);
       stopNotification();
-      closeLog();
-      is_running = false;
+      if (mainlog != null) {
+        mainlog.close();
+        mainlog = null;
+      }
+      if (rawlog != null) {
+        rawlog.close();
+        rawlog = null;
+      }
       stopSelf();
     }
   }
@@ -417,7 +274,10 @@ public class Logger extends Service {
         lastNetworkType, lastCid, lastLac,
         lastdBm,
         lastMccMnc);
-    writeLog(data);
+    if (mainlog == null) {
+      mainlog = new Backend("", this);
+    }
+    mainlog.write(data);
   }
 
   // --------------------------------------------------------------------------------
@@ -442,7 +302,7 @@ public class Logger extends Service {
       lastOperator = new String(myTelephonyManager.getNetworkOperatorName());
       lastSimOperator = new String(myTelephonyManager.getSimOperatorName());
       logCellHistory();
-      logRawCell();
+      rawlog.log_cell();
       updateDisplay();
     };
 
@@ -450,7 +310,7 @@ public class Logger extends Service {
       int asu;
       asu = strength.getGsmSignalStrength();
       lastASU = asu;
-      logRawASU();
+      rawlog.log_asu();
       if (asu == 99) {
         lastdBm = 0;
       } else {
@@ -469,7 +329,7 @@ public class Logger extends Service {
         case ServiceState.STATE_POWER_OFF:      lastState = 'O'; break;
         default:                                lastState = '?'; break;
       }
-      logRawServiceState();
+      rawlog.log_service_state();
       updateDisplay();
     };
 
@@ -501,7 +361,7 @@ public class Logger extends Service {
           break;
       }
       lastNetworkTypeRaw = network_type;
-      logRawNetworkType();
+      rawlog.log_network_type();
       updateDisplay();
     };
 
@@ -517,7 +377,7 @@ public class Logger extends Service {
     public void onLocationChanged(Location location) {
       if (location == null) {
         validFix = false;
-        logRawBadLocation();
+        rawlog.log_bad_location();
       } else {
         validFix = true;
         lastLat = location.getLatitude();
@@ -531,27 +391,24 @@ public class Logger extends Service {
         }
         // lastFixMillis = location.getTime();
         lastFixMillis = System.currentTimeMillis();
-        if (!logging_is_active) {
-          openLog();
-        }
         logToFile();
-        logRawLocation();
+        rawlog.log_raw_location();
       }
       updateDisplay();
     }
 
     public void onProviderDisabled(String provider) {
       validFix = false;
-      logRawLocationDisabled();
+      rawlog.log_location_disabled();
       updateDisplay();
     }
 
     public void onProviderEnabled(String provider) {
-      logRawLocationEnabled();
+      rawlog.log_location_enabled();
     }
 
     public void onStatusChanged(String provider, int status, Bundle extras) {
-      logRawLocationStatus();
+      rawlog.log_location_status();
     }
 
   };
@@ -579,7 +436,7 @@ public class Logger extends Service {
             else if (sat.hasEphemeris()) { ++last_ephem_sats; }
             else if (sat.hasAlmanac())   { ++last_alman_sats; }
           }
-          logRawLocationStatus();
+          rawlog.log_location_status();
           break;
         case GpsStatus.GPS_EVENT_STARTED:
           break;
@@ -591,6 +448,14 @@ public class Logger extends Service {
 
   };
 
+  // --------------------------------------------------------------------------------
+
+  public void announce(String text) {
+    Context context = getApplicationContext();
+    int duration = Toast.LENGTH_LONG;
+    Toast toast = Toast.makeText(context, text, duration);
+    toast.show();
+  }
 }
 
 
