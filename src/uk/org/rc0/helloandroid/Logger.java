@@ -25,7 +25,8 @@ import java.util.Iterator;
 
 public class Logger extends Service {
 
-  static private boolean is_running = false;
+  // Flag that's set by the UI to tell us to cut the power when we next get
+  // called back by the framework.
   static public boolean stop_tracing;
 
   private TelephonyManager myTelephonyManager;
@@ -38,6 +39,8 @@ public class Logger extends Service {
   // logfile needlessly.
   private Backend mainlog;
   private RawLogger rawlog;
+
+  static public Trail mTrail;
 
   // -----------------
   // Variables shared with the Activity
@@ -95,14 +98,25 @@ public class Logger extends Service {
   static public final int MAX_RECENT = 8;
   static public RecentCID[] recent_cids;
 
+  // This is only called once for the service lifetime
   @Override
   public void onCreate() {
     stop_tracing = false;
-    myProvider = LocationManager.GPS_PROVIDER;
-    nReadings = 0;
-    nHandoffs = 0;
-    myNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+    init_state();
     init_recent_cids();
+
+    rawlog = new RawLogger();
+    mTrail = new Trail();
+
+    myProvider = LocationManager.GPS_PROVIDER;
+    myNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    String srvcName = Context.TELEPHONY_SERVICE;
+    myTelephonyManager = (TelephonyManager) getSystemService(srvcName);
+    String context = Context.LOCATION_SERVICE;
+    myLocationManager = (LocationManager) getSystemService(context);
+
+    startListening();
   }
 
   private void init_recent_cids() {
@@ -110,27 +124,22 @@ public class Logger extends Service {
     for (int i=0; i<MAX_RECENT; i++) {
       recent_cids[i] = new RecentCID();
     }
-    // Test data
   }
 
+  private void init_state() {
+    nReadings = 0;
+    nHandoffs = 0;
+    lastCid = 0;
+    lastLac = 0;
+    lastdBm = 0;
+    lastNetworkType = '?';
+    validFix = false;
+  }
+
+  // We don't care if this gets called multiple times as it doesn't do anything.
+  // We don't need to accept any 'args' from the outside.
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
-    if (!is_running) {
-      // Start all the funky stuff
-      lastCid = 0;
-      lastLac = 0;
-      lastdBm = 0;
-      lastNetworkType = '?';
-
-      rawlog = new RawLogger();
-
-      String srvcName = Context.TELEPHONY_SERVICE;
-      myTelephonyManager = (TelephonyManager) getSystemService(srvcName);
-      String context = Context.LOCATION_SERVICE;
-      myLocationManager = (LocationManager) getSystemService(context);
-
-      startListening();
-    }
     return Service.START_STICKY;
   }
 
@@ -142,6 +151,7 @@ public class Logger extends Service {
   @Override
   public void onDestroy() {
     stopListening();
+    mTrail.save_state_to_file();
   }
 
   // --------------------------------------------------------------------------------
@@ -220,36 +230,28 @@ public class Logger extends Service {
   // --------------------------------------------------------------------------------
 
   private void startListening() {
-    if (!is_running) {
-      is_running = true;
-      startNotification();
-      myTelephonyManager.listen(myPhoneStateListener,
-          PhoneStateListener.LISTEN_CELL_LOCATION |
-          PhoneStateListener.LISTEN_SERVICE_STATE |
-          PhoneStateListener.LISTEN_SIGNAL_STRENGTHS |
-          PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
-      myLocationManager.requestLocationUpdates(myProvider, 1000, 3, myLocationListener);
-      myLocationManager.addGpsStatusListener(gpsListener);
-    }
+    startNotification();
+    myTelephonyManager.listen(myPhoneStateListener,
+        PhoneStateListener.LISTEN_CELL_LOCATION |
+        PhoneStateListener.LISTEN_SERVICE_STATE |
+        PhoneStateListener.LISTEN_SIGNAL_STRENGTHS |
+        PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
+    myLocationManager.requestLocationUpdates(myProvider, 1000, 3, myLocationListener);
+    myLocationManager.addGpsStatusListener(gpsListener);
   }
 
   // --------------------------------------------------------------------------------
 
   private void stopListening() {
-    if (is_running) {
-      myTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_NONE);
-      myLocationManager.removeGpsStatusListener(gpsListener);
-      myLocationManager.removeUpdates(myLocationListener);
-      stopNotification();
-      if (mainlog != null) {
-        mainlog.close();
-        mainlog = null;
-      }
-      if (rawlog != null) {
-        rawlog.close();
-        rawlog = null;
-      }
-      stopSelf();
+    myTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_NONE);
+    myLocationManager.removeGpsStatusListener(gpsListener);
+    myLocationManager.removeUpdates(myLocationListener);
+    stopNotification();
+    if (mainlog != null) {
+      mainlog.close();
+    }
+    if (rawlog != null) {
+      rawlog.close();
     }
   }
 
@@ -260,7 +262,7 @@ public class Logger extends Service {
     Intent intent = new Intent(DISPLAY_UPDATE);
     sendBroadcast(intent);
     if (stop_tracing) {
-      stopListening();
+      stopSelf();
     }
   }
 
@@ -393,6 +395,7 @@ public class Logger extends Service {
         lastFixMillis = System.currentTimeMillis();
         logToFile();
         rawlog.log_raw_location();
+        mTrail.add_point(new Merc28(lastLat, lastLon));
       }
       updateDisplay();
     }
@@ -459,3 +462,5 @@ public class Logger extends Service {
 }
 
 
+// vim:et:sw=2:sts=2
+//

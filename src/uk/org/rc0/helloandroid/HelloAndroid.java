@@ -48,13 +48,13 @@ public class HelloAndroid extends Activity {
       countText = (TextView) findViewById(R.id.count);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
       mMap = (Map) findViewById(R.id.map);
-      mMap.restore_state(savedInstanceState);
+      mMap.restore_state_from_file();
     }
 
-  @Override
-    public void onSaveInstanceState(Bundle icicle) {
-      mMap.save_state(icicle);
-    }
+  // @Override
+  //   public void onSaveInstanceState(Bundle icicle) {
+  //     mMap.save_state(icicle);
+  //   }
 
   @Override
     public void onStart() {
@@ -81,6 +81,9 @@ public class HelloAndroid extends Activity {
     @Override
     public void onPause() {
       unregisterReceiver(myReceiver);
+      // It seems wasteful to do this here, but there is no other safe opportunity to do so -
+      // in effect we are 'committing' the user's changes at this point.
+      mMap.save_state_to_file();
       super.onPause();
     }
 
@@ -243,8 +246,8 @@ public class HelloAndroid extends Activity {
       switch (item.getItemId()) {
         case OPTION_EXIT:
           Logger.stop_tracing = true;
-          mMap.save_state_to_file();
           finish();
+          // mMap.save_state_to_file(); - gets done under onPause
           return true;
         case OPTION_CLEAR_TRAIL:
           mMap.clear_trail();
@@ -265,5 +268,6 @@ public class HelloAndroid extends Activity {
           return false;
       }
     }
-
 }
+//
+// vim:et:sw=2:sts=2

@@ -4,6 +4,7 @@ public class RawLogger {
   private Backend log;
 
   public RawLogger () {
+    log = null;
   }
 
   private void write(String tag, String data) {
@@ -20,7 +21,9 @@ public class RawLogger {
   }
 
   public void close () {
-    log.close();
+    if (log != null) {
+      log.close();
+    }
   }
 
   public void log_asu () {
@@ -70,3 +73,5 @@ public class RawLogger {
     //writeRaw("LS", data);
   }
 }
+
+// vim:et:sw=2:sts=2
