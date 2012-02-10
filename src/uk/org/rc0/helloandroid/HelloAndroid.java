@@ -28,7 +28,7 @@ public class HelloAndroid extends Activity {
 
   private DisplayUpdateReceiver myReceiver;
 
-  // private Map mMap;
+  private Map mMap;
 
   /** Called when the activity is first created. */
   @Override
@@ -47,14 +47,9 @@ public class HelloAndroid extends Activity {
       dBmText = (TextView) findViewById(R.id.dBm);
       countText = (TextView) findViewById(R.id.count);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
-      // mMap = (Map) findViewById(R.id.map);
+      mMap = (Map) findViewById(R.id.map);
       // mMap.restore_state_from_file();
     }
-
-  // @Override
-  //   public void onSaveInstanceState(Bundle icicle) {
-  //     mMap.save_state(icicle);
-  //   }
 
   @Override
     public void onStart() {
@@ -207,7 +202,7 @@ public class HelloAndroid extends Activity {
     countText.setText(countString);
 
     updateCidHistory(current_time);
-    // mMap.update_map();
+    mMap.update_map();
   }
 
   // --------------------------------------------------------------------------

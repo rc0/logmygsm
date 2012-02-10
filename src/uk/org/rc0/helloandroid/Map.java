@@ -359,7 +359,7 @@ public class Map extends View {
       String foo2 = String.format("No fix");
       canvas.drawText(foo2, 10, 80, red_paint);
     } else {
-      // update_map(canvas);
+      update_map(canvas);
     }
   }
 

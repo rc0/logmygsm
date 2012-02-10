@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.util.Log;
 import java.io.File;
 
 public class TileCache {
@@ -15,6 +16,8 @@ public class TileCache {
   static final private int bm_width = 1<<bm_log_width;
   static final private int tiles_along_side = 2;
   static final private int pixels_along_side = tiles_along_side * bm_width;
+
+  static final private String TAG = "TileCache";
 
   private Map mOwner;
   private Bitmap cache;
@@ -31,7 +34,7 @@ public class TileCache {
   // Public interface
 
   public TileCache(Map owner) {
-    Paint gray_paint = new Paint();
+    gray_paint = new Paint();
     gray_paint.setColor(Color.GRAY);
     mOwner = owner;
   }
@@ -103,6 +106,7 @@ public class TileCache {
   // Hopefully I'm not going there.
 
   private void render_tile(Canvas canvas, int z, int tile_x, int tile_y, int dx, int dy) {
+    Log.d(TAG, "render_tile called");
     int xl = dx     << bm_log_width;
     int xr = (dx+1) << bm_log_width;
     int yt = dy     << bm_log_width;
