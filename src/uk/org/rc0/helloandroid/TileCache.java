@@ -153,23 +153,23 @@ public class TileCache {
     nw_corner = new Merc28(tile_x << tile_shift, tile_y << tile_shift);
 
     // Render old part of trail
-    Trail.PointArray pa = Logger.mTrail.get_historical();
-    int last_x = 0, last_y = 0;
-    for (int i = 0; i < pa.n; i++) {
-      XY s = trans_relative(pa.x[i], pa.y[i]);
-      boolean do_add = true;
-      if (i > 0) {
-        int manhattan = Math.abs(s.X - last_x) + Math.abs(s.Y - last_y);
-        if (manhattan < Trail.splot_gap) {
-          do_add = false;
-        }
-      }
-      if (do_add) {
-        my_canv.drawCircle((float)s.X, (float)s.Y, Trail.splot_radius, mOwner.trail_paint);
-        last_x = s.X;
-        last_y = s.Y;
-      }
-    }
+    // Trail.PointArray pa = Logger.mTrail.get_historical();
+    // int last_x = 0, last_y = 0;
+    // for (int i = 0; i < pa.n; i++) {
+    //   XY s = trans_relative(pa.x[i], pa.y[i]);
+    //   boolean do_add = true;
+    //   if (i > 0) {
+    //     int manhattan = Math.abs(s.X - last_x) + Math.abs(s.Y - last_y);
+    //     if (manhattan < Trail.splot_gap) {
+    //       do_add = false;
+    //     }
+    //   }
+    //   if (do_add) {
+    //     my_canv.drawCircle((float)s.X, (float)s.Y, Trail.splot_radius, mOwner.trail_paint);
+    //     last_x = s.X;
+    //     last_y = s.Y;
+    //   }
+    // }
   }
 
   // midpoint is the geographical position to render at centre-screen

@@ -28,7 +28,7 @@ public class HelloAndroid extends Activity {
 
   private DisplayUpdateReceiver myReceiver;
 
-  private Map mMap;
+  // private Map mMap;
 
   /** Called when the activity is first created. */
   @Override
@@ -47,8 +47,8 @@ public class HelloAndroid extends Activity {
       dBmText = (TextView) findViewById(R.id.dBm);
       countText = (TextView) findViewById(R.id.count);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
-      mMap = (Map) findViewById(R.id.map);
-      mMap.restore_state_from_file();
+      // mMap = (Map) findViewById(R.id.map);
+      // mMap.restore_state_from_file();
     }
 
   // @Override
@@ -83,7 +83,7 @@ public class HelloAndroid extends Activity {
       unregisterReceiver(myReceiver);
       // It seems wasteful to do this here, but there is no other safe opportunity to do so -
       // in effect we are 'committing' the user's changes at this point.
-      mMap.save_state_to_file();
+      // mMap.save_state_to_file();
       super.onPause();
     }
 
@@ -207,7 +207,7 @@ public class HelloAndroid extends Activity {
     countText.setText(countString);
 
     updateCidHistory(current_time);
-    mMap.update_map();
+    // mMap.update_map();
   }
 
   // --------------------------------------------------------------------------
@@ -250,19 +250,19 @@ public class HelloAndroid extends Activity {
           // mMap.save_state_to_file(); - gets done under onPause
           return true;
         case OPTION_CLEAR_TRAIL:
-          mMap.clear_trail();
+          //mMap.clear_trail();
           return true;
         case OPTION_MAP_2G:
-          mMap.select_map_source(Map.MAP_2G);
+          //mMap.select_map_source(Map.MAP_2G);
           return true;
         case OPTION_MAP_3G:
-          mMap.select_map_source(Map.MAP_3G);
+          //mMap.select_map_source(Map.MAP_3G);
           return true;
         case OPTION_MAP_OSM:
-          mMap.select_map_source(Map.MAP_OSM);
+          //mMap.select_map_source(Map.MAP_OSM);
           return true;
         case OPTION_MAP_OS:
-          mMap.select_map_source(Map.MAP_OS);
+          //mMap.select_map_source(Map.MAP_OS);
           return true;
         default:
           return false;

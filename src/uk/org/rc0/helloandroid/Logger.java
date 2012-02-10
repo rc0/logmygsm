@@ -40,7 +40,7 @@ public class Logger extends Service {
   private Backend mainlog;
   private RawLogger rawlog;
 
-  static public Trail mTrail;
+  // static public Trail mTrail;
 
   // -----------------
   // Variables shared with the Activity
@@ -107,7 +107,7 @@ public class Logger extends Service {
     init_recent_cids();
 
     rawlog = new RawLogger();
-    mTrail = new Trail();
+    // mTrail = new Trail();
 
     myProvider = LocationManager.GPS_PROVIDER;
     myNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -151,7 +151,7 @@ public class Logger extends Service {
   @Override
   public void onDestroy() {
     stopListening();
-    mTrail.save_state_to_file();
+    // mTrail.save_state_to_file();
   }
 
   // --------------------------------------------------------------------------------
@@ -395,7 +395,7 @@ public class Logger extends Service {
         lastFixMillis = System.currentTimeMillis();
         logToFile();
         rawlog.log_raw_location();
-        mTrail.add_point(new Merc28(lastLat, lastLon));
+        // mTrail.add_point(new Merc28(lastLat, lastLon));
       }
       updateDisplay();
     }

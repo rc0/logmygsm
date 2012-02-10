@@ -163,24 +163,24 @@ public class Map extends View {
   }
 
   private void draw_recent_trail(Canvas c, int w, int h) {
-    Trail.PointArray pa = Logger.mTrail.get_recent();
-    int last_x = 0, last_y = 0;
-    for (int i=0; i<pa.n; i++) {
-      int sx = ((pa.x[i] - display_pos.X) >> pixel_shift) + (w>>1);
-      int sy = ((pa.y[i] - display_pos.Y) >> pixel_shift) + (h>>1);
-      boolean do_add = true;
-      if (i > 0) {
-        int manhattan = Math.abs(sx - last_x) + Math.abs(sy - last_y);
-        if (manhattan < Trail.splot_gap) {
-          do_add = false;
-        }
-      }
-      if (do_add) {
-        c.drawCircle((float)sx, (float)sy, Trail.splot_radius, trail_paint);
-        last_x = sx;
-        last_y = sy;
-      }
-    }
+    //Trail.PointArray pa = Logger.mTrail.get_recent();
+    // int last_x = 0, last_y = 0;
+    // for (int i=0; i<pa.n; i++) {
+    //   int sx = ((pa.x[i] - display_pos.X) >> pixel_shift) + (w>>1);
+    //   int sy = ((pa.y[i] - display_pos.Y) >> pixel_shift) + (h>>1);
+    //   boolean do_add = true;
+    //   if (i > 0) {
+    //     int manhattan = Math.abs(sx - last_x) + Math.abs(sy - last_y);
+    //     if (manhattan < Trail.splot_gap) {
+    //       do_add = false;
+    //     }
+    //   }
+    //   if (do_add) {
+    //     c.drawCircle((float)sx, (float)sy, Trail.splot_radius, trail_paint);
+    //     last_x = sx;
+    //     last_y = sy;
+    //   }
+    // }
   }
 
   private void update_map(Canvas canvas) {
@@ -198,7 +198,7 @@ public class Map extends View {
     draw_centre_circle(canvas, width, height);
     draw_buttons(canvas, width, height);
     draw_bearing(canvas, width, height);
-    draw_recent_trail(canvas, width, height);
+    // draw_recent_trail(canvas, width, height);
   }
 
   // Interface with main UI activity
@@ -289,7 +289,7 @@ public class Map extends View {
   // Local UI callbacks
 
   public void clear_trail() {
-    Logger.mTrail.clear();
+    // Logger.mTrail.clear();
     tile_cache.clear();
     invalidate();
   }
@@ -359,7 +359,7 @@ public class Map extends View {
       String foo2 = String.format("No fix");
       canvas.drawText(foo2, 10, 80, red_paint);
     } else {
-      update_map(canvas);
+      // update_map(canvas);
     }
   }
 
