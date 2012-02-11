@@ -48,7 +48,7 @@ public class HelloAndroid extends Activity {
       countText = (TextView) findViewById(R.id.count);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
       mMap = (Map) findViewById(R.id.map);
-      // mMap.restore_state_from_file();
+      mMap.restore_state_from_file();
     }
 
   @Override
@@ -78,7 +78,7 @@ public class HelloAndroid extends Activity {
       unregisterReceiver(myReceiver);
       // It seems wasteful to do this here, but there is no other safe opportunity to do so -
       // in effect we are 'committing' the user's changes at this point.
-      // mMap.save_state_to_file();
+      mMap.save_state_to_file();
       super.onPause();
     }
 
