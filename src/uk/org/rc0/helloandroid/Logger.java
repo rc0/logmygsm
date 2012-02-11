@@ -151,7 +151,7 @@ public class Logger extends Service {
   @Override
   public void onDestroy() {
     stopListening();
-    // mTrail.save_state_to_file();
+    mTrail.save_state_to_file();
   }
 
   // --------------------------------------------------------------------------------

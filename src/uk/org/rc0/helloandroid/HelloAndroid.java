@@ -242,22 +242,21 @@ public class HelloAndroid extends Activity {
         case OPTION_EXIT:
           Logger.stop_tracing = true;
           finish();
-          // mMap.save_state_to_file(); - gets done under onPause
           return true;
         case OPTION_CLEAR_TRAIL:
-          //mMap.clear_trail();
+          mMap.clear_trail();
           return true;
         case OPTION_MAP_2G:
-          //mMap.select_map_source(Map.MAP_2G);
+          mMap.select_map_source(Map.MAP_2G);
           return true;
         case OPTION_MAP_3G:
-          //mMap.select_map_source(Map.MAP_3G);
+          mMap.select_map_source(Map.MAP_3G);
           return true;
         case OPTION_MAP_OSM:
-          //mMap.select_map_source(Map.MAP_OSM);
+          mMap.select_map_source(Map.MAP_OSM);
           return true;
         case OPTION_MAP_OS:
-          //mMap.select_map_source(Map.MAP_OS);
+          mMap.select_map_source(Map.MAP_OS);
           return true;
         default:
           return false;

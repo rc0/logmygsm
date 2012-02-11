@@ -17,6 +17,7 @@ public class Backend {
     CharSequence cs = DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis());
     String timedFileName = prefix + cs.toString() + ".log";
     String fullPath = basePath + "/" + ourDir + "/" + timedFileName;
+    mService = the_service;
 
     try {
       File root = new File(basePath, ourDir);

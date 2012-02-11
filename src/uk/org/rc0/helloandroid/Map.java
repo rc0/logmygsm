@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Color;
+import android.util.Log;
 
 public class Map extends View {
 
@@ -30,6 +31,8 @@ public class Map extends View {
   static final public int MAP_3G  = 101;
   static final public int MAP_OSM = 102;
   static final public int MAP_OS  = 103;
+
+  static final private String TAG = "Map";
 
   private int zoom;
   private int pixel_shift;
@@ -64,7 +67,7 @@ public class Map extends View {
     red_double_stroke_paint.setStyle(Paint.Style.STROKE);
 
     trail_paint = new Paint();
-    trail_paint.setColor(Color.argb(112, 255, 0, 130));
+    trail_paint.setColor(Color.argb(112, 192, 0, 96));
     trail_paint.setStyle(Paint.Style.FILL);
 
     button_stroke_paint = new Paint();
@@ -163,24 +166,24 @@ public class Map extends View {
   }
 
   private void draw_recent_trail(Canvas c, int w, int h) {
-    //Trail.PointArray pa = Logger.mTrail.get_recent();
-    // int last_x = 0, last_y = 0;
-    // for (int i=0; i<pa.n; i++) {
-    //   int sx = ((pa.x[i] - display_pos.X) >> pixel_shift) + (w>>1);
-    //   int sy = ((pa.y[i] - display_pos.Y) >> pixel_shift) + (h>>1);
-    //   boolean do_add = true;
-    //   if (i > 0) {
-    //     int manhattan = Math.abs(sx - last_x) + Math.abs(sy - last_y);
-    //     if (manhattan < Trail.splot_gap) {
-    //       do_add = false;
-    //     }
-    //   }
-    //   if (do_add) {
-    //     c.drawCircle((float)sx, (float)sy, Trail.splot_radius, trail_paint);
-    //     last_x = sx;
-    //     last_y = sy;
-    //   }
-    // }
+    Trail.PointArray pa = Logger.mTrail.get_recent();
+    int last_x = 0, last_y = 0;
+    for (int i=0; i<pa.n; i++) {
+      int sx = ((pa.x[i] - display_pos.X) >> pixel_shift) + (w>>1);
+      int sy = ((pa.y[i] - display_pos.Y) >> pixel_shift) + (h>>1);
+      boolean do_add = true;
+      if (i > 0) {
+        int manhattan = Math.abs(sx - last_x) + Math.abs(sy - last_y);
+        if (manhattan < Trail.splot_gap) {
+          do_add = false;
+        }
+      }
+      if (do_add) {
+        c.drawCircle((float)sx, (float)sy, Trail.splot_radius, trail_paint);
+        last_x = sx;
+        last_y = sy;
+      }
+    }
   }
 
   private void update_map(Canvas canvas) {
@@ -198,7 +201,7 @@ public class Map extends View {
     draw_centre_circle(canvas, width, height);
     draw_buttons(canvas, width, height);
     draw_bearing(canvas, width, height);
-    // draw_recent_trail(canvas, width, height);
+    draw_recent_trail(canvas, width, height);
   }
 
   // Interface with main UI activity
@@ -289,7 +292,7 @@ public class Map extends View {
   // Local UI callbacks
 
   public void clear_trail() {
-    // Logger.mTrail.clear();
+    Logger.mTrail.clear();
     tile_cache.clear();
     invalidate();
   }

@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import android.util.Log;
 
 // Meant to be instantiated as a member in the service
 public class Trail {
@@ -19,6 +20,8 @@ public class Trail {
 
   public static final int splot_gap = 12;
   public static final float splot_radius = 3.0f;
+
+  private static final String TAG = "Trail";
 
   public class PointArray {
     public int n;
@@ -45,8 +48,8 @@ public class Trail {
     public PointArray (ArrayList<Merc28> zz) {
       n = zz.size();
       if (n > 0) {
-        int [] x = new int[n];
-        int [] y = new int[n];
+        x = new int[n];
+        y = new int[n];
         for (int i = 0; i < n; i++) {
           x[i] = zz.get(i).X;
           y[i] = zz.get(i).Y;
@@ -181,6 +184,7 @@ public class Trail {
   // to accumulate the recent points onto the historical list
   public PointArray get_historical() {
     gather();
+    Log.d(TAG, "get_historical n_old=" + n_old);
     return new PointArray(n_old, x_old, y_old);
   }
 

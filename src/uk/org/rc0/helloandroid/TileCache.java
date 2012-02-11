@@ -75,16 +75,16 @@ public class TileCache {
 
   }
 
-  private XY trans_relative(Merc28 geo) {
+  private XY trans_relative(Merc28 geo, int bias_x, int bias_y) {
     int x, y;
     x = (geo.X - nw_corner.X) >> pixel_shift_1;
     x = (x + 1) >> 1;
     y = (geo.Y - nw_corner.Y) >> pixel_shift_1;
     y = (y + 1) >> 1;
-    return new XY(x, y);
+    return new XY(x - bias_x, y - bias_y);
   }
 
-  private XY trans_relative(int x28, int y28) {
+  private XY trans_relative(int x28, int y28, int bias_x, int bias_y) {
     int x, y;
     x = (x28 - nw_corner.X) >> pixel_shift_1;
     x = (x + 1) >> 1;
@@ -93,20 +93,19 @@ public class TileCache {
     return new XY(x, y);
   }
 
-  private XY trans_absolute(Merc28 geo) {
+  private XY trans_absolute(Merc28 geo, int bias_x, int bias_y) {
     int x, y;
     x = (geo.X) >> pixel_shift_1;
     x = (x + 1) >> 1;
     y = (geo.Y) >> pixel_shift_1;
     y = (y + 1) >> 1;
-    return new XY(x, y);
+    return new XY(x - bias_x, y - bias_y);
   }
 
   // I suspect there are boundary problems around 85S and the date line.
   // Hopefully I'm not going there.
 
   private void render_tile(Canvas canvas, int z, int tile_x, int tile_y, int dx, int dy) {
-    Log.d(TAG, "render_tile called");
     int xl = dx     << bm_log_width;
     int xr = (dx+1) << bm_log_width;
     int yt = dy     << bm_log_width;
@@ -141,10 +140,12 @@ public class TileCache {
     }
   }
 
-  private void rebuild(Merc28 geo) {
+  private void rebuild(Merc28 geo, int w, int h) {
     XY pos;
     int tile_x, tile_y;
-    pos = trans_absolute(geo);
+    pos = trans_absolute(geo, w>>1, h>>1);
+    // pos is now the location of the NW corner of the viewport in pixels
+    // relative to the OSM origin at the current zoom level.
     tile_x = pos.X >> 8;
     tile_y = pos.Y >> 8;
     cache = Bitmap.createBitmap(pixels_along_side, pixels_along_side, Bitmap.Config.ARGB_8888);
@@ -157,23 +158,23 @@ public class TileCache {
     nw_corner = new Merc28(tile_x << tile_shift, tile_y << tile_shift);
 
     // Render old part of trail
-    // Trail.PointArray pa = Logger.mTrail.get_historical();
-    // int last_x = 0, last_y = 0;
-    // for (int i = 0; i < pa.n; i++) {
-    //   XY s = trans_relative(pa.x[i], pa.y[i]);
-    //   boolean do_add = true;
-    //   if (i > 0) {
-    //     int manhattan = Math.abs(s.X - last_x) + Math.abs(s.Y - last_y);
-    //     if (manhattan < Trail.splot_gap) {
-    //       do_add = false;
-    //     }
-    //   }
-    //   if (do_add) {
-    //     my_canv.drawCircle((float)s.X, (float)s.Y, Trail.splot_radius, mOwner.trail_paint);
-    //     last_x = s.X;
-    //     last_y = s.Y;
-    //   }
-    // }
+    Trail.PointArray pa = Logger.mTrail.get_historical();
+    int last_x = 0, last_y = 0;
+    for (int i = 0; i < pa.n; i++) {
+      XY s = trans_relative(pa.x[i], pa.y[i], 0, 0);
+      boolean do_add = true;
+      if (i > 0) {
+        int manhattan = Math.abs(s.X - last_x) + Math.abs(s.Y - last_y);
+        if (manhattan < Trail.splot_gap) {
+          do_add = false;
+        }
+      }
+      if (do_add) {
+        my_canv.drawCircle((float)s.X, (float)s.Y, Trail.splot_radius, mOwner.trail_paint);
+        last_x = s.X;
+        last_y = s.Y;
+      }
+    }
   }
 
   // midpoint is the geographical position to render at centre-screen
@@ -181,17 +182,17 @@ public class TileCache {
     XY pos;
 
     if (cache == null) {
-      rebuild(midpoint);
+      rebuild(midpoint, w, h);
     }
 
-    pos = trans_relative(midpoint);
+    pos = trans_relative(midpoint, w>>1, h>>1);
     if ((pos.X < 0) ||
         (pos.X + w >= pixels_along_side) ||
         (pos.Y < 0) ||
         (pos.Y + h >= pixels_along_side)) {
 
-      rebuild(midpoint);
-      pos = trans_relative(midpoint);
+      rebuild(midpoint, w, h);
+      pos = trans_relative(midpoint, w>>1, h>>1);
     }
 
     Rect src = new Rect(pos.X, pos.Y, pos.X + w, pos.Y + h);
