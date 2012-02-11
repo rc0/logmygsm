@@ -21,7 +21,7 @@ public class HelloAndroid extends Activity {
   private TextView cidText;
   private TextView lacmncText;
   private TextView netmccText;
-  private TextView handoffText;
+  private TextView speedText;
   private TextView dBmText;
   private TextView countText;
   private TextView cidHistoryText;
@@ -43,7 +43,7 @@ public class HelloAndroid extends Activity {
       cidText = (TextView) findViewById(R.id.cid);
       netmccText = (TextView) findViewById(R.id.net_mcc);
       lacmncText = (TextView) findViewById(R.id.lac_mnc);
-      handoffText = (TextView) findViewById(R.id.handoffs);
+      speedText = (TextView) findViewById(R.id.speed);
       dBmText = (TextView) findViewById(R.id.dBm);
       countText = (TextView) findViewById(R.id.count);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
@@ -130,29 +130,35 @@ public class HelloAndroid extends Activity {
       String accString = String.format("%dm", Logger.lastAcc);
       String ageString;
       if (age < 90) {
-        ageString = String.format("%2ds %03d", age, Logger.lastBearing);
+        ageString = String.format(" %2ds %03d", age, Logger.lastBearing);
       } else if (age < 90*60) {
-        ageString = String.format("%2dm %03d", age/60, Logger.lastBearing);
+        ageString = String.format(" %2dm %03d", age/60, Logger.lastBearing);
       } else {
-        ageString = String.format("%2dh %03d", age/3600, Logger.lastBearing);
+        ageString = String.format(" %2dh %03d", age/3600, Logger.lastBearing);
       }
+      String speedString = String.format("%5.1f mph",
+        Logger.lastSpeed * 2.237);
       latText.setText(latString);
       lonText.setText(lonString);
       accText.setText(accString);
       ageText.setText(ageString);
+      speedText.setText(speedString);
       latText.setTextColor(Color.WHITE);
       lonText.setTextColor(Color.WHITE);
       accText.setTextColor(Color.WHITE);
       ageText.setTextColor(Color.WHITE);
+      speedText.setTextColor(Color.WHITE);
     } else {
       latText.setText("GPS?");
       lonText.setText("GPS?");
       accText.setText("GPS?");
       ageText.setText("GPS?");
+      speedText.setText("GPS?");
       latText.setTextColor(Color.RED);
       lonText.setTextColor(Color.RED);
       accText.setTextColor(Color.RED);
       ageText.setTextColor(Color.RED);
+      speedText.setTextColor(Color.RED);
     }
     String satString = String.format("%d/%d/%d",
         Logger.last_fix_sats,
@@ -174,8 +180,6 @@ public class HelloAndroid extends Activity {
         Logger.lastLac, mnc_string);
     String netmccString = String.format("%5s %3s",
         Logger.lastNetworkTypeLong, mcc_string);
-    String handoffString = String.format("%d ha",
-        Logger.nHandoffs);
     String dBmString = String.format("%ddBm", Logger.lastdBm);
     satText.setText(satString);
 
@@ -195,7 +199,6 @@ public class HelloAndroid extends Activity {
 
     lacmncText.setText(lacmncString);
     netmccText.setText(netmccString);
-    handoffText.setText(handoffString);
     dBmText.setText(dBmString);
 
     String countString = String.format("%d pt", Logger.nReadings);
