@@ -107,7 +107,7 @@ public class Logger extends Service {
     init_recent_cids();
 
     rawlog = new RawLogger();
-    mTrail = new Trail();
+    mTrail = new Trail(this);
 
     myProvider = LocationManager.GPS_PROVIDER;
     myNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

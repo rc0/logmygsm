@@ -12,6 +12,8 @@ import android.util.Log;
 // Meant to be instantiated as a member in the service
 public class Trail {
 
+  private Logger mLogger;
+
   private ArrayList<Merc28> recent;
   private Merc28 last_point;
   private int n_old;
@@ -62,7 +64,8 @@ public class Trail {
 
   }
 
-  public Trail() {
+  public Trail(Logger the_logger) {
+    mLogger = the_logger;
     restore_state_from_file();
   }
 
@@ -127,6 +130,8 @@ public class Trail {
     if (failed) {
       init();
     }
+
+    mLogger.announce(String.format("Loaded %d trail points", n_old));
   }
 
   // Skip points that are too close together to ever be visible on the map display
@@ -184,7 +189,6 @@ public class Trail {
   // to accumulate the recent points onto the historical list
   public PointArray get_historical() {
     gather();
-    Log.d(TAG, "get_historical n_old=" + n_old);
     return new PointArray(n_old, x_old, y_old);
   }
 
