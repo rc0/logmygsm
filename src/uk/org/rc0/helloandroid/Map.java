@@ -37,6 +37,7 @@ public class Map extends View {
 
   private int zoom;
   private int pixel_shift;
+  private float drag_scale;
   private TileCache tile_cache;
 
   // the GPS fix from the logger
@@ -236,6 +237,7 @@ public class Map extends View {
     tile_cache.setZoom(z);
     zoom = z;
     pixel_shift = Merc28.shift - (z+8);
+    drag_scale = (float)(1 << pixel_shift);
   }
 
   // Yes, we should use the Android preferences system for this.
@@ -312,6 +314,9 @@ public class Map extends View {
     }
   }
 
+  private float mLastX;
+  private float mLastY;
+
   @Override public boolean onTouchEvent(MotionEvent event) {
     float x = event.getX();
     float y = event.getY();
@@ -341,14 +346,20 @@ public class Map extends View {
       }
       // Not inside the zoom buttons - initiate drag
       if (display_pos != null) {
-        int dx = (int) x - (getWidth() >> 1);
-        int dy = (int) y - (getHeight() >> 1);
-        display_pos.X += (dx << pixel_shift);
-        display_pos.Y += (dy << pixel_shift);
-        is_dragged = true;
-        invalidate();
-        return true;
+        mLastX = x;
+        mLastY = y;
       }
+    } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+      float dx, dy;
+      dx = x - mLastX;
+      dy = y - mLastY;
+      display_pos.X += (int)(0.5 + drag_scale * dx);
+      display_pos.Y += (int)(0.5 + drag_scale * dy);
+      is_dragged = true;
+      mLastX = x;
+      mLastY = y;
+      invalidate();
+      return true;
     }
     return false;
   }
