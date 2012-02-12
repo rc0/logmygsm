@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.widget.TextView;
 
 public class HelloAndroid extends Activity {
@@ -223,17 +224,20 @@ public class HelloAndroid extends Activity {
 
   private final int OPTION_MAP_2G   = 1;
   private final int OPTION_MAP_3G   = 2;
-  private final int OPTION_MAP_OSM  = 3;
+  private final int OPTION_MAP_MAPNIK  = 3;
+  private final int OPTION_MAP_CYCLE = 7;
   private final int OPTION_MAP_OS   = 4;
   private final int OPTION_CLEAR_TRAIL = 5;
   private final int OPTION_EXIT     = 6;
 
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-      menu.add (Menu.NONE, OPTION_MAP_2G,  Menu.NONE, "2G map");
-      menu.add (Menu.NONE, OPTION_MAP_3G,  Menu.NONE, "3G map");
-      menu.add (Menu.NONE, OPTION_MAP_OSM, Menu.NONE, "OSM map");
-      menu.add (Menu.NONE, OPTION_MAP_OS,  Menu.NONE, "OS map");
+      SubMenu sub = menu.addSubMenu(0, 0, Menu.NONE, "Maps");
+      sub.add (Menu.NONE, OPTION_MAP_2G,  Menu.NONE, "O2 UK 2G map");
+      sub.add (Menu.NONE, OPTION_MAP_3G,  Menu.NONE, "O2 UK 3G map");
+      sub.add (Menu.NONE, OPTION_MAP_OS,  Menu.NONE, "Ordnance Survey");
+      sub.add (Menu.NONE, OPTION_MAP_MAPNIK, Menu.NONE, "Mapnik (OSM)");
+      sub.add (Menu.NONE, OPTION_MAP_CYCLE, Menu.NONE, "OpenCycleMap");
       menu.add (Menu.NONE, OPTION_CLEAR_TRAIL,  Menu.NONE, "Clear trail");
       menu.add (Menu.NONE, OPTION_EXIT,    Menu.NONE, "Exit");
       return true;
@@ -255,8 +259,11 @@ public class HelloAndroid extends Activity {
         case OPTION_MAP_3G:
           mMap.select_map_source(Map.MAP_3G);
           return true;
-        case OPTION_MAP_OSM:
-          mMap.select_map_source(Map.MAP_OSM);
+        case OPTION_MAP_MAPNIK:
+          mMap.select_map_source(Map.MAP_MAPNIK);
+          return true;
+        case OPTION_MAP_CYCLE:
+          mMap.select_map_source(Map.MAP_OPEN_CYCLE);
           return true;
         case OPTION_MAP_OS:
           mMap.select_map_source(Map.MAP_OS);

@@ -29,8 +29,9 @@ public class Map extends View {
 
   static final public int MAP_2G  = 100;
   static final public int MAP_3G  = 101;
-  static final public int MAP_OSM = 102;
+  static final public int MAP_MAPNIK = 102;
   static final public int MAP_OS  = 103;
+  static final public int MAP_OPEN_CYCLE = 104;
 
   static final private String TAG = "Map";
 

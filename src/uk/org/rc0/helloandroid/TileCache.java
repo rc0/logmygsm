@@ -121,8 +121,12 @@ public class TileCache {
         filename = String.format("/sdcard/Maverick/tiles/Custom 3/%d/%d/%d.png.tile",
             z, tile_x+dx, tile_y+dy);
         break;
-      case Map.MAP_OSM:
+      case Map.MAP_MAPNIK:
         filename = String.format("/sdcard/Maverick/tiles/mapnik/%d/%d/%d.png.tile",
+            z, tile_x+dx, tile_y+dy);
+        break;
+      case Map.MAP_OPEN_CYCLE:
+        filename = String.format("/sdcard/Maverick/tiles/OSM Cycle Map/%d/%d/%d.png.tile",
             z, tile_x+dx, tile_y+dy);
         break;
       case Map.MAP_OS:
