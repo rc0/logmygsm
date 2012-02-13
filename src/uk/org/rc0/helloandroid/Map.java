@@ -318,48 +318,58 @@ public class Map extends View {
   private float mLastY;
 
   @Override public boolean onTouchEvent(MotionEvent event) {
+    int action = event.getAction();
     float x = event.getX();
     float y = event.getY();
 
-    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-      if (y < button_size) {
-        if (x < button_size) {
-          zoom_out();
-          return true;
-        } else if (x > (getWidth() - button_size)) {
-          zoom_in();
+    switch (action) {
+      case MotionEvent.ACTION_DOWN:
+        if (y < button_size) {
+          if (x < button_size) {
+            zoom_out();
+            return true;
+          } else if (x > (getWidth() - button_size)) {
+            zoom_in();
+            return true;
+          }
+        }
+        // Hit on the centre cross-hair region to re-centre the map on the GPS fix
+        if ((y > ((getHeight() - button_size)>>1)) &&
+            (y < ((getHeight() + button_size)>>1)) &&
+            (x > ((getWidth()  - button_size)>>1)) &&
+            (x < ((getWidth()  + button_size)>>1))) {
+          // If (actual_pos == null) here, it means no GPS fix; refuse to drop the display position then
+          if (actual_pos != null) {
+            display_pos = actual_pos;
+            is_dragged = false;
+            invalidate();
+            return true;
+          }
+        }
+        // Not inside the zoom buttons - initiate drag
+        if (display_pos != null) {
+          mLastX = x;
+          mLastY = y;
+          is_dragged = true;
           return true;
         }
-      }
-      // Hit on the centre cross-hair region to re-centre the map on the GPS fix
-      if ((y > ((getHeight() - button_size)>>1)) &&
-          (y < ((getHeight() + button_size)>>1)) &&
-          (x > ((getWidth()  - button_size)>>1)) &&
-          (x < ((getWidth()  + button_size)>>1))) {
-        // If (actual_pos == null) here, it means no GPS fix; refuse to drop the display position then
-        if (actual_pos != null) {
-          display_pos = actual_pos;
-          is_dragged = false;
+        break;
+      case MotionEvent.ACTION_MOVE:
+        // Prevent a drag starting on a zoom button etc, which would be bogus.
+        if (is_dragged) {
+          float dx, dy;
+          dx = x - mLastX;
+          dy = y - mLastY;
+          display_pos.X -= (int)(0.5 + drag_scale * dx);
+          display_pos.Y -= (int)(0.5 + drag_scale * dy);
+          mLastX = x;
+          mLastY = y;
           invalidate();
           return true;
         }
-      }
-      // Not inside the zoom buttons - initiate drag
-      if (display_pos != null) {
-        mLastX = x;
-        mLastY = y;
-      }
-    } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-      float dx, dy;
-      dx = x - mLastX;
-      dy = y - mLastY;
-      display_pos.X += (int)(0.5 + drag_scale * dx);
-      display_pos.Y += (int)(0.5 + drag_scale * dy);
-      is_dragged = true;
-      mLastX = x;
-      mLastY = y;
-      invalidate();
-      return true;
+        break;
+      default:
+        return false;
     }
     return false;
   }
