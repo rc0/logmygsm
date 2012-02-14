@@ -42,6 +42,9 @@ public class Map extends View {
 
   // the GPS fix from the logger
   private Merc28 actual_pos;
+  private Merc28 last_actual_pos;
+  private Merc28 estimated_pos;
+
   // the location at the centre of the screen - may be != actual_pos if is_dragged is true.
   private Merc28 display_pos;
   // Set to true if we've off-centred the map
@@ -84,6 +87,8 @@ public class Map extends View {
     setZoom(14);
     tile_cache.setMapSource(MAP_2G);
     actual_pos = null;
+    last_actual_pos = null;
+    estimated_pos = null;
     display_pos = null;
 
   }
@@ -95,15 +100,15 @@ public class Map extends View {
   final static float LEN3 = 3.0f * LEN1;
 
   private void draw_crosshair(Canvas c, int w, int h) {
-    if (actual_pos != null) {
+    if (estimated_pos != null) {
       float x0, x1, x2, x3, xc;
       float y0, y1, y2, y3, yc;
 
       xc = (float)(w/2);
       yc = (float)(h/2);
       if (is_dragged) {
-        int dx = (actual_pos.X - display_pos.X) >> pixel_shift;
-        int dy = (actual_pos.Y - display_pos.Y) >> pixel_shift;
+        int dx = (estimated_pos.X - display_pos.X) >> pixel_shift;
+        int dy = (estimated_pos.Y - display_pos.Y) >> pixel_shift;
         xc += (float) dx;
         yc += (float) dy;
       }
@@ -209,13 +214,17 @@ public class Map extends View {
   // Interface with main UI activity
 
   public void update_map() {
+    // 2-elt 'shift register' of current and last position
+    last_actual_pos = actual_pos;
     if (Logger.validFix) {
       actual_pos = new Merc28(Logger.lastLat, Logger.lastLon);
-      if ((display_pos == null) || !is_dragged) {
-        display_pos = new Merc28(actual_pos);
-      }
     } else {
       actual_pos = null;
+    }
+    estimated_pos = Merc28.predict(last_actual_pos, actual_pos);
+    if ((estimated_pos != null) &&
+        ((display_pos == null) || !is_dragged)) {
+      display_pos = new Merc28(estimated_pos);
     }
     invalidate();
   }
@@ -317,6 +326,48 @@ public class Map extends View {
   private float mLastX;
   private float mLastY;
 
+  private boolean try_zoom(float x, float y) {
+    if (y < button_size) {
+      if (x < button_size) {
+        zoom_out();
+        return true;
+      } else if (x > (getWidth() - button_size)) {
+        zoom_in();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean try_recentre(float x, float y) {
+    // Hit on the centre cross-hair region to re-centre the map on the GPS fix
+    if ((y > ((getHeight() - button_size)>>1)) &&
+        (y < ((getHeight() + button_size)>>1)) &&
+        (x > ((getWidth()  - button_size)>>1)) &&
+        (x < ((getWidth()  + button_size)>>1))) {
+      // If (estimated_pos == null) here, it means no history of recent GPS fixes;
+      // refuse to drop the display position then
+      if (estimated_pos != null) {
+        display_pos = estimated_pos;
+        is_dragged = false;
+        invalidate();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean try_start_drag(float x, float y) {
+    // Not inside the zoom buttons - initiate drag
+    if (display_pos != null) {
+      mLastX = x;
+      mLastY = y;
+      is_dragged = true;
+      return true;
+    }
+    return false;
+  }
+
   @Override public boolean onTouchEvent(MotionEvent event) {
     int action = event.getAction();
     float x = event.getX();
@@ -324,33 +375,13 @@ public class Map extends View {
 
     switch (action) {
       case MotionEvent.ACTION_DOWN:
-        if (y < button_size) {
-          if (x < button_size) {
-            zoom_out();
-            return true;
-          } else if (x > (getWidth() - button_size)) {
-            zoom_in();
-            return true;
-          }
+        if (try_zoom(x, y)) {
+          return true;
         }
-        // Hit on the centre cross-hair region to re-centre the map on the GPS fix
-        if ((y > ((getHeight() - button_size)>>1)) &&
-            (y < ((getHeight() + button_size)>>1)) &&
-            (x > ((getWidth()  - button_size)>>1)) &&
-            (x < ((getWidth()  + button_size)>>1))) {
-          // If (actual_pos == null) here, it means no GPS fix; refuse to drop the display position then
-          if (actual_pos != null) {
-            display_pos = actual_pos;
-            is_dragged = false;
-            invalidate();
-            return true;
-          }
+        if (try_recentre(x, y)) {
+          return true;
         }
-        // Not inside the zoom buttons - initiate drag
-        if (display_pos != null) {
-          mLastX = x;
-          mLastY = y;
-          is_dragged = true;
+        if (try_start_drag(x, y)) {
           return true;
         }
         break;

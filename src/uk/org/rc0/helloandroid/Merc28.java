@@ -37,6 +37,17 @@ public class Merc28 {
     Y = orig.Y;
   }
 
+  static public Merc28 predict(Merc28 older, Merc28 newer) {
+    int xpred, ypred;
+    if ((older != null) && (newer != null)) {
+      xpred = (newer.X * 3 - older.X) >> 1;
+      ypred = (newer.Y * 3 - older.Y) >> 1;
+      return new Merc28(xpred, ypred);
+    } else {
+      return null;
+    }
+  }
+
 }
 
 // vim:et:sw=2:sts=2
