@@ -31,6 +31,8 @@ public class HelloAndroid extends Activity {
 
   private Map mMap;
 
+  private static final String PREFS_FILE = "prefs.txt";
+
   /** Called when the activity is first created. */
   @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,7 +51,7 @@ public class HelloAndroid extends Activity {
       countText = (TextView) findViewById(R.id.count);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
       mMap = (Map) findViewById(R.id.map);
-      mMap.restore_state_from_file();
+      mMap.restore_state_from_file(PREFS_FILE);
     }
 
   @Override
@@ -79,7 +81,7 @@ public class HelloAndroid extends Activity {
       unregisterReceiver(myReceiver);
       // It seems wasteful to do this here, but there is no other safe opportunity to do so -
       // in effect we are 'committing' the user's changes at this point.
-      mMap.save_state_to_file();
+      mMap.save_state_to_file(PREFS_FILE);
       super.onPause();
     }
 

@@ -252,8 +252,8 @@ public class Map extends View {
   // Yes, we should use the Android preferences system for this.
   // Saving to SD card allows us to edit the file offline etc
   // for debugging and so on
-  public void restore_state_from_file() {
-    File file = new File("/sdcard/LogMyGsm/prefs/prefs.txt");
+  public void restore_state_from_file(String tail) {
+    File file = new File("/sdcard/LogMyGsm/prefs/" + tail);
     int map_source;
     // defaults in case of strife
     display_pos = null;
@@ -282,13 +282,13 @@ public class Map extends View {
     tile_cache.setMapSource(map_source);
   }
 
-  public void save_state_to_file() {
+  public void save_state_to_file(String tail) {
     if (display_pos != null) {
       File dir = new File("/sdcard/LogMyGsm/prefs");
       if (!dir.exists()) {
         dir.mkdirs();
       }
-      File file = new File(dir, "prefs.txt");
+      File file = new File(dir, tail);
       try {
         BufferedWriter bw = new BufferedWriter(new FileWriter(file));
         bw.write(String.format("%d\n", zoom));
