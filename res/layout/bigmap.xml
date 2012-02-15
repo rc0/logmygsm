@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:weightSum="1">
+
+  <!-- The block around the buttons at the top -->
+  <LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/add_button"
+        android:typeface="monospace"
+        android:textSize="16sp"
+        android:text="Add Marker"
+        android:gravity="center">
+    </Button>
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/delete_button"
+        android:typeface="monospace"
+        android:textSize="16sp"
+        android:text="Delete Marker"
+        android:gravity="center">
+    </Button>
+  </LinearLayout>
+  <!-- The block around the buttons at the top -->
+
+  <TextView
+    android:layout_height="5dp"
+    android:layout_width="fill_parent"
+    android:id="@+id/shim_over_big_map">
+  </TextView>
+
+  <uk.org.rc0.helloandroid.Map
+    android:id="@+id/big_map"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    />
+
+</LinearLayout>
+<!-- The outermost vertical layout -->
+
+

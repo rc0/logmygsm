@@ -197,10 +197,6 @@ public class Map extends View {
     // Decide if we have to rebuild the tile22 cache
     int width = getWidth();
     int height = getHeight();
-    if (height > 240) {
-      // Avoid the viewport height getting bigger than the size of a tile - for now
-      height = 240;
-    }
 
     tile_cache.draw(canvas, width, height, display_pos);
 
@@ -220,6 +216,10 @@ public class Map extends View {
       actual_pos = new Merc28(Logger.lastLat, Logger.lastLon);
     } else {
       actual_pos = null;
+    }
+    if (last_actual_pos == null) {
+      // for 'quick start' - only need 1 update before map draw can start properly.
+      last_actual_pos = actual_pos;
     }
     estimated_pos = Merc28.predict(last_actual_pos, actual_pos);
     if ((estimated_pos != null) &&

@@ -3,4 +3,5 @@
     <string name="hello">LogMyGsm!</string>
     <string name="CellStat">A tool to collect coverage info for GSM/3G</string>
     <string name="app_name">LogMyGsm</string>
+    <string name="big_map_name">Waypoint edit</string>
 </resources>

@@ -12,14 +12,17 @@ import java.io.File;
 public class TileCache {
 
   // All OSM / Maverick tiles are this many pixels square - we hope!
-  static final private int bm_log_width = 8;
-  static final private int bm_width = 1<<bm_log_width;
-  static final private int tiles_along_side = 2;
-  static final private int pixels_along_side = tiles_along_side * bm_width;
+  static final private int bm_log_size = 8;
+  static final private int bm_size = 1<<bm_log_size;
+  static final private int galley_size = 16;
 
   static final private String TAG = "TileCache";
 
   private Map mOwner;
+  private int vertical_tiles;
+  private int horizontal_tiles;
+  private int vertical_pixels;
+  private int horizontal_pixels;
   private Bitmap cache;
   private Merc28 nw_corner;
   private int map_source;
@@ -45,7 +48,7 @@ public class TileCache {
     }
     zoom = z;
     tile_shift = (Merc28.shift - (zoom));
-    pixel_shift_1 = (Merc28.shift - (zoom + bm_log_width)) - 1;
+    pixel_shift_1 = (Merc28.shift - (zoom + bm_log_size)) - 1;
   }
 
   public void setMapSource(int code) {
@@ -106,10 +109,10 @@ public class TileCache {
   // Hopefully I'm not going there.
 
   private void render_tile(Canvas canvas, int z, int tile_x, int tile_y, int dx, int dy) {
-    int xl = dx     << bm_log_width;
-    int xr = (dx+1) << bm_log_width;
-    int yt = dy     << bm_log_width;
-    int yb = (dy+1) << bm_log_width;
+    int xl = dx     << bm_log_size;
+    int xr = (dx+1) << bm_log_size;
+    int yt = dy     << bm_log_size;
+    int yb = (dy+1) << bm_log_size;
 
     String filename = null;
     switch (map_source) {
@@ -144,6 +147,11 @@ public class TileCache {
     }
   }
 
+  static int n_tiles(int screen_dimen) {
+    int n = (screen_dimen + galley_size + bm_size - 1) >> bm_log_size;
+    return n + 1;
+  }
+
   private void rebuild(Merc28 geo, int w, int h) {
     XY pos;
     int tile_x, tile_y;
@@ -152,10 +160,16 @@ public class TileCache {
     // relative to the OSM origin at the current zoom level.
     tile_x = pos.X >> 8;
     tile_y = pos.Y >> 8;
-    cache = Bitmap.createBitmap(pixels_along_side, pixels_along_side, Bitmap.Config.ARGB_8888);
+
+    vertical_tiles = n_tiles(h);
+    horizontal_tiles = n_tiles(w);
+    vertical_pixels = vertical_tiles * bm_size;
+    horizontal_pixels = horizontal_tiles * bm_size;
+
+    cache = Bitmap.createBitmap(horizontal_pixels, vertical_pixels, Bitmap.Config.ARGB_8888);
     Canvas my_canv = new Canvas(cache);
-    for (int dx=0; dx<tiles_along_side; dx++) {
-      for (int dy=0; dy<tiles_along_side; dy++) {
+    for (int dx=0; dx<horizontal_tiles; dx++) {
+      for (int dy=0; dy<vertical_tiles; dy++) {
         render_tile(my_canv, zoom, tile_x, tile_y, dx, dy);
       }
     }
@@ -191,9 +205,9 @@ public class TileCache {
 
     pos = trans_relative(midpoint, w>>1, h>>1);
     if ((pos.X < 0) ||
-        (pos.X + w >= pixels_along_side) ||
+        (pos.X + w >= horizontal_pixels) ||
         (pos.Y < 0) ||
-        (pos.Y + h >= pixels_along_side)) {
+        (pos.Y + h >= vertical_pixels)) {
 
       rebuild(midpoint, w, h);
       pos = trans_relative(midpoint, w>>1, h>>1);

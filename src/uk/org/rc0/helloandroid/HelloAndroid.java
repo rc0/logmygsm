@@ -229,6 +229,7 @@ public class HelloAndroid extends Activity {
   private final int OPTION_MAP_OS   = 4;
   private final int OPTION_CLEAR_TRAIL = 5;
   private final int OPTION_EXIT     = 6;
+  private final int OPTION_BIG_MAP = 10;
 
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -238,6 +239,7 @@ public class HelloAndroid extends Activity {
       sub.add (Menu.NONE, OPTION_MAP_OS,  Menu.NONE, "Ordnance Survey");
       sub.add (Menu.NONE, OPTION_MAP_MAPNIK, Menu.NONE, "Mapnik (OSM)");
       sub.add (Menu.NONE, OPTION_MAP_CYCLE, Menu.NONE, "OpenCycleMap");
+      menu.add (Menu.NONE, OPTION_BIG_MAP, Menu.NONE, "Waypoint map");
       menu.add (Menu.NONE, OPTION_CLEAR_TRAIL,  Menu.NONE, "Clear trail");
       menu.add (Menu.NONE, OPTION_EXIT,    Menu.NONE, "Exit");
       return true;
@@ -252,6 +254,10 @@ public class HelloAndroid extends Activity {
           return true;
         case OPTION_CLEAR_TRAIL:
           mMap.clear_trail();
+          return true;
+        case OPTION_BIG_MAP:
+          Intent intent = new Intent(this, BigMapActivity.class);
+          startActivity(intent);
           return true;
         case OPTION_MAP_2G:
           mMap.select_map_source(Map.MAP_2G);
