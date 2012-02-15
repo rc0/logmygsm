@@ -27,7 +27,8 @@ public class HelloAndroid extends Activity {
   private TextView countText;
   private TextView cidHistoryText;
 
-  private DisplayUpdateReceiver myReceiver;
+  private CellUpdateReceiver myCellReceiver;
+  private GPSUpdateReceiver myGPSReceiver;
 
   private Map mMap;
 
@@ -68,17 +69,25 @@ public class HelloAndroid extends Activity {
     public void onResume () {
       Logger.stop_tracing = false;
       startService(new Intent(this, Logger.class));
+
       IntentFilter filter;
-      filter = new IntentFilter(Logger.DISPLAY_UPDATE);
-      myReceiver = new DisplayUpdateReceiver();
-      registerReceiver(myReceiver, filter);
+      filter = new IntentFilter(Logger.UPDATE_CELL);
+      myCellReceiver = new CellUpdateReceiver();
+      registerReceiver(myCellReceiver, filter);
+
+      filter = new IntentFilter(Logger.UPDATE_GPS);
+      myGPSReceiver = new GPSUpdateReceiver();
+      registerReceiver(myGPSReceiver, filter);
+
       updateDisplay();
+      mMap.update_map();
       super.onResume();
     }
 
     @Override
     public void onPause() {
-      unregisterReceiver(myReceiver);
+      unregisterReceiver(myCellReceiver);
+      unregisterReceiver(myGPSReceiver);
       // It seems wasteful to do this here, but there is no other safe opportunity to do so -
       // in effect we are 'committing' the user's changes at this point.
       mMap.save_state_to_file(PREFS_FILE);
@@ -208,15 +217,22 @@ public class HelloAndroid extends Activity {
     countText.setText(countString);
 
     updateCidHistory(current_time);
-    mMap.update_map();
   }
 
   // --------------------------------------------------------------------------
   //
 
-  public class DisplayUpdateReceiver extends BroadcastReceiver {
+  public class CellUpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+      updateDisplay();
+    }
+  }
+
+  public class GPSUpdateReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      mMap.update_map();
       updateDisplay();
     }
   }

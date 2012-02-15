@@ -46,7 +46,8 @@ public class Logger extends Service {
   // Variables shared with the Activity
   // -----------------
   //
-  public static final String DISPLAY_UPDATE = "Display_Update_LogMyGSM";
+  public static final String UPDATE_CELL = "LogMyGSM_Update_Cell";
+  public static final String UPDATE_GPS  = "LogMyGSM_Update_GPS";
 
   // --- Telephony
   static public char   lastNetworkType;
@@ -257,9 +258,18 @@ public class Logger extends Service {
 
   // --------------------------------------------------------------------------------
 
-  private void updateDisplay() {
+  private void updateUIGPS() {
     updateNotification();
-    Intent intent = new Intent(DISPLAY_UPDATE);
+    Intent intent = new Intent(UPDATE_GPS);
+    sendBroadcast(intent);
+    if (stop_tracing) {
+      stopSelf();
+    }
+  }
+
+  private void updateUICell() {
+    updateNotification();
+    Intent intent = new Intent(UPDATE_CELL);
     sendBroadcast(intent);
     if (stop_tracing) {
       stopSelf();
@@ -305,7 +315,7 @@ public class Logger extends Service {
       lastSimOperator = new String(myTelephonyManager.getSimOperatorName());
       logCellHistory();
       rawlog.log_cell();
-      updateDisplay();
+      updateUICell();
     };
 
     public void onSignalStrengthsChanged(SignalStrength strength) {
@@ -320,7 +330,7 @@ public class Logger extends Service {
       }
       lastBer = strength.getGsmBitErrorRate();
       logCellHistory();
-      updateDisplay();
+      updateUICell();
     };
 
     public void onServiceStateChanged(ServiceState newState) {
@@ -332,7 +342,7 @@ public class Logger extends Service {
         default:                                lastState = '?'; break;
       }
       rawlog.log_service_state();
-      updateDisplay();
+      updateUICell();
     };
 
     private void handle_network_type(int network_type) {
@@ -364,7 +374,7 @@ public class Logger extends Service {
       }
       lastNetworkTypeRaw = network_type;
       rawlog.log_network_type();
-      updateDisplay();
+      updateUICell();
     };
 
     public void onDataConnectionStateChanged(int state, int network_type) {
@@ -397,13 +407,13 @@ public class Logger extends Service {
         rawlog.log_raw_location();
         mTrail.add_point(new Merc28(lastLat, lastLon));
       }
-      updateDisplay();
+      updateUIGPS();
     }
 
     public void onProviderDisabled(String provider) {
       validFix = false;
       rawlog.log_location_disabled();
-      updateDisplay();
+      updateUIGPS();
     }
 
     public void onProviderEnabled(String provider) {

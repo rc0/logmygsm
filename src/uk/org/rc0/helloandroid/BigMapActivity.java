@@ -12,7 +12,7 @@ import android.view.SubMenu;
 
 public class BigMapActivity extends Activity {
 
-  private DisplayUpdateReceiver myReceiver;
+  private GPSUpdateReceiver myGPSReceiver;
   private Map mMap;
 
   private static final String PREFS_FILE = "prefs2.txt";
@@ -40,16 +40,17 @@ public class BigMapActivity extends Activity {
     //Logger.stop_tracing = false;
     //startService(new Intent(this, Logger.class));
     IntentFilter filter;
-    filter = new IntentFilter(Logger.DISPLAY_UPDATE);
-    myReceiver = new DisplayUpdateReceiver();
-    registerReceiver(myReceiver, filter);
-    updateDisplay();
+
+    filter = new IntentFilter(Logger.UPDATE_GPS);
+    myGPSReceiver = new GPSUpdateReceiver();
+    registerReceiver(myGPSReceiver, filter);
+    mMap.update_map();
     super.onResume();
   }
 
   @Override
   public void onPause() {
-    unregisterReceiver(myReceiver);
+    unregisterReceiver(myGPSReceiver);
     // It seems wasteful to do this here, but there is no other safe opportunity to do so -
     // in effect we are 'committing' the user's changes at this point.
     mMap.save_state_to_file(PREFS_FILE);
@@ -101,15 +102,13 @@ public class BigMapActivity extends Activity {
     }
   }
 
-  private void updateDisplay() {
-    mMap.update_map();
-  }
-
-  public class DisplayUpdateReceiver extends BroadcastReceiver {
+  public class GPSUpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-      updateDisplay();
+      mMap.update_map();
     }
   }
 }
 
+// vim:et:sw=2:sts=2
+//

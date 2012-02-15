@@ -193,7 +193,7 @@ public class Map extends View {
     }
   }
 
-  private void update_map(Canvas canvas) {
+  private void redraw_map(Canvas canvas) {
     // Decide if we have to rebuild the tile22 cache
     int width = getWidth();
     int height = getHeight();
@@ -415,7 +415,7 @@ public class Map extends View {
       String foo2 = String.format("No fix");
       canvas.drawText(foo2, 10, 80, red_paint);
     } else {
-      update_map(canvas);
+      redraw_map(canvas);
     }
   }
 
