@@ -206,7 +206,13 @@ public class Map extends View {
   // Interface with main UI activity
 
   public void update_map() {
-    estimated_pos = Logger.mTrail.get_estimated_position();
+    // don't know why this try-catch is needed :(
+    try {
+      estimated_pos = Logger.mTrail.get_estimated_position();
+    } catch (NullPointerException e) {
+      estimated_pos = null;
+    }
+
     if ((estimated_pos != null) &&
         ((display_pos == null) || !is_dragged)) {
       display_pos = new Merc28(estimated_pos);
