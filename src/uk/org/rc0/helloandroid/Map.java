@@ -41,11 +41,9 @@ public class Map extends View {
   private TileCache tile_cache;
 
   // the GPS fix from the logger
-  private Merc28 actual_pos;
-  private Merc28 last_actual_pos;
   private Merc28 estimated_pos;
 
-  // the location at the centre of the screen - may be != actual_pos if is_dragged is true.
+  // the location at the centre of the screen - may be != estimated_pos if is_dragged is true.
   private Merc28 display_pos;
   // Set to true if we've off-centred the map
   private boolean is_dragged;
@@ -86,8 +84,6 @@ public class Map extends View {
 
     setZoom(14);
     tile_cache.setMapSource(MAP_2G);
-    actual_pos = null;
-    last_actual_pos = null;
     estimated_pos = null;
     display_pos = null;
 
@@ -210,18 +206,7 @@ public class Map extends View {
   // Interface with main UI activity
 
   public void update_map() {
-    // 2-elt 'shift register' of current and last position
-    last_actual_pos = actual_pos;
-    if (Logger.validFix) {
-      actual_pos = new Merc28(Logger.lastLat, Logger.lastLon);
-    } else {
-      actual_pos = null;
-    }
-    if (last_actual_pos == null) {
-      // for 'quick start' - only need 1 update before map draw can start properly.
-      last_actual_pos = actual_pos;
-    }
-    estimated_pos = Merc28.predict(last_actual_pos, actual_pos);
+    estimated_pos = Logger.mTrail.get_estimated_position();
     if ((estimated_pos != null) &&
         ((display_pos == null) || !is_dragged)) {
       display_pos = new Merc28(estimated_pos);
@@ -348,7 +333,7 @@ public class Map extends View {
       // If (estimated_pos == null) here, it means no history of recent GPS fixes;
       // refuse to drop the display position then
       if (estimated_pos != null) {
-        display_pos = estimated_pos;
+        display_pos = new Merc28(estimated_pos);
         is_dragged = false;
         invalidate();
         return true;

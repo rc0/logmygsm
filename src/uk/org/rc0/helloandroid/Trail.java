@@ -19,6 +19,7 @@ public class Trail {
   private int n_old;
   private int[] x_old;
   private int[] y_old;
+  private History mHistory;
 
   public static final int splot_gap = 12;
   public static final float splot_radius = 3.0f;
@@ -64,8 +65,45 @@ public class Trail {
 
   }
 
+  public class History {
+    private Merc28 x0;
+    private Merc28 x1;
+
+    public History() {
+      clear();
+    }
+
+    public void clear () {
+      x0 = null;
+      x1 = null;
+    }
+
+    public void add(Merc28 x) {
+      x1 = x0;
+      x0 = new Merc28(x);
+    }
+
+    public Merc28 estimated_position() {
+      int xpred, ypred;
+      if (x0 != null) {
+        if (x1 != null) {
+          // x0 is newer, x1 is older
+          xpred = (x0.X * 3 - x1.X) >> 1;
+          ypred = (x0.Y * 3 - x1.Y) >> 1;
+          return new Merc28(xpred, ypred);
+        } else {
+          return x0;
+        }
+      } else {
+        return null;
+      }
+    }
+  }
+
+
   public Trail(Logger the_logger) {
     mLogger = the_logger;
+    mHistory = new History();
     restore_state_from_file();
   }
 
@@ -79,6 +117,7 @@ public class Trail {
 
   public void clear() {
     init();
+    mHistory.clear();
   }
 
   // Move to subclass of service
@@ -136,6 +175,7 @@ public class Trail {
 
   // Skip points that are too close together to ever be visible on the map display
   public void add_point(Merc28 p) {
+    mHistory.add(p);
     boolean do_add = true;
     if (last_point != null) {
       // 4 is (28 - (16+8)), i.e. the pixel size at the highest zoom level.
@@ -195,6 +235,11 @@ public class Trail {
   public PointArray get_recent() {
     return new PointArray(recent);
   }
+
+  public Merc28 get_estimated_position() {
+    return mHistory.estimated_position();
+  }
+
 }
 
 
