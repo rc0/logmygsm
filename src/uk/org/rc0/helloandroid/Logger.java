@@ -41,6 +41,7 @@ public class Logger extends Service {
   private RawLogger rawlog;
 
   static public Trail mTrail;
+  static public Landmarks mMarks;
 
   // -----------------
   // Variables shared with the Activity
@@ -109,6 +110,7 @@ public class Logger extends Service {
 
     rawlog = new RawLogger();
     mTrail = new Trail(this);
+    mMarks = new Landmarks();
 
     myProvider = LocationManager.GPS_PROVIDER;
     myNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -153,6 +155,7 @@ public class Logger extends Service {
   public void onDestroy() {
     stopListening();
     mTrail.save_state_to_file();
+    mMarks.save_state_to_file();
   }
 
   // --------------------------------------------------------------------------------

@@ -201,18 +201,19 @@ public class Map extends View {
     draw_buttons(canvas, width, height);
     draw_bearing(canvas, width, height);
     draw_recent_trail(canvas, width, height);
+    Logger.mMarks.draw(canvas, display_pos, width, height, pixel_shift);
   }
 
   // Interface with main UI activity
 
   public void update_map() {
-    // don't know why this try-catch is needed :(
+    // This try-catch shouldn't be necessary.
+    // What is the real bug?
     try {
       estimated_pos = Logger.mTrail.get_estimated_position();
-    } catch (NullPointerException e) {
+    } catch (NullPointerException n) {
       estimated_pos = null;
     }
-
     if ((estimated_pos != null) &&
         ((display_pos == null) || !is_dragged)) {
       display_pos = new Merc28(estimated_pos);
@@ -410,7 +411,18 @@ public class Map extends View {
     }
   }
 
+  public void add_landmark() {
+    Logger.mMarks.add(display_pos);
+    invalidate();
+  }
+
+  public void delete_all_landmarks() {
+    Logger.mMarks.delete_all();
+    invalidate();
+  }
 
 }
 
+// vim:et:sw=2:sts=2
+//
 

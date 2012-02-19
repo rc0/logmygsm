@@ -17,7 +17,7 @@
         android:id="@+id/add_button"
         android:typeface="monospace"
         android:textSize="16sp"
-        android:text="Add Marker"
+        android:text="Add"
         android:gravity="center">
     </Button>
     <Button
@@ -26,7 +26,16 @@
         android:id="@+id/delete_button"
         android:typeface="monospace"
         android:textSize="16sp"
-        android:text="Delete Marker"
+        android:text="Delete"
+        android:gravity="center">
+    </Button>
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/delete_all_button"
+        android:typeface="monospace"
+        android:textSize="16sp"
+        android:text="Delete All"
         android:gravity="center">
     </Button>
   </LinearLayout>

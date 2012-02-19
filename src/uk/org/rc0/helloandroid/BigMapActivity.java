@@ -9,11 +9,17 @@ import android.content.IntentFilter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
 public class BigMapActivity extends Activity {
 
   private GPSUpdateReceiver myGPSReceiver;
   private Map mMap;
+  private Button mAddButton;
+  private Button mDeleteButton;
+  private Button mDeleteAllButton;
 
   private static final String PREFS_FILE = "prefs2.txt";
 
@@ -23,6 +29,20 @@ public class BigMapActivity extends Activity {
     setContentView(R.layout.bigmap);
     mMap = (Map) findViewById(R.id.big_map);
     mMap.restore_state_from_file(PREFS_FILE);
+    mAddButton = (Button) findViewById(R.id.add_button);
+    mDeleteButton = (Button) findViewById(R.id.delete_button);
+    mDeleteAllButton = (Button) findViewById(R.id.delete_all_button);
+
+    mAddButton.setOnClickListener(new OnClickListener () {
+      public void onClick(View v) {
+        mMap.add_landmark();
+      }
+    });
+    mDeleteAllButton.setOnClickListener(new OnClickListener () {
+      public void onClick(View v) {
+        mMap.delete_all_landmarks();
+      }
+    });
   }
 
   @Override
