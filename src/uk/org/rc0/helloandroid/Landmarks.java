@@ -15,7 +15,22 @@ import java.util.ArrayList;
 
 public class Landmarks {
 
-  private ArrayList<Merc28> points;
+  private class Landmark {
+    Merc28 pos;
+    boolean alive;
+
+    public Landmark(Merc28 p) {
+      pos = new Merc28(p);
+      alive = true;
+    }
+
+    public Landmark(int x, int y) {
+      pos = new Merc28(x, y);
+      alive = true;
+    }
+  }
+
+  private ArrayList<Landmark> points;
   private Paint marker_paint;
 
   static final private String TAIL = "markers.txt";
@@ -29,6 +44,17 @@ public class Landmarks {
 
   }
 
+  private int count_alive() {
+    int n = 0;
+    int m = points.size();
+    for (int i=0; i<m; i++) {
+      if (points.get(i).alive) {
+        ++n;
+      }
+    }
+    return n;
+  }
+
   public void save_state_to_file() {
     File dir = new File("/sdcard/LogMyGsm/prefs");
     if (!dir.exists()) {
@@ -38,10 +64,12 @@ public class Landmarks {
     try {
       BufferedWriter bw = new BufferedWriter(new FileWriter(file));
       int n = points.size();
-      bw.write(String.format("%d\n", n));
+      bw.write(String.format("%d\n", count_alive()));
       for (int i=0; i < n; i++) {
-        bw.write(String.format("%d\n", points.get(i).X));
-        bw.write(String.format("%d\n", points.get(i).Y));
+        if (points.get(i).alive) {
+          bw.write(String.format("%d\n", points.get(i).pos.X));
+          bw.write(String.format("%d\n", points.get(i).pos.Y));
+        }
       }
       bw.close();
     } catch (IOException e) {
@@ -49,7 +77,7 @@ public class Landmarks {
   }
 
   private void restore_state_from_file() {
-    points = new ArrayList<Merc28> ();
+    points = new ArrayList<Landmark> ();
     File file = new File("/sdcard/LogMyGsm/prefs/" + TAIL);
     boolean failed = false;
     if (file.exists()) {
@@ -63,7 +91,7 @@ public class Landmarks {
           int x = Integer.parseInt(line);
           line = br.readLine();
           int y = Integer.parseInt(line);
-          points.add(new Merc28(x, y));
+          points.add(new Landmark(x, y));
         }
         br.close();
       } catch (IOException e) {
@@ -73,13 +101,13 @@ public class Landmarks {
       }
     }
     if (failed) {
-      points = new ArrayList<Merc28> ();
+      points = new ArrayList<Landmark> ();
     }
 
   }
 
   public void add(Merc28 pos) {
-    points.add(new Merc28(pos.X, pos.Y));
+    points.add(new Landmark(pos));
   }
 
   // Return value is true if a deletion successfully occurred, false if no point was
@@ -89,7 +117,7 @@ public class Landmarks {
   }
 
   public void delete_all() {
-    points = new ArrayList<Merc28> ();
+    points = new ArrayList<Landmark> ();
   }
 
   private final static int RADIUS = 8;
@@ -99,13 +127,15 @@ public class Landmarks {
   public void draw(Canvas c, Merc28 pos, int w, int h, int pixel_shift) {
     int n = points.size();
     for (int i = 0; i < n; i++) {
-      Merc28 p = points.get(i);
-      int dx = (p.X - pos.X) >> pixel_shift;
-      int x = (w>>1) + dx;
-      int dy = (p.Y - pos.Y) >> pixel_shift;
-      int y = (h>>1) + dy;
-      c.drawCircle(x, y, (float) RADIUS, marker_paint);
-      c.drawPoint(x, y, marker_paint);
+      if (points.get(i).alive) {
+        Merc28 p = points.get(i).pos;
+        int dx = (p.X - pos.X) >> pixel_shift;
+        int x = (w>>1) + dx;
+        int dy = (p.Y - pos.Y) >> pixel_shift;
+        int y = (h>>1) + dy;
+        c.drawCircle(x, y, (float) RADIUS, marker_paint);
+        c.drawPoint(x, y, marker_paint);
+      }
     }
   }
 }
