@@ -16,8 +16,8 @@
         android:layout_width="wrap_content"
         android:id="@+id/add_button"
         android:typeface="monospace"
-        android:textSize="16sp"
-        android:text="Add"
+        android:textSize="14sp"
+        android:text="Add 1"
         android:gravity="center">
     </Button>
     <Button
@@ -25,8 +25,17 @@
         android:layout_width="wrap_content"
         android:id="@+id/delete_button"
         android:typeface="monospace"
-        android:textSize="16sp"
-        android:text="Delete"
+        android:textSize="14sp"
+        android:text="Del 1"
+        android:gravity="center">
+    </Button>
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/delete_visible_button"
+        android:typeface="monospace"
+        android:textSize="14sp"
+        android:text="Del vis"
         android:gravity="center">
     </Button>
     <Button
@@ -34,8 +43,8 @@
         android:layout_width="wrap_content"
         android:id="@+id/delete_all_button"
         android:typeface="monospace"
-        android:textSize="16sp"
-        android:text="Delete All"
+        android:textSize="14sp"
+        android:text="Del all"
         android:gravity="center">
     </Button>
   </LinearLayout>

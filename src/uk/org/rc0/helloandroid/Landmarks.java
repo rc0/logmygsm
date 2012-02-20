@@ -139,6 +139,25 @@ public class Landmarks {
     }
   }
 
+  public boolean delete_visible(Merc28 pos, int pixel_shift, int width, int height) {
+    int w2 = width >> 1;
+    int h2 = height >> 1;
+    int n = points.size();
+    boolean did_any = false;
+    for (int i=0; i<n; i++) {
+      if (points.get(i).alive) {
+        int dx = (points.get(i).pos.X - pos.X) >> pixel_shift;
+        int dy = (points.get(i).pos.Y - pos.Y) >> pixel_shift;
+        if ((Math.abs(dx) < w2) &&
+            (Math.abs(dy) < h2)) {
+          did_any = true;
+          points.get(i).alive = false;
+        }
+      }
+    }
+    return did_any;
+  }
+
   public void delete_all() {
     points = new ArrayList<Landmark> ();
   }

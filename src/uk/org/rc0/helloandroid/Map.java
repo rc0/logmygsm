@@ -422,6 +422,12 @@ public class Map extends View {
     }
   }
 
+  public void delete_visible_landmarks() {
+    if (Logger.mMarks.delete_visible(display_pos, pixel_shift, getWidth(), getHeight() )) {
+      invalidate();
+    }
+  }
+
   public void delete_all_landmarks() {
     Logger.mMarks.delete_all();
     invalidate();

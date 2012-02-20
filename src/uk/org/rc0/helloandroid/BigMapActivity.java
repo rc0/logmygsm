@@ -19,6 +19,7 @@ public class BigMapActivity extends Activity {
   private Map mMap;
   private Button mAddButton;
   private Button mDeleteButton;
+  private Button mDeleteVisibleButton;
   private Button mDeleteAllButton;
 
   private static final String PREFS_FILE = "prefs2.txt";
@@ -31,6 +32,7 @@ public class BigMapActivity extends Activity {
     mMap.restore_state_from_file(PREFS_FILE);
     mAddButton = (Button) findViewById(R.id.add_button);
     mDeleteButton = (Button) findViewById(R.id.delete_button);
+    mDeleteVisibleButton = (Button) findViewById(R.id.delete_visible_button);
     mDeleteAllButton = (Button) findViewById(R.id.delete_all_button);
 
     mAddButton.setOnClickListener(new OnClickListener () {
@@ -42,6 +44,12 @@ public class BigMapActivity extends Activity {
     mDeleteButton.setOnClickListener(new OnClickListener () {
       public void onClick(View v) {
         mMap.delete_landmark();
+      }
+    });
+
+    mDeleteVisibleButton.setOnClickListener(new OnClickListener () {
+      public void onClick(View v) {
+        mMap.delete_visible_landmarks();
       }
     });
 
