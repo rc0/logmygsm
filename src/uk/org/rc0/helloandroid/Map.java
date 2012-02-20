@@ -416,6 +416,12 @@ public class Map extends View {
     invalidate();
   }
 
+  public void delete_landmark() {
+    if (Logger.mMarks.delete(display_pos, pixel_shift)) {
+      invalidate();
+    }
+  }
+
   public void delete_all_landmarks() {
     Logger.mMarks.delete_all();
     invalidate();

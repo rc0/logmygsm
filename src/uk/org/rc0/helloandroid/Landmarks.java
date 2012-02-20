@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.Math;
 import java.util.ArrayList;
 
 // Storage for the the waypoints that the user can define
@@ -112,8 +113,30 @@ public class Landmarks {
 
   // Return value is true if a deletion successfully occurred, false if no point was
   // close enough to 'pos' to qualify.  Only delete the point that is 'closest'
-  public boolean delete(Merc28 pos) {
-    return false;
+  public boolean delete(Merc28 pos, int pixel_shift) {
+    int victim;
+    int closest;
+    int n = points.size();
+    victim = -1;
+    closest = 0;
+    for (int i=0; i<n; i++) {
+      if (points.get(i).alive) {
+        int dx = (points.get(i).pos.X - pos.X) >> pixel_shift;
+        int dy = (points.get(i).pos.Y - pos.Y) >> pixel_shift;
+        int d = Math.abs(dx) + Math.abs(dy);
+        if ((victim < 0) ||
+            (d < closest)) {
+          closest = d;
+          victim = i;
+        }
+      }
+    }
+    if (victim < 0) {
+      return false;
+    } else {
+      points.get(victim).alive = false;
+      return true;
+    }
   }
 
   public void delete_all() {

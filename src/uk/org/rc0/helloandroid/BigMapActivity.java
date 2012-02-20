@@ -38,6 +38,13 @@ public class BigMapActivity extends Activity {
         mMap.add_landmark();
       }
     });
+
+    mDeleteButton.setOnClickListener(new OnClickListener () {
+      public void onClick(View v) {
+        mMap.delete_landmark();
+      }
+    });
+
     mDeleteAllButton.setOnClickListener(new OnClickListener () {
       public void onClick(View v) {
         mMap.delete_all_landmarks();
