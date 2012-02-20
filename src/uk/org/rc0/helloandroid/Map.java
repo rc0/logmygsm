@@ -153,18 +153,18 @@ public class Map extends View {
 
   private void draw_buttons(Canvas c, int w, int h) {
     int button_offset = button_radius + (button_radius >> 1);
-    // draw minus
+    // draw plus
     c.drawCircle(button_offset, button_offset, button_radius, button_stroke_paint);
     c.drawLine(button_offset - button_half_line, button_offset,
         button_offset + button_half_line, button_offset,
         button_stroke_paint);
-    // draw plus
+    c.drawLine(button_offset, button_offset - button_half_line,
+        button_offset, button_offset + button_half_line,
+        button_stroke_paint);
+    // draw minus
     c.drawCircle(w - button_offset, button_offset, button_radius, button_stroke_paint);
     c.drawLine(w - button_offset - button_half_line, button_offset,
         w - button_offset + button_half_line, button_offset,
-        button_stroke_paint);
-    c.drawLine(w - button_offset, button_offset - button_half_line,
-        w - button_offset, button_offset + button_half_line,
         button_stroke_paint);
   }
 
@@ -321,10 +321,10 @@ public class Map extends View {
   private boolean try_zoom(float x, float y) {
     if (y < button_size) {
       if (x < button_size) {
-        zoom_out();
+        zoom_in();
         return true;
       } else if (x > (getWidth() - button_size)) {
-        zoom_in();
+        zoom_out();
         return true;
       }
     }
