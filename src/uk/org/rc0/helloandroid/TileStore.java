@@ -17,7 +17,7 @@ public class TileStore {
   // -----------
   // State
 
-  private class Entry {
+  private static class Entry {
     int zoom;
     int map_source;
     int x;
@@ -61,6 +61,7 @@ public class TileStore {
   static void init () {
     front = new Entry[SIZE];
     next = 0;
+    back = null;
     gray_paint = new Paint();
     gray_paint.setColor(Color.GRAY);
   }
@@ -68,7 +69,7 @@ public class TileStore {
   // -----------
   // Internal
 
-  private Bitmap render_bitmap(int zoom, int map_source, int x, int y) {
+  static private Bitmap render_bitmap(int zoom, int map_source, int x, int y) {
     String filename = null;
     switch (map_source) {
       case Map.MAP_2G:
@@ -105,7 +106,11 @@ public class TileStore {
     return bm;
   }
 
-  private Bitmap lookup(int zoom, int map_source, int x, int y) {
+  static private Entry make_entry(int zoom, int map_source, int x, int y, Bitmap b) {
+    return new Entry(zoom, map_source, x, y, b);
+  }
+
+  static private Bitmap lookup(int zoom, int map_source, int x, int y) {
     // front should never be null
     for (int i=0; i<next; i++) {
       if (front[i].isMatch(zoom, map_source, x, y)) {
@@ -133,7 +138,7 @@ public class TileStore {
 
     // OK, no match.  We have to build a new bitmap from file
     Bitmap b = render_bitmap(zoom, map_source, x, y);
-    front[next++] = new Entry(zoom, map_source, x, y, b);
+    front[next++] = make_entry(zoom, map_source, x, y, b);
     return b;
 
   }
@@ -141,7 +146,11 @@ public class TileStore {
   // -----------
   // Interface with map
 
-  public void draw(Canvas c, int w, int h, int zoom, int map_source, Merc28 midpoint) {
+  static public void invalidate() {
+    init();
+  }
+
+  static public void draw(Canvas c, int w, int h, int zoom, int map_source, Merc28 midpoint) {
     int pixel_shift = (Merc28.shift - (zoom + bm_log_size));
 
     // Compute pixels from origin at this zoom level for top-left corner of canvas

@@ -38,7 +38,8 @@ public class Map extends View {
   private int zoom;
   private int pixel_shift;
   private float drag_scale;
-  private TileCache tile_cache;
+
+  private int map_source;
 
   // the GPS fix from the logger
   private Merc28 estimated_pos;
@@ -52,8 +53,6 @@ public class Map extends View {
 
   public Map(Context context, AttributeSet attrs) {
     super(context, attrs);
-
-    tile_cache = new TileCache(this);
 
     red_paint = new Paint();
     red_paint.setStrokeWidth(1);
@@ -83,7 +82,7 @@ public class Map extends View {
     grey_paint.setColor(Color.GRAY);
 
     setZoom(14);
-    tile_cache.setMapSource(MAP_2G);
+    map_source = MAP_2G;
     estimated_pos = null;
     display_pos = null;
 
@@ -194,7 +193,7 @@ public class Map extends View {
     int width = getWidth();
     int height = getHeight();
 
-    tile_cache.draw(canvas, width, height, display_pos);
+    TileStore.draw(canvas, width, height, zoom, map_source, display_pos);
 
     draw_crosshair(canvas, width, height);
     draw_centre_circle(canvas, width, height);
@@ -222,7 +221,7 @@ public class Map extends View {
   }
 
   public void select_map_source(int which) {
-    tile_cache.setMapSource(which);
+    map_source = which;
     invalidate();
   }
 
@@ -235,7 +234,7 @@ public class Map extends View {
   static final String WHICH_MAP_KEY = "LogMyGsm_Which_Map";
 
   private void setZoom(int z) {
-    tile_cache.setZoom(z);
+    //tile_cache.setZoom(z);
     zoom = z;
     pixel_shift = Merc28.shift - (z+8);
     drag_scale = (float)(1 << pixel_shift);
@@ -246,7 +245,6 @@ public class Map extends View {
   // for debugging and so on
   public void restore_state_from_file(String tail) {
     File file = new File("/sdcard/LogMyGsm/prefs/" + tail);
-    int map_source;
     // defaults in case of strife
     display_pos = null;
     setZoom(14);
@@ -271,7 +269,6 @@ public class Map extends View {
       } catch (NumberFormatException n) {
       }
     }
-    tile_cache.setMapSource(map_source);
   }
 
   public void save_state_to_file(String tail) {
@@ -286,7 +283,7 @@ public class Map extends View {
         bw.write(String.format("%d\n", zoom));
         bw.write(String.format("%d\n", display_pos.X));
         bw.write(String.format("%d\n", display_pos.Y));
-        bw.write(String.format("%d\n", tile_cache.getMapSource()));
+        bw.write(String.format("%d\n", map_source));
         bw.close();
       } catch (IOException e) {
       }
@@ -297,7 +294,7 @@ public class Map extends View {
 
   public void clear_trail() {
     Logger.mTrail.clear();
-    tile_cache.clear();
+    TileStore.invalidate();
     invalidate();
   }
 
