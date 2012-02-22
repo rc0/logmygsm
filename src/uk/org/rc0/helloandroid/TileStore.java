@@ -24,6 +24,7 @@ public class TileStore {
     int map_source;
     int x;
     int y;
+    int cycle;
     Bitmap b;
 
     Bitmap getBitmap() {
@@ -36,6 +37,7 @@ public class TileStore {
       x = ax;
       y = ay;
       b = ab;
+      touch();
     }
 
     boolean isMatch(int azoom, int amap_source, int ax, int ay) {
@@ -48,6 +50,10 @@ public class TileStore {
         return false;
       }
     }
+
+    void touch () {
+      cycle = draw_cycle;
+    }
   }
 
   // Eventually, make this depend on the canvas size and hence on how much welly the phone has
@@ -56,6 +62,7 @@ public class TileStore {
   static private Entry [] front;
   static private int next;
   static private Entry [] back;
+  static int draw_cycle;
 
   static private Paint gray_paint;
   static Paint trail_paint;
@@ -66,6 +73,8 @@ public class TileStore {
     front = new Entry[SIZE];
     next = 0;
     back = null;
+
+    draw_cycle = 0;
 
     gray_paint = new Paint();
     gray_paint.setColor(Color.GRAY);
@@ -149,8 +158,9 @@ public class TileStore {
 
   static private Bitmap lookup(int zoom, int map_source, int x, int y) {
     // front should never be null
-    for (int i=0; i<next; i++) {
+    for (int i=next-1; i>=0; i--) {
       if (front[i].isMatch(zoom, map_source, x, y)) {
+        front[i].touch();
         return front[i].getBitmap();
       }
     }
@@ -166,9 +176,10 @@ public class TileStore {
 
     // Search 'back' array for a match.  'back' is either null, or full
     if (back != null) {
-      for (int i=0; i<SIZE; i++) {
+      for (int i=SIZE-1; i>=0; i--) {
         if (back[i].isMatch(zoom, map_source, x, y)) {
           front[next++] = back[i];
+          back[i].touch();
           return back[i].getBitmap();
         }
       }
@@ -176,9 +187,21 @@ public class TileStore {
 
     // OK, no match.  We have to build a new bitmap from file
     Bitmap b = render_bitmap(zoom, map_source, x, y);
-    front[next++] = make_entry(zoom, map_source, x, y, b);
+    front[next++] = make_entry(zoom, map_source, x, y, b); // auto touch
     return b;
 
+  }
+
+  static private void ripple() {
+    // gravitate entries in 'front' towards the end that's checked first
+    for (int i=1; i<next; i++) {
+      if (front[i-1].cycle > front[i].cycle) {
+        // swap two entries over
+        Entry t = front[i];
+        front[i] = front[i-1];
+        front[i-1] = t;
+      }
+    }
   }
 
   // -----------
@@ -208,6 +231,10 @@ public class TileStore {
     ox = (tx << bm_log_size) - px;
     oy = (ty << bm_log_size) - py;
 
+    // This is used in maintaining the cache so that the most recently used
+    // entries are the ones hit first in the search.
+    draw_cycle++;
+
     int i, j;
     i = 0;
     while (ox + (i<<bm_log_size) < w) {
@@ -222,6 +249,9 @@ public class TileStore {
       }
       i++;
     }
+
+    ripple();
+
   }
 
 }
