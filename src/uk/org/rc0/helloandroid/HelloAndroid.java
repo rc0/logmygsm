@@ -268,6 +268,8 @@ public class HelloAndroid extends Activity {
       switch (item.getItemId()) {
         case OPTION_EXIT:
           Logger.stop_tracing = true;
+          // avoid holding onto oodles of memory at Application level...
+          TileStore.invalidate();
           finish();
           return true;
         case OPTION_CLEAR_TRAIL:
