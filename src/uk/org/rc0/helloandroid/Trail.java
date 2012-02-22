@@ -231,14 +231,36 @@ public class Trail {
     return new PointArray(n_old, x_old, y_old);
   }
 
-  public PointArray get_recent() {
-    return new PointArray(recent);
-  }
-
   public Merc28 get_estimated_position() {
     return mHistory.estimated_position();
   }
 
+  void draw_recent_trail(Canvas c, int w, int h, int pixel_shift, Merc28 display_pos) {
+    int n = recent.size();
+    int w2 = w>>1;
+    int h2 = h>>1;
+    int last_x = 0, last_y = 0;
+    for (int i=0; i<n; i++) {
+      Merc28 p = recent.get(i);
+      int sx = ((p.X - display_pos.X) >> pixel_shift) + w2;
+      int sy = ((p.Y - display_pos.Y) >> pixel_shift) + h2;
+      boolean do_add = true;
+      if (i > 0) {
+        int manhattan = Math.abs(sx - last_x) + Math.abs(sy - last_y);
+        if (manhattan < Trail.splot_gap) {
+          do_add = false;
+        }
+      }
+      if (do_add) {
+        // Don't even bother invoking the library if we're off-screen.
+        if ((sx >= 0) && (sy >= 0) && (sx < w) && (sy < h)) {
+          c.drawCircle((float)sx, (float)sy, Trail.splot_radius, TileStore.trail_paint);
+          last_x = sx;
+          last_y = sy;
+        }
+      }
+    }
+  }
 }
 
 

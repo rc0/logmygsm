@@ -162,27 +162,6 @@ public class Map extends View {
         button_stroke_paint);
   }
 
-  private void draw_recent_trail(Canvas c, int w, int h) {
-    Trail.PointArray pa = Logger.mTrail.get_recent();
-    int last_x = 0, last_y = 0;
-    for (int i=0; i<pa.n; i++) {
-      int sx = ((pa.x[i] - display_pos.X) >> pixel_shift) + (w>>1);
-      int sy = ((pa.y[i] - display_pos.Y) >> pixel_shift) + (h>>1);
-      boolean do_add = true;
-      if (i > 0) {
-        int manhattan = Math.abs(sx - last_x) + Math.abs(sy - last_y);
-        if (manhattan < Trail.splot_gap) {
-          do_add = false;
-        }
-      }
-      if (do_add) {
-        c.drawCircle((float)sx, (float)sy, Trail.splot_radius, TileStore.trail_paint);
-        last_x = sx;
-        last_y = sy;
-      }
-    }
-  }
-
   private void redraw_map(Canvas canvas) {
     // Decide if we have to rebuild the tile22 cache
     int width = getWidth();
@@ -194,7 +173,7 @@ public class Map extends View {
     draw_centre_circle(canvas, width, height);
     draw_buttons(canvas, width, height);
     draw_bearing(canvas, width, height);
-    draw_recent_trail(canvas, width, height);
+    Logger.mTrail.draw_recent_trail(canvas, width, height, pixel_shift, display_pos);
     Logger.mMarks.draw(canvas, display_pos, width, height, pixel_shift);
   }
 
