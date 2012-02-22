@@ -14,6 +14,8 @@ public class TileStore {
   static final private int bm_log_size = 8;
   static final private int bm_size = 1<<bm_log_size;
 
+  static final private String TAG = "TileStore";
+
   // -----------
   // State
 
@@ -56,18 +58,51 @@ public class TileStore {
   static private Entry [] back;
 
   static private Paint gray_paint;
+  static Paint trail_paint;
+
   // -----------
 
   static void init () {
     front = new Entry[SIZE];
     next = 0;
     back = null;
+
     gray_paint = new Paint();
     gray_paint.setColor(Color.GRAY);
+    trail_paint = new Paint();
+    trail_paint.setColor(Color.argb(128, 0x8d, 0, 0xcf));
+    trail_paint.setStyle(Paint.Style.FILL);
   }
 
   // -----------
   // Internal
+  //
+
+  static private void render_old_trail(Bitmap bm, int zoom, int tile_x, int tile_y) {
+    int pixel_shift = (Merc28.shift - (zoom + bm_log_size));
+    int tile_shift = (Merc28.shift - zoom);
+    int xnw = tile_x << tile_shift;
+    int ynw = tile_y << tile_shift;
+    Canvas my_canv = new Canvas(bm);
+    Trail.PointArray pa = Logger.mTrail.get_historical();
+    int last_x = 0, last_y = 0;
+    for (int i = 0; i < pa.n; i++) {
+      int px = (pa.x[i] - xnw) >> pixel_shift;
+      int py = (pa.y[i] - ynw) >> pixel_shift;
+      boolean do_add = true;
+      if (i > 0) {
+        int manhattan = Math.abs(px - last_x) + Math.abs(py - last_y);
+        if (manhattan < Trail.splot_gap) {
+          do_add = false;
+        }
+      }
+      if (do_add) {
+        my_canv.drawCircle((float)px, (float)py, Trail.splot_radius, trail_paint);
+        last_x = px;
+        last_y = py;
+      }
+    }
+  }
 
   static private Bitmap render_bitmap(int zoom, int map_source, int x, int y) {
     String filename = null;
@@ -96,13 +131,15 @@ public class TileStore {
     File file = new File(filename);
     Bitmap bm;
     if (file.exists()) {
-      bm = BitmapFactory.decodeFile(filename);
+      Bitmap temp_bm = BitmapFactory.decodeFile(filename);
+      bm = temp_bm.copy(Bitmap.Config.ARGB_8888, true);
     } else {
       bm = Bitmap.createBitmap(bm_size, bm_size, Bitmap.Config.ARGB_8888);
       Canvas my_canv = new Canvas(bm);
       my_canv.drawRect(0, 0, bm_size, bm_size, gray_paint);
     }
     // TODO : Draw trail points into the bitmap
+    render_old_trail(bm, zoom, x, y);
     return bm;
   }
 
@@ -124,6 +161,7 @@ public class TileStore {
       // Might consider garbage collection here?
       front = new Entry[SIZE];
       next = 0;
+      //Log.i(TAG, "Flushed tile store");
     }
 
     // Search 'back' array for a match.  'back' is either null, or full
@@ -147,7 +185,9 @@ public class TileStore {
   // Interface with map
 
   static public void invalidate() {
-    init();
+    front = new Entry[SIZE];
+    next = 0;
+    back = null;
   }
 
   static public void draw(Canvas c, int w, int h, int zoom, int map_source, Merc28 midpoint) {

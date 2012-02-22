@@ -228,7 +228,6 @@ public class Trail {
   // If this is being requested, it's because the tile cache is being rebuilt, so it's a good time
   // to accumulate the recent points onto the historical list
   public PointArray get_historical() {
-    gather();
     return new PointArray(n_old, x_old, y_old);
   }
 

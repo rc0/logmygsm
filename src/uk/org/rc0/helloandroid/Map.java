@@ -23,7 +23,6 @@ public class Map extends View {
   private final Paint red_paint;
   private final Paint red_stroke_paint;
   private final Paint red_double_stroke_paint;
-  public  final Paint trail_paint;
   private final Paint button_stroke_paint;
   private final Paint grey_paint;
 
@@ -67,10 +66,6 @@ public class Map extends View {
     red_double_stroke_paint.setStrokeWidth(2);
     red_double_stroke_paint.setColor(Color.RED);
     red_double_stroke_paint.setStyle(Paint.Style.STROKE);
-
-    trail_paint = new Paint();
-    trail_paint.setColor(Color.argb(128, 0x8d, 0, 0xcf));
-    trail_paint.setStyle(Paint.Style.FILL);
 
     button_stroke_paint = new Paint();
     button_stroke_paint.setStrokeWidth(2);
@@ -181,7 +176,7 @@ public class Map extends View {
         }
       }
       if (do_add) {
-        c.drawCircle((float)sx, (float)sy, Trail.splot_radius, trail_paint);
+        c.drawCircle((float)sx, (float)sy, Trail.splot_radius, TileStore.trail_paint);
         last_x = sx;
         last_y = sy;
       }
