@@ -1,5 +1,7 @@
 package uk.org.rc0.helloandroid;
 
+import android.graphics.Canvas;
+import android.util.Log;
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -7,7 +9,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import android.util.Log;
 
 // Meant to be instantiated as a member in the service
 public class Trail {

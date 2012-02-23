@@ -175,6 +175,7 @@ public class Map extends View {
     draw_bearing(canvas, width, height);
     Logger.mTrail.draw_recent_trail(canvas, width, height, pixel_shift, display_pos);
     Logger.mMarks.draw(canvas, display_pos, width, height, pixel_shift);
+    TowerLine.draw_line(canvas, width, height, pixel_shift, display_pos);
   }
 
   // Interface with main UI activity
