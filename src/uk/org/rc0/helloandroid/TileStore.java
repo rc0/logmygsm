@@ -21,10 +21,16 @@ public class TileStore {
 
   private static class Entry {
     int zoom;
+    int pixel_shift;
+    int tile_shift;
     int map_source;
     int x;
     int y;
     int cycle;
+    // index in Trail's recent list of the last point we plotted, -1 if none
+    int lx, ly;
+    // index in Trail's recent list of the next point to try
+    int n_next;
     Bitmap b;
 
     Bitmap getBitmap() {
@@ -33,10 +39,15 @@ public class TileStore {
 
     Entry(int azoom, int amap_source, int ax, int ay, Bitmap ab) {
       zoom = azoom;
+      pixel_shift = (Merc28.shift - (zoom + bm_log_size));
+      tile_shift = (Merc28.shift - zoom);
       map_source = amap_source;
       x = ax;
       y = ay;
       b = ab;
+      n_next = 0;
+      lx = -256;
+      ly = -256;
       touch();
     }
 
@@ -53,6 +64,18 @@ public class TileStore {
 
     void touch () {
       cycle = draw_cycle;
+    }
+
+    void add_recent_trail() {
+      Canvas my_canv = new Canvas(b);
+      int [] result =
+        Logger.mTrail.draw_recent_trail(my_canv,
+            x<<tile_shift, y<<tile_shift,
+            pixel_shift,
+            lx, ly, n_next);
+      n_next = result[2];
+      lx = result[0];
+      ly = result[1];
     }
   }
 
@@ -156,12 +179,11 @@ public class TileStore {
     return new Entry(zoom, map_source, x, y, b);
   }
 
-  static private Bitmap lookup(int zoom, int map_source, int x, int y) {
+  static private Entry lookup(int zoom, int map_source, int x, int y) {
     // front should never be null
     for (int i=next-1; i>=0; i--) {
       if (front[i].isMatch(zoom, map_source, x, y)) {
-        front[i].touch();
-        return front[i].getBitmap();
+        return front[i];
       }
     }
     // Miss.  Any space left?
@@ -179,16 +201,16 @@ public class TileStore {
       for (int i=SIZE-1; i>=0; i--) {
         if (back[i].isMatch(zoom, map_source, x, y)) {
           front[next++] = back[i];
-          back[i].touch();
-          return back[i].getBitmap();
+          return back[i];
         }
       }
     }
 
     // OK, no match.  We have to build a new bitmap from file
     Bitmap b = render_bitmap(zoom, map_source, x, y);
-    front[next++] = make_entry(zoom, map_source, x, y, b); // auto touch
-    return b;
+    Entry e = make_entry(zoom, map_source, x, y, b); // auto touch
+    front[next++] = e;
+    return e;
 
   }
 
@@ -242,7 +264,10 @@ public class TileStore {
       j = 0;
       while (oy + (j<<bm_log_size) < h) {
         int yy = oy + (j<<bm_log_size);
-        Bitmap bm = lookup(zoom, map_source, tx+i, ty+j);
+        Entry e = lookup(zoom, map_source, tx+i, ty+j);
+        e.add_recent_trail();
+        e.touch();
+        Bitmap bm = e.getBitmap();
         Rect dest = new Rect(xx, yy, xx+bm_size, yy+bm_size);
         c.drawBitmap(bm, null, dest, null);
         j++;

@@ -173,7 +173,6 @@ public class Map extends View {
     draw_centre_circle(canvas, width, height);
     draw_buttons(canvas, width, height);
     draw_bearing(canvas, width, height);
-    Logger.mTrail.draw_recent_trail(canvas, width, height, pixel_shift, display_pos);
     Logger.mMarks.draw(canvas, display_pos, width, height, pixel_shift);
     TowerLine.draw_line(canvas, width, height, pixel_shift, display_pos);
   }

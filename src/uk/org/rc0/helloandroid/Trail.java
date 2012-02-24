@@ -236,31 +236,32 @@ public class Trail {
     return mHistory.estimated_position();
   }
 
-  void draw_recent_trail(Canvas c, int w, int h, int pixel_shift, Merc28 display_pos) {
+  int [] draw_recent_trail(Canvas c, int xnw, int ynw, int pixel_shift, int lx, int ly, int n_next) {
     int n = recent.size();
-    int w2 = w>>1;
-    int h2 = h>>1;
-    int last_x = 0, last_y = 0;
-    for (int i=0; i<n; i++) {
+    for (int i=n_next; i<n; i++) {
       Merc28 p = recent.get(i);
-      int sx = ((p.X - display_pos.X) >> pixel_shift) + w2;
-      int sy = ((p.Y - display_pos.Y) >> pixel_shift) + h2;
+      int sx = (p.X - xnw) >> pixel_shift;
+      int sy = (p.Y - ynw) >> pixel_shift;
       boolean do_add = true;
-      if (i > 0) {
-        int manhattan = Math.abs(sx - last_x) + Math.abs(sy - last_y);
-        if (manhattan < Trail.splot_gap) {
-          do_add = false;
-        }
+      int manhattan = Math.abs(sx - lx) + Math.abs(sy - ly);
+      if (manhattan < Trail.splot_gap) {
+        do_add = false;
       }
       if (do_add) {
         // Don't even bother invoking the library if we're off-screen.
-        if ((sx >= 0) && (sy >= 0) && (sx < w) && (sy < h)) {
+        // HARDCODED ASSUMPTION ABOUT TILE SIZE!
+        if ((sx >= 0) && (sy >= 0) && (sx < 256) && (sy < 256)) {
           c.drawCircle((float)sx, (float)sy, Trail.splot_radius, TileStore.trail_paint);
-          last_x = sx;
-          last_y = sy;
+          lx = sx;
+          ly = sy;
         }
       }
     }
+    return new int[] {lx, ly, n};
+  }
+
+  int n_recent () {
+    return recent.size();
   }
 }
 
