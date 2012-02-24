@@ -3,6 +3,7 @@ package uk.org.rc0.helloandroid;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.util.Log;
 import java.io.File;
 import java.io.BufferedReader;
@@ -15,6 +16,7 @@ public class TowerLine {
 
   static private HashMap<String, Merc28> lut;
   static private Paint line_paint;
+  static private Paint text_paint;
 
   static final private String TAIL = "cidxy.txt";
   static final private String TAG = "TowerLine";
@@ -24,8 +26,14 @@ public class TowerLine {
 
     line_paint = new Paint();
     line_paint.setStyle(Paint.Style.STROKE);
-    line_paint.setStrokeWidth(6);
-    line_paint.setColor(Color.argb(96, 0x7d, 0x0, 0x9f));
+    line_paint.setStrokeWidth(8);
+    line_paint.setColor(Color.argb(128, 0x6d, 0x0, 0x88));
+
+    text_paint = new Paint();
+    text_paint.setColor(Color.argb(192, 0x58, 0x0, 0x78));
+    Typeface face = Typeface.DEFAULT_BOLD;
+    text_paint.setTypeface(face);
+    text_paint.setTextSize(22);
 
     File file = new File("/sdcard/LogMyGsm/prefs/" + TAIL);
     boolean failed = false;
@@ -62,6 +70,7 @@ public class TowerLine {
   }
 
   static final float BASE = 16.0f;
+  static final float TEXT_RADIUS = 70.0f;
 
   static void draw_line(Canvas c, int w, int h, int pixel_shift, Merc28 display_pos) {
     // CidLac cl = new CidLac(Logger.lastCid, Logger.lastLac);
@@ -84,6 +93,21 @@ public class TowerLine {
         float x1 = (float)(w>>1) + fx;
         float y1 = (float)(h>>1) + fy;
         c.drawLine(x0, y0, x1, y1, line_paint);
+
+        double zx = (double)(pos.X - display_pos.X);
+        double zy = (double)(pos.Y - display_pos.Y);
+        double zd = Math.sqrt(zx*zx + zy*zy) * 25220000.0 / Merc28.scale;
+
+        String caption;
+        if (zd < 1000) {
+          caption = String.format("%dm", (int)zd);
+        } else {
+          caption = String.format("%.1fkm", 0.001*zd);
+        }
+        float tw = text_paint.measureText(caption);
+        float xt = (float)(w>>1) + TEXT_RADIUS * (fx / f);
+        float yt = (float)(h>>1) + TEXT_RADIUS * (fy / f);
+        c.drawText(caption, xt-(0.5f*tw), yt, text_paint);
       }
     }
   }
