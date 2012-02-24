@@ -225,6 +225,8 @@ public class HelloAndroid extends Activity {
   public class CellUpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+      // update the map in case the current cell has changed.
+      mMap.update_map();
       updateDisplay();
     }
   }
