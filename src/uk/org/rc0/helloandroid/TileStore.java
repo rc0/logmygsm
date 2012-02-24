@@ -80,7 +80,9 @@ public class TileStore {
   }
 
   // Eventually, make this depend on the canvas size and hence on how much welly the phone has
-  static private final int SIZE = 32;
+  // For a 400x240 screen we need 6 tiles for the whole screen or 4 for half the screen
+  // so this will deal with 3 whole pans
+  static private final int SIZE = 12;
 
   static private Entry [] front;
   static private int next;
@@ -233,6 +235,11 @@ public class TileStore {
     front = new Entry[SIZE];
     next = 0;
     back = null;
+  }
+
+  static public void semi_invalidate() {
+    back = null;
+    System.gc();
   }
 
   static public void draw(Canvas c, int w, int h, int zoom, int map_source, Merc28 midpoint) {

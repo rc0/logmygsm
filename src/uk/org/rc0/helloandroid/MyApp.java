@@ -9,5 +9,10 @@ public class MyApp extends Application {
     TowerLine.init();
   }
 
+  @Override
+  public void onLowMemory() {
+    TileStore.invalidate();
+  }
+
 }
 
