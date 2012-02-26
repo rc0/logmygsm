@@ -22,8 +22,8 @@ public class Trail {
   private int[] y_old;
   private History mHistory;
 
-  public static final int splot_gap = 12;
-  public static final float splot_radius = 3.0f;
+  public static final int splot_gap = 10;
+  public static final float splot_radius = 2.0f;
 
   private static final String TAG = "Trail";
 
@@ -236,6 +236,10 @@ public class Trail {
     return mHistory.estimated_position();
   }
 
+  // OK unless we ever decide to use HUGE spots for the trail
+  static final int MIN_CENTRE = -5;
+  static final int MAX_CENTRE = 256 - MIN_CENTRE;
+
   int [] draw_recent_trail(Canvas c, int xnw, int ynw, int pixel_shift, int lx, int ly, int n_next) {
     int n = recent.size();
     for (int i=n_next; i<n; i++) {
@@ -249,8 +253,8 @@ public class Trail {
       }
       if (do_add) {
         // Don't even bother invoking the library if we're off-screen.
-        // HARDCODED ASSUMPTION ABOUT TILE SIZE!
-        if ((sx >= 0) && (sy >= 0) && (sx < 256) && (sy < 256)) {
+        // // Loose bounds to allow for 
+        if ((sx >= MIN_CENTRE) && (sy >= MIN_CENTRE) && (sx < MAX_CENTRE) && (sy < MAX_CENTRE)) {
           c.drawCircle((float)sx, (float)sy, Trail.splot_radius, TileStore.trail_paint);
           lx = sx;
           ly = sy;

@@ -26,13 +26,14 @@ public class TowerLine {
 
     line_paint = new Paint();
     line_paint.setStyle(Paint.Style.STROKE);
-    line_paint.setStrokeWidth(8);
-    line_paint.setColor(Color.argb(128, 0x6d, 0x0, 0x88));
+    line_paint.setStrokeWidth(6);
+    line_paint.setColor(Color.argb(128, 0x88, 0x0, 0x6d));
 
     text_paint = new Paint();
-    text_paint.setColor(Color.argb(192, 0x58, 0x0, 0x78));
+    text_paint.setColor(Color.argb(192, 0x38, 0x0, 0x58));
     Typeface face = Typeface.DEFAULT_BOLD;
     text_paint.setTypeface(face);
+    text_paint.setAntiAlias(true);
     text_paint.setTextSize(22);
 
     File file = new File("/sdcard/LogMyGsm/prefs/" + TAIL);
