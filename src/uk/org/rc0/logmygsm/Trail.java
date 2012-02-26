@@ -22,8 +22,8 @@ public class Trail {
   private int[] y_old;
   private History mHistory;
 
-  public static final int splot_gap = 10;
-  public static final float splot_radius = 2.0f;
+  public static final int splot_gap = 9;
+  public static final float splot_radius = 2.5f;
 
   private static final String TAG = "Trail";
 

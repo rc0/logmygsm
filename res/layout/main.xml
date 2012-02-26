@@ -175,7 +175,7 @@
     android:id="@+id/shim_over_map">
   </TextView>
 
-  <uk.org.rc0.helloandroid.Map
+  <uk.org.rc0.logmygsm.Map
     android:id="@+id/map"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
