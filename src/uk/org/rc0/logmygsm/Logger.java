@@ -1,4 +1,4 @@
-package uk.org.rc0.helloandroid;
+package uk.org.rc0.logmygsm;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -184,7 +184,7 @@ public class Logger extends Service {
         lastAcc,
         last_fix_sats, last_ephem_sats, last_alman_sats);
     String expandedTitle = String.format("GSM Logger running (%d)", nReadings);
-    Intent intent = new Intent(this, HelloAndroid.class);
+    Intent intent = new Intent(this, MainActivity.class);
 
     // The next line is to stop Android from creating multiple activities - it
     // jus thas to go back to the one it was using before

@@ -1,4 +1,4 @@
-package uk.org.rc0.helloandroid;
+package uk.org.rc0.logmygsm;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -12,7 +12,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.widget.TextView;
 
-public class HelloAndroid extends Activity {
+public class MainActivity extends Activity {
 
   private TextView latText;
   private TextView lonText;
@@ -38,7 +38,7 @@ public class HelloAndroid extends Activity {
   @Override
     public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
-      setContentView(R.layout.main_new);
+      setContentView(R.layout.main);
       latText = (TextView) findViewById(R.id.latitude);
       lonText = (TextView) findViewById(R.id.longitude);
       accText = (TextView) findViewById(R.id.accuracy);

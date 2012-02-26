@@ -1,4 +1,4 @@
-package uk.org.rc0.helloandroid;
+package uk.org.rc0.logmygsm;
 
 import java.io.File;
 import java.io.BufferedReader;

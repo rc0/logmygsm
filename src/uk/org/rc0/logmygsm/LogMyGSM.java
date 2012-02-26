@@ -1,7 +1,7 @@
-package uk.org.rc0.helloandroid;
+package uk.org.rc0.logmygsm;
 import android.app.Application;
 
-public class MyApp extends Application {
+public class LogMyGSM extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
