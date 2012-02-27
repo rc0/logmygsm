@@ -1,5 +1,6 @@
 package uk.org.rc0.logmygsm;
 
+//import android.R.drawable;
 import android.app.Activity;
 import android.os.Bundle;
 import android.content.BroadcastReceiver;
@@ -256,14 +257,21 @@ public class MainActivity extends Activity {
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
       SubMenu sub = menu.addSubMenu(0, 0, Menu.NONE, "Maps");
+      sub.setIcon(android.R.drawable.ic_menu_mapmode);
       sub.add (Menu.NONE, OPTION_MAP_2G,  Menu.NONE, "O2 UK 2G map");
       sub.add (Menu.NONE, OPTION_MAP_3G,  Menu.NONE, "O2 UK 3G map");
       sub.add (Menu.NONE, OPTION_MAP_OS,  Menu.NONE, "Ordnance Survey");
       sub.add (Menu.NONE, OPTION_MAP_MAPNIK, Menu.NONE, "Mapnik (OSM)");
       sub.add (Menu.NONE, OPTION_MAP_CYCLE, Menu.NONE, "OpenCycleMap");
-      menu.add (Menu.NONE, OPTION_BIG_MAP, Menu.NONE, "Waypoint map");
-      menu.add (Menu.NONE, OPTION_CLEAR_TRAIL,  Menu.NONE, "Clear trail");
-      menu.add (Menu.NONE, OPTION_EXIT,    Menu.NONE, "Exit");
+      MenuItem m_waypoints =
+        menu.add (Menu.NONE, OPTION_BIG_MAP, Menu.NONE, "Waypoint map");
+      m_waypoints.setIcon(android.R.drawable.ic_menu_myplaces);
+      MenuItem m_clear_waypoints =
+        menu.add (Menu.NONE, OPTION_CLEAR_TRAIL,  Menu.NONE, "Clear trail");
+      m_clear_waypoints.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+      MenuItem m_exit =
+        menu.add (Menu.NONE, OPTION_EXIT,    Menu.NONE, "Exit");
+      m_exit.setIcon(android.R.drawable.ic_lock_power_off);
       return true;
     }
 
