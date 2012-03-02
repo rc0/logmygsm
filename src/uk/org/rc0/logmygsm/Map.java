@@ -162,6 +162,17 @@ public class Map extends View {
         button_stroke_paint);
   }
 
+  private boolean want_tower_line() {
+    switch (map_source) {
+      case MAP_2G:
+        return true;
+      case MAP_3G:
+        return true;
+      default:
+        return false;
+    }
+  }
+
   private void redraw_map(Canvas canvas) {
     // Decide if we have to rebuild the tile22 cache
     int width = getWidth();
@@ -174,7 +185,9 @@ public class Map extends View {
     draw_buttons(canvas, width, height);
     draw_bearing(canvas, width, height);
     Logger.mMarks.draw(canvas, display_pos, width, height, pixel_shift);
-    TowerLine.draw_line(canvas, width, height, pixel_shift, display_pos);
+    if (want_tower_line()) {
+      TowerLine.draw_line(canvas, width, height, pixel_shift, display_pos);
+    }
   }
 
   // Interface with main UI activity
