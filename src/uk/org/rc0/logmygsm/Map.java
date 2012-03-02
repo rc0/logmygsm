@@ -50,7 +50,7 @@ public class Map extends View {
 
   // --------------------------------------------------------------------------
 
-  Map(Context context, AttributeSet attrs) {
+  public Map(Context context, AttributeSet attrs) {
     super(context, attrs);
 
     red_paint = new Paint();
