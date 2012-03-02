@@ -1,9 +1,9 @@
 package uk.org.rc0.logmygsm;
 
-public class RawLogger {
+class RawLogger {
   private Backend log;
 
-  public RawLogger () {
+  RawLogger () {
     log = null;
   }
 
@@ -20,53 +20,53 @@ public class RawLogger {
     log.write(all);
   }
 
-  public void close () {
+  void close () {
     if (log != null) {
       log.close();
     }
   }
 
-  public void log_asu () {
+  void log_asu () {
     String data = String.format("%d", Logger.lastASU);
     write("AS", data);
   }
 
-  public void log_cell () {
+  void log_cell () {
     String data = String.format("%10d %10d %s",
         Logger.lastCid, Logger.lastLac,
         Logger.lastMccMnc);
     write("CL", data);
   }
 
-  public void log_service_state () {
+  void log_service_state () {
     String data = String.format("%c", Logger.lastState);
     write("ST", data);
   }
 
-  public void log_network_type () {
+  void log_network_type () {
     String data = String.format("%c %d", Logger.lastNetworkType, Logger.lastNetworkTypeRaw);
     write("NT", data);
   }
 
-  public void log_bad_location () {
+  void log_bad_location () {
     write("LB", "-- bad --");
   }
 
-  public void log_raw_location () {
+  void log_raw_location () {
     String data = String.format("%12.7f %12.7f %3d",
         Logger.lastLat, Logger.lastLon, Logger.lastAcc);
     write("LC", data);
   }
 
-  public void log_location_disabled () {
+  void log_location_disabled () {
     write("LD", "-- disabled --");
   }
 
-  public void log_location_enabled () {
+  void log_location_enabled () {
     write("LE", "-- enabled --");
   }
 
-  public void log_location_status () {
+  void log_location_status () {
     // This seems to log every second - very wasteful!
     //String data = String.format("%d %d %d %d",
     //    last_n_sats, last_fix_sats, last_ephem_sats, last_alman_sats);

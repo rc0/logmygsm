@@ -26,11 +26,11 @@ public class Map extends View {
   private final Paint button_stroke_paint;
   private final Paint grey_paint;
 
-  static final public int MAP_2G  = 100;
-  static final public int MAP_3G  = 101;
-  static final public int MAP_MAPNIK = 102;
-  static final public int MAP_OS  = 103;
-  static final public int MAP_OPEN_CYCLE = 104;
+  static final int MAP_2G  = 100;
+  static final int MAP_3G  = 101;
+  static final int MAP_MAPNIK = 102;
+  static final int MAP_OS  = 103;
+  static final int MAP_OPEN_CYCLE = 104;
 
   static final private String TAG = "Map";
 
@@ -50,7 +50,7 @@ public class Map extends View {
 
   // --------------------------------------------------------------------------
 
-  public Map(Context context, AttributeSet attrs) {
+  Map(Context context, AttributeSet attrs) {
     super(context, attrs);
 
     red_paint = new Paint();
@@ -125,7 +125,7 @@ public class Map extends View {
     c.drawCircle(xc, yc, LEN3, red_stroke_paint);
   }
 
-  public void draw_bearing(Canvas c, int w, int h) {
+  void draw_bearing(Canvas c, int w, int h) {
     if (Logger.validFix) {
       c.save();
       c.rotate((float) Logger.lastBearing, (w>>1), (h>>1));
@@ -192,7 +192,7 @@ public class Map extends View {
 
   // Interface with main UI activity
 
-  public void update_map() {
+  void update_map() {
     // This try-catch shouldn't be necessary.
     // What is the real bug?
     try {
@@ -207,7 +207,7 @@ public class Map extends View {
     invalidate();
   }
 
-  public void select_map_source(int which) {
+  void select_map_source(int which) {
     map_source = which;
     invalidate();
   }
@@ -230,7 +230,7 @@ public class Map extends View {
   // Yes, we should use the Android preferences system for this.
   // Saving to SD card allows us to edit the file offline etc
   // for debugging and so on
-  public void restore_state_from_file(String tail) {
+  void restore_state_from_file(String tail) {
     File file = new File("/sdcard/LogMyGsm/prefs/" + tail);
     // defaults in case of strife
     display_pos = null;
@@ -258,7 +258,7 @@ public class Map extends View {
     }
   }
 
-  public void save_state_to_file(String tail) {
+  void save_state_to_file(String tail) {
     if (display_pos != null) {
       File dir = new File("/sdcard/LogMyGsm/prefs");
       if (!dir.exists()) {
@@ -279,20 +279,20 @@ public class Map extends View {
 
   // Local UI callbacks
 
-  public void clear_trail() {
+  void clear_trail() {
     Logger.mTrail.clear();
     TileStore.invalidate();
     invalidate();
   }
 
-  public void zoom_out() {
+  void zoom_out() {
     if (zoom > 9) {
       setZoom(zoom - 1);
       invalidate();
     }
   }
 
-  public void zoom_in() {
+  void zoom_in() {
     if (zoom < 16) {
       setZoom(zoom + 1);
       invalidate();
@@ -395,24 +395,24 @@ public class Map extends View {
     }
   }
 
-  public void add_landmark() {
+  void add_landmark() {
     Logger.mMarks.add(display_pos);
     invalidate();
   }
 
-  public void delete_landmark() {
+  void delete_landmark() {
     if (Logger.mMarks.delete(display_pos, pixel_shift)) {
       invalidate();
     }
   }
 
-  public void delete_visible_landmarks() {
+  void delete_visible_landmarks() {
     if (Logger.mMarks.delete_visible(display_pos, pixel_shift, getWidth(), getHeight() )) {
       invalidate();
     }
   }
 
-  public void delete_all_landmarks() {
+  void delete_all_landmarks() {
     Logger.mMarks.delete_all();
     invalidate();
   }

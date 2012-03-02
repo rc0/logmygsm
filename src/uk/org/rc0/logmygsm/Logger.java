@@ -27,7 +27,7 @@ public class Logger extends Service {
 
   // Flag that's set by the UI to tell us to cut the power when we next get
   // called back by the framework.
-  static public boolean stop_tracing;
+  static boolean stop_tracing;
 
   private TelephonyManager myTelephonyManager;
   private LocationManager myLocationManager;
@@ -40,65 +40,65 @@ public class Logger extends Service {
   private Backend mainlog;
   private RawLogger rawlog;
 
-  static public Trail mTrail;
-  static public Landmarks mMarks;
+  static Trail mTrail;
+  static Landmarks mMarks;
 
   // -----------------
   // Variables shared with the Activity
   // -----------------
   //
-  public static final String UPDATE_CELL = "LogMyGSM_Update_Cell";
-  public static final String UPDATE_GPS  = "LogMyGSM_Update_GPS";
+  static final String UPDATE_CELL = "LogMyGSM_Update_Cell";
+  static final String UPDATE_GPS  = "LogMyGSM_Update_GPS";
 
   // --- Telephony
-  static public char   lastNetworkType;
-  static public String lastNetworkTypeLong;
-  static public int    lastNetworkTypeRaw;
-  static public char   lastState;
-  static public int    lastCid;
-  static public int    lastLac;
-  static public String lastMccMnc;
-  static public String lastOperator;
-  static public String lastSimOperator;
-  static public int    lastdBm;
-  static public int    lastASU;
-  static public int    lastBer;
+  static char   lastNetworkType;
+  static String lastNetworkTypeLong;
+  static int    lastNetworkTypeRaw;
+  static char   lastState;
+  static int    lastCid;
+  static int    lastLac;
+  static String lastMccMnc;
+  static String lastOperator;
+  static String lastSimOperator;
+  static int    lastdBm;
+  static int    lastASU;
+  static int    lastBer;
 
   // --- GPS
-  static public boolean validFix;
-  static public String myProvider;
-  static public int    nReadings;
-  static public int    nHandoffs;
-  static public double lastLat;
-  static public double lastLon;
-  static public int    lastAcc;
-  static public int    lastBearing;
-  static public float  lastSpeed;
-  static public long   lastFixMillis;
+  static boolean validFix;
+  static String myProvider;
+  static int    nReadings;
+  static int    nHandoffs;
+  static double lastLat;
+  static double lastLon;
+  static int    lastAcc;
+  static int    lastBearing;
+  static float  lastSpeed;
+  static long   lastFixMillis;
 
   // --- GPS fix info
-  static public int    last_n_sats;
-  static public int    last_fix_sats;
-  static public int    last_ephem_sats;
-  static public int    last_alman_sats;
+  static int    last_n_sats;
+  static int    last_fix_sats;
+  static int    last_ephem_sats;
+  static int    last_alman_sats;
 
   // --- CID history
 
-  public class RecentCID {
-    public int cid;
-    public char network_type;
-    public char state;
-    public int dbm;
-    public int handoff;
+  class RecentCID {
+    int cid;
+    char network_type;
+    char state;
+    int dbm;
+    int handoff;
     // Time this CID was last encountered
-    public long lastMillis;
+    long lastMillis;
 
-    public RecentCID() { cid = -1; }
+    RecentCID() { cid = -1; }
   };
 
 
-  static public final int MAX_RECENT = 8;
-  static public RecentCID[] recent_cids;
+  static final int MAX_RECENT = 8;
+  static RecentCID[] recent_cids;
 
   // This is only called once for the service lifetime
   @Override
@@ -466,7 +466,7 @@ public class Logger extends Service {
 
   // --------------------------------------------------------------------------------
 
-  public void announce(String text) {
+  void announce(String text) {
     Context context = getApplicationContext();
     int duration = Toast.LENGTH_LONG;
     Toast toast = Toast.makeText(context, text, duration);

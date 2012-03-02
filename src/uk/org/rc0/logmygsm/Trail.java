@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 // Meant to be instantiated as a member in the service
-public class Trail {
+class Trail {
 
   private Logger mLogger;
 
@@ -22,23 +22,23 @@ public class Trail {
   private int[] y_old;
   private History mHistory;
 
-  public static final int splot_gap = 9;
-  public static final float splot_radius = 2.5f;
+  static final int splot_gap = 9;
+  static final float splot_radius = 2.5f;
 
   private static final String TAG = "Trail";
 
-  public class PointArray {
-    public int n;
-    public int [] x;
-    public int [] y;
+  class PointArray {
+    int n;
+    int [] x;
+    int [] y;
 
-    public PointArray () {
+    PointArray () {
       n = 0;
       x = null;
       y = null;
     }
 
-    public PointArray (int nn, int [] xx, int [] yy) {
+    PointArray (int nn, int [] xx, int [] yy) {
       n = nn;
       if (n > 0) {
         x = xx;
@@ -49,7 +49,7 @@ public class Trail {
       }
     }
 
-    public PointArray (ArrayList<Merc28> zz) {
+    PointArray (ArrayList<Merc28> zz) {
       n = zz.size();
       if (n > 0) {
         x = new int[n];
@@ -66,25 +66,25 @@ public class Trail {
 
   }
 
-  public class History {
+  class History {
     private Merc28 x0;
     private Merc28 x1;
 
-    public History() {
+    History() {
       clear();
     }
 
-    public void clear () {
+    void clear () {
       x0 = null;
       x1 = null;
     }
 
-    public void add(Merc28 x) {
+    void add(Merc28 x) {
       x1 = x0;
       x0 = new Merc28(x);
     }
 
-    public Merc28 estimated_position() {
+    Merc28 estimated_position() {
       int xpred, ypred;
       if (x0 != null) {
         if (x1 != null) {
@@ -102,7 +102,7 @@ public class Trail {
   }
 
 
-  public Trail(Logger the_logger) {
+  Trail(Logger the_logger) {
     mLogger = the_logger;
     mHistory = new History();
     restore_state_from_file();
@@ -116,13 +116,13 @@ public class Trail {
     y_old = null;
   }
 
-  public void clear() {
+  void clear() {
     init();
     mHistory.clear();
   }
 
   // Move to subclass of service
-  public void save_state_to_file() {
+  void save_state_to_file() {
     gather();
 
     File dir = new File("/sdcard/LogMyGsm/prefs");
@@ -142,7 +142,7 @@ public class Trail {
     }
   }
 
-  public void restore_state_from_file() {
+  void restore_state_from_file() {
     File file = new File("/sdcard/LogMyGsm/prefs/trail.txt");
     boolean failed = false;
     init();
@@ -175,7 +175,7 @@ public class Trail {
   }
 
   // Skip points that are too close together to ever be visible on the map display
-  public void add_point(Merc28 p) {
+  void add_point(Merc28 p) {
     mHistory.add(p);
     boolean do_add = true;
     if (last_point != null) {
@@ -228,11 +228,11 @@ public class Trail {
 
   // If this is being requested, it's because the tile cache is being rebuilt, so it's a good time
   // to accumulate the recent points onto the historical list
-  public PointArray get_historical() {
+  PointArray get_historical() {
     return new PointArray(n_old, x_old, y_old);
   }
 
-  public Merc28 get_estimated_position() {
+  Merc28 get_estimated_position() {
     return mHistory.estimated_position();
   }
 

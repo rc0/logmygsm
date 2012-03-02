@@ -9,7 +9,7 @@ import android.graphics.Rect;
 import android.util.Log;
 import java.io.File;
 
-public class TileStore {
+class TileStore {
 
   static final private int bm_log_size = 8;
   static final private int bm_size = 1<<bm_log_size;
@@ -231,18 +231,18 @@ public class TileStore {
   // -----------
   // Interface with map
 
-  static public void invalidate() {
+  static void invalidate() {
     front = new Entry[SIZE];
     next = 0;
     back = null;
   }
 
-  static public void semi_invalidate() {
+  static void semi_invalidate() {
     back = null;
     System.gc();
   }
 
-  static public void draw(Canvas c, int w, int h, int zoom, int map_source, Merc28 midpoint) {
+  static void draw(Canvas c, int w, int h, int zoom, int map_source, Merc28 midpoint) {
     int pixel_shift = (Merc28.shift - (zoom + bm_log_size));
 
     // Compute pixels from origin at this zoom level for top-left corner of canvas

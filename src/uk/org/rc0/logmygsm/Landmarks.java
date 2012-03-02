@@ -14,18 +14,18 @@ import java.util.ArrayList;
 
 // Storage for the the waypoints that the user can define
 
-public class Landmarks {
+class Landmarks {
 
   private class Landmark {
     Merc28 pos;
     boolean alive;
 
-    public Landmark(Merc28 p) {
+    Landmark(Merc28 p) {
       pos = new Merc28(p);
       alive = true;
     }
 
-    public Landmark(int x, int y) {
+    Landmark(int x, int y) {
       pos = new Merc28(x, y);
       alive = true;
     }
@@ -35,7 +35,8 @@ public class Landmarks {
   private Paint marker_paint;
 
   static final private String TAIL = "markers.txt";
-  public Landmarks() {
+
+  Landmarks() {
     restore_state_from_file();
 
     marker_paint = new Paint();
@@ -56,7 +57,7 @@ public class Landmarks {
     return n;
   }
 
-  public void save_state_to_file() {
+  void save_state_to_file() {
     File dir = new File("/sdcard/LogMyGsm/prefs");
     if (!dir.exists()) {
       dir.mkdirs();
@@ -107,13 +108,13 @@ public class Landmarks {
 
   }
 
-  public void add(Merc28 pos) {
+  void add(Merc28 pos) {
     points.add(new Landmark(pos));
   }
 
   // Return value is true if a deletion successfully occurred, false if no point was
   // close enough to 'pos' to qualify.  Only delete the point that is 'closest'
-  public boolean delete(Merc28 pos, int pixel_shift) {
+  boolean delete(Merc28 pos, int pixel_shift) {
     int victim;
     int closest;
     int n = points.size();
@@ -139,7 +140,7 @@ public class Landmarks {
     }
   }
 
-  public boolean delete_visible(Merc28 pos, int pixel_shift, int width, int height) {
+  boolean delete_visible(Merc28 pos, int pixel_shift, int width, int height) {
     int w2 = width >> 1;
     int h2 = height >> 1;
     int n = points.size();
@@ -158,7 +159,7 @@ public class Landmarks {
     return did_any;
   }
 
-  public void delete_all() {
+  void delete_all() {
     points = new ArrayList<Landmark> ();
   }
 
@@ -166,7 +167,7 @@ public class Landmarks {
 
 
   // pos is the position of the centre-screen
-  public void draw(Canvas c, Merc28 pos, int w, int h, int pixel_shift) {
+  void draw(Canvas c, Merc28 pos, int w, int h, int pixel_shift) {
     int n = points.size();
     for (int i = 0; i < n; i++) {
       if (points.get(i).alive) {

@@ -6,12 +6,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class Backend {
+class Backend {
   private File file;
   private FileWriter writer;
   private Logger mService;
 
-  public Backend(String prefix, Logger the_service) {
+  Backend(String prefix, Logger the_service) {
     String basePath = "/sdcard";
     String ourDir = "LogMyGsm/logs";
     CharSequence cs = DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis());
@@ -40,7 +40,7 @@ public class Backend {
     }
   }
 
-  public void write(String data) {
+  void write(String data) {
     if (writer != null) {
       try {
         writer.append(data);
@@ -49,7 +49,7 @@ public class Backend {
     }
   }
 
-  public void close() {
+  void close() {
     if (writer != null) {
       if (mService != null) {
         mService.announce("Closing logfile");

@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.lang.Math;
 import java.util.HashMap;
 
-public class TowerLine {
+class TowerLine {
 
   static private HashMap<String, Merc28> lut;
   static private Paint line_paint;

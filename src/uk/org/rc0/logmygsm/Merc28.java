@@ -11,14 +11,14 @@ import java.lang.Math;
 // can work more cheaply with integer arithmetic (e.g. use right shift to get
 // the X,Y of the tile containing a location).
 
-public class Merc28 {
-  public int X;
-  public int Y;
+class Merc28 {
+  int X;
+  int Y;
 
-  static public final int shift = 28;
-  static public final double scale = (double)(1<<shift);
+  static final int shift = 28;
+  static final double scale = (double)(1<<shift);
 
-  public Merc28(double lat, double lon) {
+  Merc28(double lat, double lon) {
     double x, yy, y, XX, YY;
     x = Math.toRadians(lon);
     yy = Math.toRadians(lat);
@@ -28,11 +28,11 @@ public class Merc28 {
     X = (int) Math.floor(XX * scale);
     Y = (int) Math.floor(YY * scale);
   }
-  public Merc28(int x, int y) {
+  Merc28(int x, int y) {
     X = x;
     Y = y;
   }
-  public Merc28(Merc28 orig) {
+  Merc28(Merc28 orig) {
     X = orig.X;
     Y = orig.Y;
   }
