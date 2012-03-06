@@ -2,9 +2,11 @@ package uk.org.rc0.logmygsm;
 
 class RawLogger {
   private Backend log;
+  private boolean enabled;
 
-  RawLogger () {
+  RawLogger (boolean _enabled) {
     log = null;
+    enabled = _enabled;
   }
 
   private void write(String tag, String data) {
@@ -27,50 +29,68 @@ class RawLogger {
   }
 
   void log_asu () {
-    String data = String.format("%d", Logger.lastASU);
-    write("AS", data);
+    if (enabled) {
+      String data = String.format("%d", Logger.lastASU);
+      write("AS", data);
+    }
   }
 
   void log_cell () {
-    String data = String.format("%10d %10d %s",
-        Logger.lastCid, Logger.lastLac,
-        Logger.lastMccMnc);
-    write("CL", data);
+    if (enabled) {
+      String data = String.format("%10d %10d %s",
+          Logger.lastCid, Logger.lastLac,
+          Logger.lastMccMnc);
+      write("CL", data);
+    }
   }
 
   void log_service_state () {
-    String data = String.format("%c", Logger.lastState);
-    write("ST", data);
+    if (enabled) {
+      String data = String.format("%c", Logger.lastState);
+      write("ST", data);
+    }
   }
 
   void log_network_type () {
-    String data = String.format("%c %d", Logger.lastNetworkType, Logger.lastNetworkTypeRaw);
-    write("NT", data);
+    if (enabled) {
+      String data = String.format("%c %d", Logger.lastNetworkType, Logger.lastNetworkTypeRaw);
+      write("NT", data);
+    }
   }
 
   void log_bad_location () {
-    write("LB", "-- bad --");
+    if (enabled) {
+      write("LB", "-- bad --");
+    }
   }
 
   void log_raw_location () {
-    String data = String.format("%12.7f %12.7f %3d",
-        Logger.lastLat, Logger.lastLon, Logger.lastAcc);
-    write("LC", data);
+    if (enabled) {
+      String data = String.format("%12.7f %12.7f %3d",
+          Logger.lastLat, Logger.lastLon, Logger.lastAcc);
+      write("LC", data);
+    }
   }
 
   void log_location_disabled () {
-    write("LD", "-- disabled --");
+    if (enabled) {
+      write("LD", "-- disabled --");
+    }
   }
 
   void log_location_enabled () {
-    write("LE", "-- enabled --");
+    if (enabled) {
+      write("LE", "-- enabled --");
+    }
   }
 
   void log_location_status () {
-    // This seems to log every second - very wasteful!
-    //String data = String.format("%d %d %d %d",
-    //    last_n_sats, last_fix_sats, last_ephem_sats, last_alman_sats);
-    //writeRaw("LS", data);
+    if (enabled) {
+      // This seems to log every second - very wasteful!
+      //String data = String.format("%d %d %d %d",
+      //    last_n_sats, last_fix_sats, last_ephem_sats, last_alman_sats);
+      //writeRaw("LS", data);
+    }
   }
 }
 

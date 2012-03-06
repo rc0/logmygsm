@@ -108,7 +108,7 @@ public class Logger extends Service {
     init_state();
     init_recent_cids();
 
-    rawlog = new RawLogger();
+    rawlog = new RawLogger(false); // 'true' to re-enable raw logs for debug
     mTrail = new Trail(this);
     mMarks = new Landmarks();
 
