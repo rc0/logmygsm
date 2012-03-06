@@ -27,10 +27,7 @@ class TileStore {
     int x;
     int y;
     int cycle;
-    // index in Trail's recent list of the last point we plotted, -1 if none
-    int lx, ly;
-    // index in Trail's recent list of the next point to try
-    int n_next;
+    private Trail.Upto upto;
     Bitmap b;
 
     Bitmap getBitmap() {
@@ -45,9 +42,7 @@ class TileStore {
       x = _x;
       y = _y;
       b = _b;
-      n_next = 0;
-      lx = -256;
-      ly = -256;
+      upto = new Trail.Upto ();
       touch();
     }
 
@@ -68,14 +63,9 @@ class TileStore {
 
     void add_recent_trail() {
       Canvas my_canv = new Canvas(b);
-      int [] result =
-        Logger.mTrail.draw_recent_trail(my_canv,
-            x<<tile_shift, y<<tile_shift,
-            pixel_shift,
-            lx, ly, n_next);
-      n_next = result[2];
-      lx = result[0];
-      ly = result[1];
+      Logger.mTrail.draw_recent_trail(my_canv,
+          x<<tile_shift, y<<tile_shift,
+          pixel_shift, upto);
     }
   }
 

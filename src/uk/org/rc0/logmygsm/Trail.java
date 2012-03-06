@@ -240,15 +240,26 @@ class Trail {
   static final int MIN_CENTRE = -5;
   static final int MAX_CENTRE = 256 - MIN_CENTRE;
 
-  int [] draw_recent_trail(Canvas c, int xnw, int ynw, int pixel_shift, int lx, int ly, int n_next) {
+  static class Upto {
+    int lx;
+    int ly;
+    int next;
+    Upto() {
+      lx = -256;
+      ly = -256;
+      next=0;
+    }
+  }
+
+  void draw_recent_trail(Canvas c, int xnw, int ynw, int pixel_shift, Upto upto) {
     int n = recent.size();
-    for (int i=n_next; i<n; i++) {
+    for (int i=upto.next; i<n; i++) {
       Merc28 p = recent.get(i);
       int sx = (p.X - xnw) >> pixel_shift;
       int sy = (p.Y - ynw) >> pixel_shift;
       boolean do_add = true;
-      int manhattan = Math.abs(sx - lx) + Math.abs(sy - ly);
-      if (manhattan < Trail.splot_gap) {
+      int manhattan = Math.abs(sx - upto.lx) + Math.abs(sy - upto.ly);
+      if (manhattan < splot_gap) {
         do_add = false;
       }
       if (do_add) {
@@ -256,12 +267,13 @@ class Trail {
         // // Loose bounds to allow for 
         if ((sx >= MIN_CENTRE) && (sy >= MIN_CENTRE) && (sx < MAX_CENTRE) && (sy < MAX_CENTRE)) {
           c.drawCircle((float)sx, (float)sy, Trail.splot_radius, TileStore.trail_paint);
-          lx = sx;
-          ly = sy;
+          upto.lx = sx;
+          upto.ly = sy;
         }
       }
     }
-    return new int[] {lx, ly, n};
+    upto.next = n;
+    return;
   }
 
   int n_recent () {
