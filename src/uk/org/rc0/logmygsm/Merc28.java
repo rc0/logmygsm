@@ -28,9 +28,9 @@ class Merc28 {
     X = (int) Math.floor(XX * scale);
     Y = (int) Math.floor(YY * scale);
   }
-  Merc28(int x, int y) {
-    X = x;
-    Y = y;
+  Merc28(int _X, int _Y) {
+    X = _X;
+    Y = _Y;
   }
   Merc28(Merc28 orig) {
     X = orig.X;

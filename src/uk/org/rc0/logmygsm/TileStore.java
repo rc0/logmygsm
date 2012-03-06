@@ -37,25 +37,25 @@ class TileStore {
       return b;
     }
 
-    Entry(int azoom, int amap_source, int ax, int ay, Bitmap ab) {
-      zoom = azoom;
+    Entry(int _zoom, int _map_source, int _x, int _y, Bitmap _b) {
+      zoom = _zoom;
       pixel_shift = (Merc28.shift - (zoom + bm_log_size));
       tile_shift = (Merc28.shift - zoom);
-      map_source = amap_source;
-      x = ax;
-      y = ay;
-      b = ab;
+      map_source = _map_source;
+      x = _x;
+      y = _y;
+      b = _b;
       n_next = 0;
       lx = -256;
       ly = -256;
       touch();
     }
 
-    boolean isMatch(int azoom, int amap_source, int ax, int ay) {
-      if ((azoom == zoom) &&
-          (amap_source == map_source) &&
-          (ax == x) &&
-          (ay == y)) {
+    boolean isMatch(int _zoom, int _map_source, int _x, int _y) {
+      if ((_zoom == zoom) &&
+          (_map_source == map_source) &&
+          (_x == x) &&
+          (_y == y)) {
         return true;
       } else {
         return false;

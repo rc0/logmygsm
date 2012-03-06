@@ -20,13 +20,13 @@ class Landmarks {
     Merc28 pos;
     boolean alive;
 
-    Landmark(Merc28 p) {
-      pos = new Merc28(p);
+    Landmark(Merc28 _pos) {
+      pos = new Merc28(_pos);
       alive = true;
     }
 
-    Landmark(int x, int y) {
-      pos = new Merc28(x, y);
+    Landmark(int _x, int _y) {
+      pos = new Merc28(_x, _y);
       alive = true;
     }
   }
