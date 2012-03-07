@@ -328,6 +328,14 @@ public class Map extends View {
         is_dragged = false;
         invalidate();
         return true;
+      } else {
+        Merc28 tower_pos = new Merc28(0,0);
+        if (TowerLine.find_current_tower_pos(tower_pos)) {
+          display_pos = tower_pos;
+          is_dragged = false;
+          invalidate();
+          return true;
+        }
       }
     }
     return false;

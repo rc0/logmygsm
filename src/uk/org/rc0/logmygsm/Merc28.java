@@ -37,6 +37,11 @@ class Merc28 {
     Y = orig.Y;
   }
 
+  void copy_from(Merc28 src) {
+    X = src.X;
+    Y = src.Y;
+  }
+
 }
 
 // vim:et:sw=2:sts=2

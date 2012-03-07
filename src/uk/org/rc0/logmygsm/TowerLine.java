@@ -21,8 +21,11 @@ class TowerLine {
   static final private String TAIL = "cidxy.txt";
   static final private String TAG = "TowerLine";
 
+  static private Merc28 tmp_pos;
+
   static void init() {
     lut = new HashMap<String,Merc28>();
+    tmp_pos = new Merc28(0,0);
 
     line_paint = new Paint();
     line_paint.setStyle(Paint.Style.STROKE);
@@ -73,17 +76,22 @@ class TowerLine {
   static final float BASE = 16.0f;
   static final float TEXT_RADIUS = 70.0f;
 
-  static void draw_line(Canvas c, int w, int h, int pixel_shift, Merc28 display_pos) {
-    // CidLac cl = new CidLac(Logger.lastCid, Logger.lastLac);
+  static boolean find_current_tower_pos(Merc28 tower_pos) {
     int cid = Logger.lastCid;
     int lac = 0;
-    //Log.i(TAG, "Looking up " + cid + "," + lac);
     String cl = cid + "," + lac;
     if (lut.containsKey(cl)) {
-      Merc28 pos = lut.get(cl);
-      //Log.i(TAG, "Matched in lut");
-      int dx = (pos.X - display_pos.X) >> pixel_shift;
-      int dy = (pos.Y - display_pos.Y) >> pixel_shift;
+      tower_pos.copy_from(lut.get(cl));
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  static void draw_line(Canvas c, int w, int h, int pixel_shift, Merc28 display_pos) {
+    if (find_current_tower_pos(tmp_pos)) {
+      int dx = (tmp_pos.X - display_pos.X) >> pixel_shift;
+      int dy = (tmp_pos.Y - display_pos.Y) >> pixel_shift;
 
       float fx = (float) dx;
       float fy = (float) dy;
@@ -95,8 +103,8 @@ class TowerLine {
         float y1 = (float)(h>>1) + fy;
         c.drawLine(x0, y0, x1, y1, line_paint);
 
-        double zx = (double)(pos.X - display_pos.X);
-        double zy = (double)(pos.Y - display_pos.Y);
+        double zx = (double)(tmp_pos.X - display_pos.X);
+        double zy = (double)(tmp_pos.Y - display_pos.Y);
         double zd = Math.sqrt(zx*zx + zy*zy) * 25220000.0 / Merc28.scale;
 
         String caption;
