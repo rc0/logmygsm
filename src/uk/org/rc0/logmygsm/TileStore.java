@@ -94,7 +94,7 @@ class TileStore {
     gray_paint = new Paint();
     gray_paint.setColor(Color.GRAY);
     trail_paint = new Paint();
-    trail_paint.setColor(Color.argb(144, 0x6d, 0, 0xb0));
+    trail_paint.setColor(Color.argb(96, 0x6d, 0, 0xb0));
     trail_paint.setStyle(Paint.Style.FILL);
   }
 
