@@ -30,7 +30,7 @@ class TowerLine {
     line_paint = new Paint();
     line_paint.setStyle(Paint.Style.STROKE);
     line_paint.setStrokeWidth(6);
-    line_paint.setColor(Color.argb(128, 0x88, 0x0, 0x6d));
+    line_paint.setColor(Color.argb(128, 0xa0, 0x0, 0x4d));
 
     text_paint = new Paint();
     text_paint.setColor(Color.argb(192, 0x38, 0x0, 0x58));
@@ -78,6 +78,7 @@ class TowerLine {
 
   static boolean find_current_tower_pos(Merc28 tower_pos) {
     int cid = Logger.lastCid;
+    cid = 16899;
     int lac = 0;
     String cl = cid + "," + lac;
     if (lut.containsKey(cl)) {

@@ -81,6 +81,7 @@ class TileStore {
 
   static private Paint gray_paint;
   static Paint trail_paint;
+  static Paint trail_dot_paint;
 
   // -----------
 
@@ -94,8 +95,11 @@ class TileStore {
     gray_paint = new Paint();
     gray_paint.setColor(Color.GRAY);
     trail_paint = new Paint();
-    trail_paint.setColor(Color.argb(96, 0x6d, 0, 0xb0));
+    trail_paint.setColor(Color.argb(72, 0x6d, 0, 0xb0));
     trail_paint.setStyle(Paint.Style.FILL);
+    trail_dot_paint = new Paint();
+    trail_dot_paint.setColor(Color.argb(255, 0x6d, 0, 0xb0));
+    trail_dot_paint.setStyle(Paint.Style.FILL);
   }
 
   // -----------
@@ -122,6 +126,7 @@ class TileStore {
       }
       if (do_add) {
         my_canv.drawCircle((float)px, (float)py, Trail.splot_radius, trail_paint);
+        my_canv.drawCircle((float)px, (float)py, 1.0f, trail_dot_paint);
         last_x = px;
         last_y = py;
       }
