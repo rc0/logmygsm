@@ -267,7 +267,7 @@ class Trail {
         // // Loose bounds to allow for 
         if ((sx >= MIN_CENTRE) && (sy >= MIN_CENTRE) && (sx < MAX_CENTRE) && (sy < MAX_CENTRE)) {
           c.drawCircle((float)sx, (float)sy, Trail.splot_radius, TileStore.trail_paint);
-          c.drawCircle((float)sx, (float)sy, 1.0f, TileStore.trail_dot_paint);
+          c.drawCircle((float)sx, (float)sy, 2.0f, TileStore.trail_dot_paint);
           upto.lx = sx;
           upto.ly = sy;
         }

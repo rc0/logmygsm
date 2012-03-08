@@ -240,7 +240,7 @@ public class Logger extends Service {
         PhoneStateListener.LISTEN_SERVICE_STATE |
         PhoneStateListener.LISTEN_SIGNAL_STRENGTHS |
         PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
-    myLocationManager.requestLocationUpdates(myProvider, 1000, 3, myLocationListener);
+    myLocationManager.requestLocationUpdates(myProvider, 1000, 8, myLocationListener);
     myLocationManager.addGpsStatusListener(gpsListener);
   }
 

@@ -126,7 +126,7 @@ class TileStore {
       }
       if (do_add) {
         my_canv.drawCircle((float)px, (float)py, Trail.splot_radius, trail_paint);
-        my_canv.drawCircle((float)px, (float)py, 1.0f, trail_dot_paint);
+        my_canv.drawCircle((float)px, (float)py, 2.0f, trail_dot_paint);
         last_x = px;
         last_y = py;
       }
