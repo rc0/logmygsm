@@ -38,7 +38,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements Map.PositionListener {
 
   private TextView latText;
   private TextView lonText;
@@ -79,6 +79,7 @@ public class MainActivity extends Activity {
       daOffsetText = (TextView) findViewById(R.id.da_offset);
       mMap = (Map) findViewById(R.id.map);
       mMap.restore_state_from_file(PREFS_FILE);
+      mMap.register_position_listener(this);
     }
 
   @Override
@@ -161,7 +162,7 @@ public class MainActivity extends Activity {
     }
   }
 
-  void position_update() {
+  private void position_update() {
     if (Logger.validFix) {
       String daOffsetString;
       double da_offset_m = mMap.da_offset_metres();
@@ -174,6 +175,10 @@ public class MainActivity extends Activity {
     } else {
       daOffsetText.setText("DA -----");
     }
+  }
+
+  public void display_position_update() {
+    position_update();
   }
 
   private void updateDisplay() {

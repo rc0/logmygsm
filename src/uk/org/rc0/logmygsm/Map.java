@@ -75,6 +75,18 @@ public class Map extends View {
 
   // --------------------------------------------------------------------------
 
+  public interface PositionListener {
+    void display_position_update();
+  }
+
+  private PositionListener mPL;
+
+  void register_position_listener(PositionListener pl) {
+    mPL = pl;
+  }
+
+  // --------------------------------------------------------------------------
+
   public Map(Context context, AttributeSet attrs) {
     super(context, attrs);
 
@@ -302,6 +314,12 @@ public class Map extends View {
     }
   }
 
+  private void notify_position_update() {
+    if (mPL != null) {
+      mPL.display_position_update();
+    }
+  }
+
   // Local UI callbacks
 
   void clear_trail() {
@@ -351,6 +369,7 @@ public class Map extends View {
       if (estimated_pos != null) {
         display_pos = new Merc28(estimated_pos);
         is_dragged = false;
+        notify_position_update();
         invalidate();
         return true;
       } else {
@@ -358,6 +377,7 @@ public class Map extends View {
         if (TowerLine.find_current_tower_pos(tower_pos)) {
           display_pos = tower_pos;
           is_dragged = false;
+          notify_position_update();
           invalidate();
           return true;
         }
@@ -404,6 +424,7 @@ public class Map extends View {
           display_pos.Y -= (int)(0.5 + drag_scale * dy);
           mLastX = x;
           mLastY = y;
+          notify_position_update();
           invalidate();
           return true;
         }
