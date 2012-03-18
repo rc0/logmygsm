@@ -428,6 +428,15 @@ public class Map extends View {
     }
   }
 
+  double da_offset_metres () {
+    if ((estimated_pos != null) && (display_pos != null)) {
+      return display_pos.metres_away(estimated_pos);
+    } else {
+      return 0;
+    }
+  }
+
+
   void add_landmark() {
     Logger.mMarks.add(display_pos);
     invalidate();

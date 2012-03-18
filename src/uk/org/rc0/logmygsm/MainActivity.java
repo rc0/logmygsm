@@ -48,8 +48,8 @@ public class MainActivity extends Activity {
   private TextView cidText;
   private TextView lacmncText;
   private TextView netmccText;
-  private TextView speedText;
   private TextView dBmText;
+  private TextView daOffsetText;
   private TextView countText;
   private TextView cidHistoryText;
 
@@ -73,10 +73,10 @@ public class MainActivity extends Activity {
       cidText = (TextView) findViewById(R.id.cid);
       netmccText = (TextView) findViewById(R.id.net_mcc);
       lacmncText = (TextView) findViewById(R.id.lac_mnc);
-      speedText = (TextView) findViewById(R.id.speed);
       dBmText = (TextView) findViewById(R.id.dBm);
       countText = (TextView) findViewById(R.id.count);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
+      daOffsetText = (TextView) findViewById(R.id.da_offset);
       mMap = (Map) findViewById(R.id.map);
       mMap.restore_state_from_file(PREFS_FILE);
     }
@@ -161,6 +161,21 @@ public class MainActivity extends Activity {
     }
   }
 
+  void position_update() {
+    if (Logger.validFix) {
+      String daOffsetString;
+      double da_offset_m = mMap.da_offset_metres();
+      if (da_offset_m < 10000) {
+        daOffsetString = String.format("DA %5dm", (int)da_offset_m);
+      } else {
+        daOffsetString = String.format("DA %5.1fkm", 0.001*da_offset_m);
+      }
+      daOffsetText.setText(daOffsetString);
+    } else {
+      daOffsetText.setText("DA -----");
+    }
+  }
+
   private void updateDisplay() {
     long current_time = System.currentTimeMillis();
     if (Logger.validFix) {
@@ -176,30 +191,28 @@ public class MainActivity extends Activity {
       } else {
         ageString = String.format(" %2dh %03d", age/3600, Logger.lastBearing);
       }
-      String speedString = String.format("%5.1f mph",
-        Logger.lastSpeed * 2.237);
       latText.setText(latString);
       lonText.setText(lonString);
       accText.setText(accString);
       ageText.setText(ageString);
-      speedText.setText(speedString);
       latText.setTextColor(Color.WHITE);
       lonText.setTextColor(Color.WHITE);
       accText.setTextColor(Color.WHITE);
       ageText.setTextColor(Color.WHITE);
-      speedText.setTextColor(Color.WHITE);
     } else {
       latText.setText("GPS?");
       lonText.setText("GPS?");
       accText.setText("GPS?");
       ageText.setText("GPS?");
-      speedText.setText("GPS?");
+      daOffsetText.setText("DA -----");
       latText.setTextColor(Color.RED);
       lonText.setTextColor(Color.RED);
       accText.setTextColor(Color.RED);
       ageText.setTextColor(Color.RED);
-      speedText.setTextColor(Color.RED);
     }
+
+    position_update();
+
     String satString = String.format("%d/%d/%d",
         Logger.last_fix_sats,
         Logger.last_ephem_sats, Logger.last_alman_sats);

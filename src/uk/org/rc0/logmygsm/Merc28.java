@@ -67,6 +67,23 @@ class Merc28 {
     Y = src.Y;
   }
 
+  static double metres_per_pixel = (25220000.0 / scale);
+  static final double EARTH_RADIUS_IN_METRES = 6378140.0;
+
+  static void update_latitude(double lat) {
+    metres_per_pixel =
+      2.0 * Math.PI *
+      EARTH_RADIUS_IN_METRES *
+      Math.cos(Math.toRadians(lat)) / scale;
+  }
+
+  double metres_away(Merc28 other) {
+    double zx = (double)(X - other.X);
+    double zy = (double)(Y - other.Y);
+    double zd = Math.sqrt(zx*zx + zy*zy) * metres_per_pixel;
+    return zd;
+  }
+
 }
 
 // vim:et:sw=2:sts=2

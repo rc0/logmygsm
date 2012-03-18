@@ -171,10 +171,10 @@
       <TextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:id="@+id/speed"
+        android:id="@+id/da_offset"
         android:typeface="monospace"
         android:textSize="16sp"
-        android:text="###.# mph"
+        android:text="D-A #####m"
         android:layout_gravity="center">
       </TextView>
 

@@ -434,6 +434,7 @@ public class Logger extends Service {
         logToFile();
         rawlog.log_raw_location();
         mTrail.add_point(new Merc28(lastLat, lastLon));
+        Merc28.update_latitude(lastLat);
       }
       updateUIGPS();
     }

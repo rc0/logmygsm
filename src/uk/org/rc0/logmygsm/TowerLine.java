@@ -128,9 +128,7 @@ class TowerLine {
         float y1 = (float)(h>>1) + fy;
         c.drawLine(x0, y0, x1, y1, line_paint);
 
-        double zx = (double)(tmp_pos.X - display_pos.X);
-        double zy = (double)(tmp_pos.Y - display_pos.Y);
-        double zd = Math.sqrt(zx*zx + zy*zy) * 25220000.0 / Merc28.scale;
+        double zd = tmp_pos.metres_away(display_pos);
 
         String caption;
         if (zd < 1000) {
