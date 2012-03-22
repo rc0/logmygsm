@@ -290,6 +290,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
 
   private final int OPTION_MAP_2G   = 1;
   private final int OPTION_MAP_3G   = 2;
+  private final int OPTION_MAP_TODO = 8;
   private final int OPTION_MAP_MAPNIK  = 3;
   private final int OPTION_MAP_CYCLE = 7;
   private final int OPTION_MAP_OS   = 4;
@@ -303,6 +304,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
       sub.setIcon(android.R.drawable.ic_menu_mapmode);
       sub.add (Menu.NONE, OPTION_MAP_2G,  Menu.NONE, "O2 UK 2G map");
       sub.add (Menu.NONE, OPTION_MAP_3G,  Menu.NONE, "O2 UK 3G map");
+      sub.add (Menu.NONE, OPTION_MAP_TODO,  Menu.NONE, "O2 UK to-visit map");
       sub.add (Menu.NONE, OPTION_MAP_OS,  Menu.NONE, "Ordnance Survey");
       sub.add (Menu.NONE, OPTION_MAP_MAPNIK, Menu.NONE, "Mapnik (OSM)");
       sub.add (Menu.NONE, OPTION_MAP_CYCLE, Menu.NONE, "OpenCycleMap");
@@ -339,6 +341,9 @@ public class MainActivity extends Activity implements Map.PositionListener {
           return true;
         case OPTION_MAP_3G:
           mMap.select_map_source(Map.MAP_3G);
+          return true;
+        case OPTION_MAP_TODO:
+          mMap.select_map_source(Map.MAP_TODO);
           return true;
         case OPTION_MAP_MAPNIK:
           mMap.select_map_source(Map.MAP_MAPNIK);

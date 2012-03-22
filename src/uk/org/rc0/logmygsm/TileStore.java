@@ -169,6 +169,10 @@ class TileStore {
         filename = String.format("/sdcard/Maverick/tiles/Custom 3/%d/%d/%d.png.tile",
             zoom, x, y);
         break;
+      case Map.MAP_TODO:
+        filename = String.format("/sdcard/Maverick/tiles/logmygsm_todo/%d/%d/%d.png.tile",
+            zoom, x, y);
+        break;
       case Map.MAP_MAPNIK:
         filename = String.format("/sdcard/Maverick/tiles/mapnik/%d/%d/%d.png.tile",
             zoom, x, y);
