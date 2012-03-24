@@ -265,7 +265,7 @@ public class Logger extends Service {
         PhoneStateListener.LISTEN_SERVICE_STATE |
         PhoneStateListener.LISTEN_SIGNAL_STRENGTHS |
         PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
-    myLocationManager.requestLocationUpdates(myProvider, 1000, 8, myLocationListener);
+    myLocationManager.requestLocationUpdates(myProvider, 1000, 6, myLocationListener);
     myLocationManager.addGpsStatusListener(gpsListener);
   }
 
@@ -413,6 +413,19 @@ public class Logger extends Service {
 
   // --------------------------------------------------------------------------------
 
+  // Ensure we re-read the cell information every time we log a GPS update, on
+  // the offchance that we've lost a callback along the way and we're not
+  // changing cells very much
+  private void sample_cell_info () {
+    GsmCellLocation loc = (GsmCellLocation) myTelephonyManager.getCellLocation();
+    if (loc != null) {
+      lastCid = loc.getCid();
+      lastLac = loc.getLac();
+    }
+  }
+
+  // --------------------------------------------------------------------------------
+
   private final LocationListener myLocationListener = new LocationListener () {
     public void onLocationChanged(Location location) {
       if (location == null) {
@@ -431,12 +444,16 @@ public class Logger extends Service {
         }
         // lastFixMillis = location.getTime();
         lastFixMillis = System.currentTimeMillis();
+
+        sample_cell_info();
+
         logToFile();
         rawlog.log_raw_location();
         mTrail.add_point(new Merc28(lastLat, lastLon));
         Merc28.update_latitude(lastLat);
       }
       updateUIGPS();
+      updateUICell();
     }
 
     public void onProviderDisabled(String provider) {
