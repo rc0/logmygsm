@@ -265,7 +265,10 @@ public class Logger extends Service {
         PhoneStateListener.LISTEN_SERVICE_STATE |
         PhoneStateListener.LISTEN_SIGNAL_STRENGTHS |
         PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
-    myLocationManager.requestLocationUpdates(myProvider, 1000, 6, myLocationListener);
+    // 8m steps regardless of time - get finer grained data whilst driving -
+    // power consumption then doesn't matter as the phone will typically be
+    // tethered.
+    myLocationManager.requestLocationUpdates(myProvider, 0, 8, myLocationListener);
     myLocationManager.addGpsStatusListener(gpsListener);
   }
 
