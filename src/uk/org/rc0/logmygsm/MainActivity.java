@@ -51,6 +51,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
   private TextView dBmText;
   private TextView daOffsetText;
   private TextView countText;
+  private TextView tileText;
   private TextView cidHistoryText;
 
   private CellUpdateReceiver myCellReceiver;
@@ -75,6 +76,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
       lacmncText = (TextView) findViewById(R.id.lac_mnc);
       dBmText = (TextView) findViewById(R.id.dBm);
       countText = (TextView) findViewById(R.id.count);
+      tileText = (TextView) findViewById(R.id.tile);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
       daOffsetText = (TextView) findViewById(R.id.da_offset);
       mMap = (Map) findViewById(R.id.map);
@@ -175,6 +177,10 @@ public class MainActivity extends Activity implements Map.PositionListener {
     } else {
       daOffsetText.setText("DA -----");
     }
+
+    String tileString = mMap.current_tile_string();
+    tileText.setText(tileString);
+
   }
 
   public void display_position_update() {

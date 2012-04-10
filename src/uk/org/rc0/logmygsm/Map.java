@@ -62,6 +62,7 @@ public class Map extends View {
 
   private int zoom;
   private int pixel_shift;
+  private int tile_shift;
   private float drag_scale;
 
   private int map_source;
@@ -262,6 +263,7 @@ public class Map extends View {
     //tile_cache.setZoom(z);
     zoom = z;
     pixel_shift = Merc28.shift - (z+8);
+    tile_shift = Merc28.shift - (z);
     drag_scale = (float)(1 << pixel_shift);
   }
 
@@ -321,6 +323,18 @@ public class Map extends View {
     }
   }
 
+  String current_tile_string() {
+    int X, Y;
+    if (display_pos != null) {
+      X = display_pos.X >> tile_shift;
+      Y = display_pos.Y >> tile_shift;
+    } else {
+      X = 0;
+      Y = 0;
+    }
+    return String.format("%5d%5d", X, Y);
+  }
+
   // Local UI callbacks
 
   void clear_trail() {
@@ -330,8 +344,9 @@ public class Map extends View {
   }
 
   void zoom_out() {
-    if (zoom > 9) {
+    if (zoom > 7) {
       setZoom(zoom - 1);
+      notify_position_update();
       invalidate();
     }
   }
@@ -339,6 +354,7 @@ public class Map extends View {
   void zoom_in() {
     if (zoom < 16) {
       setZoom(zoom + 1);
+      notify_position_update();
       invalidate();
     }
   }
