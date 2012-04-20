@@ -41,6 +41,7 @@ class TowerLine {
 
   static private HashMap<String, Merc28> lut;
   static private Paint line_paint;
+  static private Paint thin_line_paint;
   static private Paint text_paint;
 
   static final private String TAIL = "cidxy.txt";
@@ -56,6 +57,11 @@ class TowerLine {
     line_paint.setStyle(Paint.Style.STROKE);
     line_paint.setStrokeWidth(6);
     line_paint.setColor(Color.argb(128, 0xa0, 0x0, 0x4d));
+
+    thin_line_paint = new Paint();
+    thin_line_paint.setStyle(Paint.Style.STROKE);
+    thin_line_paint.setStrokeWidth(1);
+    thin_line_paint.setColor(Color.argb(192, 0xff, 0xff, 0xff));
 
     text_paint = new Paint();
     text_paint.setColor(Color.argb(192, 0x38, 0x0, 0x58));
@@ -127,6 +133,7 @@ class TowerLine {
         float x1 = (float)(w>>1) + fx;
         float y1 = (float)(h>>1) + fy;
         c.drawLine(x0, y0, x1, y1, line_paint);
+        c.drawLine(x0, y0, x1, y1, thin_line_paint);
 
         double zd = tmp_pos.metres_away(display_pos);
 
