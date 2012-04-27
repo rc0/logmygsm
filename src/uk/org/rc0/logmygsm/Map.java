@@ -207,6 +207,8 @@ public class Map extends View {
         return true;
       case MAP_3G:
         return true;
+      case MAP_TODO:
+        return true;
       default:
         return false;
     }
