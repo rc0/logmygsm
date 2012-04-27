@@ -37,15 +37,18 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.TextView;
 
-public class BigMapActivity extends Activity {
+public class BigMapActivity extends Activity implements Map.PositionListener {
 
+  private CellUpdateReceiver myCellReceiver;
   private GPSUpdateReceiver myGPSReceiver;
   private Map mMap;
   private Button mAddButton;
   private Button mDeleteButton;
   private Button mDeleteVisibleButton;
   private Button mDeleteAllButton;
+  private TextView summaryText;
 
   private static final String PREFS_FILE = "prefs2.txt";
 
@@ -59,6 +62,7 @@ public class BigMapActivity extends Activity {
     mDeleteButton = (Button) findViewById(R.id.delete_button);
     mDeleteVisibleButton = (Button) findViewById(R.id.delete_visible_button);
     mDeleteAllButton = (Button) findViewById(R.id.delete_all_button);
+    summaryText = (TextView) findViewById(R.id.big_summary);
 
     mAddButton.setOnClickListener(new OnClickListener () {
       public void onClick(View v) {
@@ -83,6 +87,8 @@ public class BigMapActivity extends Activity {
         mMap.delete_all_landmarks();
       }
     });
+
+    mMap.register_position_listener(this);
   }
 
   @Override
@@ -104,12 +110,18 @@ public class BigMapActivity extends Activity {
     filter = new IntentFilter(Logger.UPDATE_GPS);
     myGPSReceiver = new GPSUpdateReceiver();
     registerReceiver(myGPSReceiver, filter);
+
+    filter = new IntentFilter(Logger.UPDATE_CELL);
+    myCellReceiver = new CellUpdateReceiver();
+    registerReceiver(myCellReceiver, filter);
+
     mMap.update_map();
     super.onResume();
   }
 
   @Override
   public void onPause() {
+    unregisterReceiver(myCellReceiver);
     unregisterReceiver(myGPSReceiver);
     // It seems wasteful to do this here, but there is no other safe opportunity to do so -
     // in effect we are 'committing' the user's changes at this point.
@@ -170,12 +182,48 @@ public class BigMapActivity extends Activity {
     }
   }
 
+  private void updateDisplay() {
+
+    String summaryString;
+    if (Logger.validFix) {
+      summaryString = String.format("%9d %2d %3dm %s",
+        Logger.lastCid,
+        Logger.lastASU,
+        Logger.lastAcc,
+        mMap.current_tile_string()
+      );
+    } else {
+      summaryString = String.format("%9d %2d  GPS? %s",
+        Logger.lastCid,
+        Logger.lastASU,
+        mMap.current_tile_string()
+      );
+    }
+
+    summaryText.setText(summaryString);
+  }
+
+  public void display_position_update() {
+    updateDisplay();
+  }
+
   public class GPSUpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
       mMap.update_map();
     }
   }
+
+  public class CellUpdateReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      // update the map in case the current cell has changed.
+      mMap.update_map();
+      updateDisplay();
+    }
+  }
+
+
 }
 
 // vim:et:sw=2:sts=2

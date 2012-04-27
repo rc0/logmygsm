@@ -77,9 +77,25 @@
   <!-- The block around the buttons at the top -->
 
   <TextView
-    android:layout_height="5dp"
+    android:layout_height="1dp"
     android:layout_width="fill_parent"
     android:id="@+id/shim_over_big_map">
+  </TextView>
+
+  <TextView
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:id="@+id/big_summary"
+    android:typeface="monospace"
+    android:textSize="16sp"
+    android:text="######### ## ###m ##### #####"
+    android:layout_gravity="center">
+  </TextView>
+
+  <TextView
+    android:layout_height="1dp"
+    android:layout_width="fill_parent"
+    android:id="@+id/shim_over_big_map2">
   </TextView>
 
   <uk.org.rc0.logmygsm.Map
