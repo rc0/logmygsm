@@ -265,10 +265,9 @@ public class Logger extends Service {
         PhoneStateListener.LISTEN_SERVICE_STATE |
         PhoneStateListener.LISTEN_SIGNAL_STRENGTHS |
         PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
-    // Try getting continuous updates.
-    // See if this fixes problem where the GPS updates just stop completely
-    // sometimes
-    myLocationManager.requestLocationUpdates(myProvider, 0, 0, myLocationListener);
+    // Don't use continuous updates.  You keep getting callbacks, even if
+    // you're stationary.
+    myLocationManager.requestLocationUpdates(myProvider, 0, 2, myLocationListener);
     myLocationManager.addGpsStatusListener(gpsListener);
   }
 
