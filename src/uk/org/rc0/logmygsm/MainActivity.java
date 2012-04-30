@@ -168,7 +168,10 @@ public class MainActivity extends Activity implements Map.PositionListener {
     if (Logger.validFix) {
       String daOffsetString;
       double da_offset_m = mMap.da_offset_metres();
-      if (da_offset_m < 10000) {
+      if (da_offset_m == 0) {
+        daOffsetString = String.format("%5.1f mph",
+            Logger.lastSpeed * 2.237);
+      } else if (da_offset_m < 10000) {
         daOffsetString = String.format("DA %5dm", (int)da_offset_m);
       } else {
         daOffsetString = String.format("DA %5.1fkm", 0.001*da_offset_m);
