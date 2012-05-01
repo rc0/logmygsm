@@ -258,6 +258,9 @@ public class Logger extends Service {
 
   // --------------------------------------------------------------------------------
 
+  static final private long GPS_MIN_MILLISECONDS = 1000;
+  static final private float GPS_MIN_DISTANCE = 2.0f;
+
   private void startListening() {
     startNotification();
     myTelephonyManager.listen(myPhoneStateListener,
@@ -267,7 +270,10 @@ public class Logger extends Service {
         PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
     // Don't use continuous updates.  You keep getting callbacks, even if
     // you're stationary.
-    myLocationManager.requestLocationUpdates(myProvider, 0, 2, myLocationListener);
+    myLocationManager.requestLocationUpdates(myProvider,
+        GPS_MIN_MILLISECONDS,
+        GPS_MIN_DISTANCE,
+        myLocationListener);
     myLocationManager.addGpsStatusListener(gpsListener);
   }
 
