@@ -106,7 +106,8 @@ class TileStore {
 
   static private Paint gray_paint;
   static Paint trail_paint;
-  static Paint trail_dot_paint;
+  static Paint trail_dot_paint_0;
+  static Paint trail_dot_paint_1;
   static final float TRAIL_DOT_SIZE = 2.0f;
 
   // -----------
@@ -123,20 +124,33 @@ class TileStore {
     trail_paint = new Paint();
     trail_paint.setColor(Color.argb(56, 0x6d, 0, 0xb0));
     trail_paint.setStyle(Paint.Style.FILL);
-    trail_dot_paint = new Paint();
-    trail_dot_paint.setColor(Color.argb(255, 0, 0, 0));
-    trail_dot_paint.setStyle(Paint.Style.FILL);
+    trail_dot_paint_0 = new Paint();
+    trail_dot_paint_0.setColor(Color.argb(255, 0, 0, 0));
+    trail_dot_paint_0.setStyle(Paint.Style.FILL);
+    trail_dot_paint_1 = new Paint();
+    trail_dot_paint_1.setColor(Color.argb(255, 255, 255, 255));
+    trail_dot_paint_1.setStyle(Paint.Style.FILL);
   }
 
   // -----------
   // Internal
   //
 
+  static void render_dot(Canvas c, float px, float py, int parity) {
+    c.drawCircle(px, py, Trail.splot_radius, trail_paint);
+    if (parity == 1) {
+      c.drawCircle(px, py, TRAIL_DOT_SIZE, trail_dot_paint_1);
+    } else {
+      c.drawCircle(px, py, TRAIL_DOT_SIZE, trail_dot_paint_0);
+    }
+  }
+
   static private void render_old_trail(Bitmap bm, int zoom, int tile_x, int tile_y) {
     int pixel_shift = (Merc28.shift - (zoom + bm_log_size));
     int tile_shift = (Merc28.shift - zoom);
     int xnw = tile_x << tile_shift;
     int ynw = tile_y << tile_shift;
+    int parity = 0;
     Canvas my_canv = new Canvas(bm);
     Trail.PointArray pa = Logger.mTrail.get_historical();
     int last_x = 0, last_y = 0;
@@ -151,8 +165,8 @@ class TileStore {
         }
       }
       if (do_add) {
-        my_canv.drawCircle((float)px, (float)py, Trail.splot_radius, trail_paint);
-        my_canv.drawCircle((float)px, (float)py, TRAIL_DOT_SIZE, trail_dot_paint);
+        render_dot(my_canv, px, py, parity);
+        parity = parity ^ 1;
         last_x = px;
         last_y = py;
       }
