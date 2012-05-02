@@ -269,16 +269,17 @@ class Trail {
     int lx;
     int ly;
     int next;
+    int parity;
     Upto() {
       lx = -256;
       ly = -256;
-      next=0;
+      next = 0;
+      parity = 0;
     }
   }
 
   void draw_recent_trail(Canvas c, int xnw, int ynw, int pixel_shift, Upto upto) {
     int n = recent.size();
-    int parity = 0;
     for (int i=upto.next; i<n; i++) {
       Merc28 p = recent.get(i);
       int sx = (p.X - xnw) >> pixel_shift;
@@ -292,8 +293,8 @@ class Trail {
         // Don't even bother invoking the library if we're off-screen.
         // // Loose bounds to allow for 
         if ((sx >= MIN_CENTRE) && (sy >= MIN_CENTRE) && (sx < MAX_CENTRE) && (sy < MAX_CENTRE)) {
-          TileStore.render_dot(c, sx, sy, parity);
-          parity = parity ^ 1;
+          TileStore.render_dot(c, sx, sy, upto.parity);
+          upto.parity ^= 1;
           upto.lx = sx;
           upto.ly = sy;
         }
