@@ -453,7 +453,7 @@ public class Logger extends Service {
         // lastFixMillis = location.getTime();
         lastFixMillis = System.currentTimeMillis();
 
-        sample_cell_info();
+        // sample_cell_info();
 
         logToFile();
         rawlog.log_raw_location();

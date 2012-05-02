@@ -227,9 +227,10 @@ public class MainActivity extends Activity implements Map.PositionListener {
 
     position_update();
 
-    String satString = String.format("%d/%d/%d",
+    String satString = String.format("%d/%d/%d/%d",
         Logger.last_fix_sats,
-        Logger.last_ephem_sats, Logger.last_alman_sats);
+        Logger.last_ephem_sats, Logger.last_alman_sats,
+        Logger.last_n_sats);
     String cidString = String.format("%d",
         Logger.lastCid);
 
