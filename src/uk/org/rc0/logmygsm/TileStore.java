@@ -46,13 +46,23 @@ class TileStore {
   // -----------
   // State
 
-  private static class Entry {
+  private static class TilePos {
     int zoom;
-    int pixel_shift;
-    int tile_shift;
-    int map_source;
     int x;
     int y;
+    int map_source;
+
+    TilePos(int _zoom, int _x, int _y, int _map_source) {
+      zoom = _zoom;
+      x = _x;
+      y = _y;
+      map_source = _map_source;
+    }
+  };
+
+  private static class Entry extends TilePos {
+    int pixel_shift;
+    int tile_shift;
     int cycle;
     private Trail.Upto upto;
     Bitmap b;
@@ -62,12 +72,9 @@ class TileStore {
     }
 
     Entry(int _zoom, int _map_source, int _x, int _y, Bitmap _b) {
-      zoom = _zoom;
+      super(_zoom, _x, _y, _map_source);
       pixel_shift = (Merc28.shift - (zoom + bm_log_size));
       tile_shift = (Merc28.shift - zoom);
-      map_source = _map_source;
-      x = _x;
-      y = _y;
       b = _b;
       upto = new Trail.Upto ();
       touch();
@@ -276,34 +283,49 @@ class TileStore {
     // front should never be null
     for (int i=next-1; i>=0; i--) {
       if (front[i].isMatch(zoom, map_source, x, y)) {
+        Log.i(TAG, "Front match found at " + i);
         return front[i];
       }
     }
-    // Miss.  Any space left?
-    if (next == SIZE) {
-      // No.  Dump old junk
-      back = front;
-      // Might consider garbage collection here?
-      front = new Entry[SIZE];
-      next = 0;
-      //Log.i(TAG, "Flushed tile store");
-    }
-
-    // Search 'back' array for a match.  'back' is either null, or full
+    // Miss. Match in back?
+    Entry back_match = null;
     if (back != null) {
       for (int i=SIZE-1; i>=0; i--) {
         if (back[i].isMatch(zoom, map_source, x, y)) {
-          front[next++] = back[i];
-          return back[i];
+          Log.i(TAG, "Back match found at " + i);
+          back_match = back[i];
+          break;
         }
       }
     }
-
-    // OK, no match.  We have to build a new bitmap from file
-    Bitmap b = render_bitmap(zoom, map_source, x, y);
-    Entry e = make_entry(zoom, map_source, x, y, b); // auto touch
-    front[next++] = e;
-    return e;
+    if (back_match != null) {
+      if (next == SIZE) {
+        // No.  Dump old junk
+        back = front;
+        // Might consider garbage collection here?
+        front = new Entry[SIZE];
+        next = 0;
+        Log.i(TAG, "Flushed tile store");
+      }
+      front[next++] = back_match;
+      return back_match;
+    } else {
+      // Full miss.
+      // Migrate to : Do tile load, in background
+      if (next == SIZE) {
+        // No.  Dump old junk
+        back = front;
+        // Might consider garbage collection here?
+        front = new Entry[SIZE];
+        next = 0;
+        Log.i(TAG, "Flushed tile store (full miss)");
+        // OK, no match.  We have to build a new bitmap from file
+      }
+      Bitmap b = render_bitmap(zoom, map_source, x, y);
+      Entry e = make_entry(zoom, map_source, x, y, b); // auto touch
+      front[next++] = e;
+      return e;
+    }
 
   }
 
