@@ -58,6 +58,18 @@ class TileStore {
       y = _y;
       map_source = _map_source;
     }
+
+    boolean isMatch(int _zoom, int _x, int _y, int _map_source) {
+      if ((_zoom == zoom) &&
+          (_map_source == map_source) &&
+          (_x == x) &&
+          (_y == y)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
   };
 
   private static class Entry extends TilePos {
@@ -78,17 +90,6 @@ class TileStore {
       b = _b;
       upto = new Trail.Upto ();
       touch();
-    }
-
-    boolean isMatch(int _zoom, int _map_source, int _x, int _y) {
-      if ((_zoom == zoom) &&
-          (_map_source == map_source) &&
-          (_x == x) &&
-          (_y == y)) {
-        return true;
-      } else {
-        return false;
-      }
     }
 
     void touch () {
@@ -279,10 +280,19 @@ class TileStore {
     return new Entry(zoom, map_source, x, y, b);
   }
 
+  static private void check_full () {
+    if (next == SIZE) {
+      back = front;
+      front = new Entry[SIZE];
+      next = 0;
+      Log.i(TAG, "Flushed tile store");
+    }
+  }
+
   static private Entry lookup(int zoom, int map_source, int x, int y) {
     // front should never be null
     for (int i=next-1; i>=0; i--) {
-      if (front[i].isMatch(zoom, map_source, x, y)) {
+      if (front[i].isMatch(zoom, x, y, map_source)) {
         Log.i(TAG, "Front match found at " + i);
         return front[i];
       }
@@ -291,7 +301,7 @@ class TileStore {
     Entry back_match = null;
     if (back != null) {
       for (int i=SIZE-1; i>=0; i--) {
-        if (back[i].isMatch(zoom, map_source, x, y)) {
+        if (back[i].isMatch(zoom, x, y, map_source)) {
           Log.i(TAG, "Back match found at " + i);
           back_match = back[i];
           break;
@@ -299,28 +309,13 @@ class TileStore {
       }
     }
     if (back_match != null) {
-      if (next == SIZE) {
-        // No.  Dump old junk
-        back = front;
-        // Might consider garbage collection here?
-        front = new Entry[SIZE];
-        next = 0;
-        Log.i(TAG, "Flushed tile store");
-      }
+      check_full();
       front[next++] = back_match;
       return back_match;
     } else {
       // Full miss.
       // Migrate to : Do tile load, in background
-      if (next == SIZE) {
-        // No.  Dump old junk
-        back = front;
-        // Might consider garbage collection here?
-        front = new Entry[SIZE];
-        next = 0;
-        Log.i(TAG, "Flushed tile store (full miss)");
-        // OK, no match.  We have to build a new bitmap from file
-      }
+      check_full();
       Bitmap b = render_bitmap(zoom, map_source, x, y);
       Entry e = make_entry(zoom, map_source, x, y, b); // auto touch
       front[next++] = e;
