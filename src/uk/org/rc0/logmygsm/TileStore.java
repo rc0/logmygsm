@@ -31,8 +31,10 @@ import android.graphics.Color;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.util.Log;
 import java.io.File;
+import java.lang.Runnable;
 
 class TileStore {
 
@@ -110,6 +112,8 @@ class TileStore {
   static Paint trail_dot_paint_1;
   static final float TRAIL_DOT_SIZE = 2.0f;
 
+  static private Handler mHandler;
+
   // -----------
 
   static void init () {
@@ -130,7 +134,50 @@ class TileStore {
     trail_dot_paint_1 = new Paint();
     trail_dot_paint_1.setColor(Color.argb(255, 255, 255, 255));
     trail_dot_paint_1.setStyle(Paint.Style.FILL);
+
+    mHandler = new Handler();
   }
+
+  // -----------
+
+  private static class TilingResponse implements Runnable {
+    private String message;
+
+    public TilingResponse(String _message) {
+      message = _message;
+    }
+
+    @Override
+    public void run() {
+      Log.i(TAG, message);
+    }
+
+  }
+
+  private static class TilingThread extends Thread {
+    private int zoom;
+    private int x;
+    private int y;
+    private int map_source;
+    private String message;
+
+
+    public TilingThread(int _zoom, int _x, int _y, int _map_source) {
+      zoom = _zoom;
+      x = _x;
+      y = _y;
+      map_source = _map_source;
+    }
+
+    @Override
+    public void run () {
+      message = String.format("Tile in thread: z=%d x=%d y=%d m=%d",
+          zoom, x, y, map_source);
+      mHandler.post (new TilingResponse(message));
+    }
+
+  }
+
 
   // -----------
   // Internal
@@ -173,6 +220,10 @@ class TileStore {
     }
   }
 
+  static private TilingThread make_tiling_thread(int zoom, int x, int y, int map_source) {
+    return new TilingThread(zoom, x, y, map_source);
+  }
+
   static private Bitmap render_bitmap(int zoom, int map_source, int x, int y) {
     String filename = null;
     switch (map_source) {
@@ -201,6 +252,7 @@ class TileStore {
             zoom, x, y);
         break;
     }
+    make_tiling_thread(zoom, x, y, map_source).start();
     File file = new File(filename);
     Bitmap bm;
     if (file.exists()) {
