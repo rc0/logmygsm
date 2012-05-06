@@ -43,6 +43,7 @@ class TileStore {
   static final private int bm_size = 1<<bm_log_size;
 
   static final private String TAG = "TileStore";
+  static final private boolean do_log = false;
 
   // -----------
   // State
@@ -175,12 +176,12 @@ class TileStore {
       check_full();
       TilePos tp = bg_queue.remove(); // head of list
       Entry e = make_entry(tp.zoom, tp.map_source, tp.x, tp.y, bm);
-      Log.i(TAG, "Putting load response at position " + next);
+      if (do_log) { Log.i(TAG, "Putting load response at position " + next); }
       front[next++] = e;
 
       if (bg_queue.size() > 0) {
         tp = bg_queue.getFirst();
-        Log.i(TAG, "Start next job, queue size is " + bg_queue.size());
+        if (do_log) { Log.i(TAG, "Start next job, queue size is " + bg_queue.size()); }
         (new TilingThread(tp.zoom, tp.x, tp.y, tp.map_source)).start();
       }
     }
@@ -283,6 +284,7 @@ class TileStore {
       Bitmap temp_bm = BitmapFactory.decodeFile(filename);
       bm = temp_bm.copy(Bitmap.Config.ARGB_8888, true);
     } else {
+      // TODO : could attempt a load off the network at this point?
       bm = Bitmap.createBitmap(bm_size, bm_size, Bitmap.Config.ARGB_8888);
       Canvas my_canv = new Canvas(bm);
       my_canv.drawRect(0, 0, bm_size, bm_size, gray_paint);
@@ -304,7 +306,7 @@ class TileStore {
     bg_queue.add(new TilePos(zoom, x, y, map_source));
     if (bg_queue.size() == 1) {
       // We've just queued the 1st piece of work: kick off the bg stuff
-      Log.i(TAG, "Starting first bg load op");
+      if (do_log) { Log.i(TAG, "Starting first bg load op"); }
       (new TilingThread(zoom, x, y, map_source)).start();
     }
   }
@@ -318,7 +320,7 @@ class TileStore {
       back = front;
       front = new Entry[SIZE];
       next = 0;
-      Log.i(TAG, "Flushed tile store");
+      if (do_log) { Log.i(TAG, "Flushed tile store"); }
     }
   }
 
@@ -334,7 +336,7 @@ class TileStore {
     if (back != null) {
       for (int i=SIZE-1; i>=0; i--) {
         if (back[i].isMatch(zoom, x, y, map_source)) {
-          Log.i(TAG, "Back match found at " + i);
+          if (do_log) { Log.i(TAG, "Back match found at " + i); }
           back_match = back[i];
           break;
         }
@@ -371,6 +373,7 @@ class TileStore {
     front = new Entry[SIZE];
     next = 0;
     back = null;
+    // Todo : drop all bar first entry in bg_queue ?
   }
 
   static void semi_invalidate() {
