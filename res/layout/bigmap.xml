@@ -88,6 +88,7 @@
     android:id="@+id/big_summary"
     android:typeface="monospace"
     android:textSize="16sp"
+    android:textColor="@android:color/white"
     android:text="######### ## ###m ##### #####"
     android:layout_gravity="center">
   </TextView>

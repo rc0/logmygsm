@@ -66,6 +66,7 @@
           android:id="@+id/dBm"
           android:typeface="monospace"
           android:textSize="28sp"
+          android:textColor="@android:color/white"
           android:text="-###dBm"
           android:gravity="right">
         </TextView>
@@ -88,6 +89,7 @@
         android:id="@+id/cid_history"
         android:typeface="monospace"
         android:textSize="16sp"
+        android:textColor="@android:color/white"
         android:text="######## ##:##"
         android:gravity="left">
       </TextView>
@@ -114,6 +116,7 @@
         android:id="@+id/net_mcc"
         android:typeface="monospace"
         android:textSize="16sp"
+        android:textColor="@android:color/white"
         android:text="####"
         android:layout_gravity="center">
       </TextView>
@@ -124,6 +127,7 @@
         android:id="@+id/lac_mnc"
         android:typeface="monospace"
         android:textSize="16sp"
+        android:textColor="@android:color/white"
         android:text="#####"
         android:layout_gravity="center">
       </TextView>
@@ -154,6 +158,7 @@
         android:id="@+id/sat"
         android:typeface="monospace"
         android:textSize="16sp"
+        android:textColor="@android:color/white"
         android:text="##-##-##"
         android:layout_gravity="center">
       </TextView>
@@ -174,6 +179,7 @@
         android:id="@+id/da_offset"
         android:typeface="monospace"
         android:textSize="16sp"
+        android:textColor="@android:color/white"
         android:text="D-A #####m"
         android:layout_gravity="center">
       </TextView>
@@ -184,6 +190,7 @@
         android:id="@+id/count"
         android:typeface="monospace"
         android:textSize="16sp"
+        android:textColor="@android:color/white"
         android:text="####"
         android:layout_gravity="center">
       </TextView>
@@ -194,6 +201,7 @@
         android:id="@+id/tile"
         android:typeface="monospace"
         android:textSize="16sp"
+        android:textColor="@android:color/white"
         android:text="##########"
         android:layout_gravity="center">
       </TextView>
