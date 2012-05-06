@@ -35,6 +35,7 @@ import android.os.Handler;
 import android.util.Log;
 import java.io.File;
 import java.lang.Runnable;
+import java.util.LinkedList;
 
 class TileStore {
 
@@ -115,12 +116,16 @@ class TileStore {
   static int draw_cycle;
 
   static private Paint gray_paint;
+  static private Paint light_gray_paint;
   static Paint trail_paint;
   static Paint trail_dot_paint_0;
   static Paint trail_dot_paint_1;
   static final float TRAIL_DOT_SIZE = 2.0f;
 
   static private Handler mHandler;
+
+  static private LinkedList<TilePos> bg_queue;
+  static private Bitmap loading_bitmap;
 
   // -----------
 
@@ -133,6 +138,8 @@ class TileStore {
 
     gray_paint = new Paint();
     gray_paint.setColor(Color.GRAY);
+    light_gray_paint = new Paint();
+    light_gray_paint.setColor(Color.argb(255, 0xa0, 0xa0, 0xa0));
     trail_paint = new Paint();
     trail_paint.setColor(Color.argb(56, 0x6d, 0, 0xb0));
     trail_paint.setStyle(Paint.Style.FILL);
@@ -144,20 +151,38 @@ class TileStore {
     trail_dot_paint_1.setStyle(Paint.Style.FILL);
 
     mHandler = new Handler();
+    bg_queue = new LinkedList<TilePos> ();
+
+    loading_bitmap = Bitmap.createBitmap(bm_size, bm_size, Bitmap.Config.ARGB_8888);
+    Canvas my_canv = new Canvas(loading_bitmap);
+    my_canv.drawRect(0, 0, bm_size, bm_size, gray_paint);
+    my_canv.drawRect(bm_size>>3, bm_size>>3,
+        bm_size - (bm_size>>3), bm_size - (bm_size>>3),
+        light_gray_paint);
   }
 
   // -----------
 
   private static class TilingResponse implements Runnable {
-    private String message;
+    private Bitmap bm;
 
-    public TilingResponse(String _message) {
-      message = _message;
+    public TilingResponse(Bitmap _bm) {
+      bm = _bm;
     }
 
     @Override
     public void run() {
-      Log.i(TAG, message);
+      check_full();
+      TilePos tp = bg_queue.remove(); // head of list
+      Entry e = make_entry(tp.zoom, tp.map_source, tp.x, tp.y, bm);
+      Log.i(TAG, "Putting load response at position " + next);
+      front[next++] = e;
+
+      if (bg_queue.size() > 0) {
+        tp = bg_queue.getFirst();
+        Log.i(TAG, "Start next job, queue size is " + bg_queue.size());
+        (new TilingThread(tp.zoom, tp.x, tp.y, tp.map_source)).start();
+      }
     }
 
   }
@@ -167,8 +192,6 @@ class TileStore {
     private int x;
     private int y;
     private int map_source;
-    private String message;
-
 
     public TilingThread(int _zoom, int _x, int _y, int _map_source) {
       zoom = _zoom;
@@ -179,13 +202,11 @@ class TileStore {
 
     @Override
     public void run () {
-      message = String.format("Tile in thread: z=%d x=%d y=%d m=%d",
-          zoom, x, y, map_source);
-      mHandler.post (new TilingResponse(message));
+      Bitmap bm = render_bitmap(zoom, map_source, x, y);
+      mHandler.post (new TilingResponse(bm));
+      bm = null;
     }
-
   }
-
 
   // -----------
   // Internal
@@ -228,10 +249,6 @@ class TileStore {
     }
   }
 
-  static private TilingThread make_tiling_thread(int zoom, int x, int y, int map_source) {
-    return new TilingThread(zoom, x, y, map_source);
-  }
-
   static private Bitmap render_bitmap(int zoom, int map_source, int x, int y) {
     String filename = null;
     switch (map_source) {
@@ -260,7 +277,6 @@ class TileStore {
             zoom, x, y);
         break;
     }
-    make_tiling_thread(zoom, x, y, map_source).start();
     File file = new File(filename);
     Bitmap bm;
     if (file.exists()) {
@@ -274,6 +290,23 @@ class TileStore {
     // TODO : Draw trail points into the bitmap
     render_old_trail(bm, zoom, x, y);
     return bm;
+  }
+
+  static private void start_bg_load(int zoom, int x, int y, int map_source) {
+    // Check if this job is already on the queue
+    int i;
+    for (i=0; i<bg_queue.size(); i++) {
+      if (bg_queue.get(i).isMatch(zoom, x, y, map_source)) {
+        return;
+      }
+    }
+    // Not already in the queue of tiles to render.  Let's go....
+    bg_queue.add(new TilePos(zoom, x, y, map_source));
+    if (bg_queue.size() == 1) {
+      // We've just queued the 1st piece of work: kick off the bg stuff
+      Log.i(TAG, "Starting first bg load op");
+      (new TilingThread(zoom, x, y, map_source)).start();
+    }
   }
 
   static private Entry make_entry(int zoom, int map_source, int x, int y, Bitmap b) {
@@ -293,7 +326,6 @@ class TileStore {
     // front should never be null
     for (int i=next-1; i>=0; i--) {
       if (front[i].isMatch(zoom, x, y, map_source)) {
-        Log.i(TAG, "Front match found at " + i);
         return front[i];
       }
     }
@@ -314,12 +346,8 @@ class TileStore {
       return back_match;
     } else {
       // Full miss.
-      // Migrate to : Do tile load, in background
-      check_full();
-      Bitmap b = render_bitmap(zoom, map_source, x, y);
-      Entry e = make_entry(zoom, map_source, x, y, b); // auto touch
-      front[next++] = e;
-      return e;
+      start_bg_load(zoom, x, y, map_source);
+      return null;
     }
 
   }
@@ -380,9 +408,14 @@ class TileStore {
       while (oy + (j<<bm_log_size) < h) {
         int yy = oy + (j<<bm_log_size);
         Entry e = lookup(zoom, map_source, tx+i, ty+j);
-        e.add_recent_trail();
-        e.touch();
-        Bitmap bm = e.getBitmap();
+        Bitmap bm;
+        if (e != null) {
+          e.add_recent_trail();
+          e.touch();
+          bm = e.getBitmap();
+        } else {
+          bm = loading_bitmap;
+        }
         Rect dest = new Rect(xx, yy, xx+bm_size, yy+bm_size);
         c.drawBitmap(bm, null, dest, null);
         j++;
