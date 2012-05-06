@@ -55,16 +55,17 @@ class TowerLine {
 
     line_paint = new Paint();
     line_paint.setStyle(Paint.Style.STROKE);
-    line_paint.setStrokeWidth(6);
-    line_paint.setColor(Color.argb(128, 0xa0, 0x0, 0x4d));
+    line_paint.setStrokeWidth(8);
+    //line_paint.setColor(Color.argb(128, 0xa0, 0x0, 0x4d));
+    line_paint.setColor(Color.argb(176, 0x00, 0x30, 0x10));
 
     thin_line_paint = new Paint();
     thin_line_paint.setStyle(Paint.Style.STROKE);
-    thin_line_paint.setStrokeWidth(1);
+    thin_line_paint.setStrokeWidth(2);
     thin_line_paint.setColor(Color.argb(192, 0xff, 0xff, 0xff));
 
     text_paint = new Paint();
-    text_paint.setColor(Color.argb(192, 0x38, 0x0, 0x58));
+    text_paint.setColor(Color.argb(224, 0x38, 0x0, 0x58));
     Typeface face = Typeface.DEFAULT_BOLD;
     text_paint.setTypeface(face);
     text_paint.setAntiAlias(true);
@@ -110,6 +111,7 @@ class TowerLine {
   static boolean find_current_tower_pos(Merc28 tower_pos) {
     int cid = Logger.lastCid;
     int lac = 0;
+    cid = 13412;
     String cl = cid + "," + lac;
     if (lut.containsKey(cl)) {
       tower_pos.copy_from(lut.get(cl));
