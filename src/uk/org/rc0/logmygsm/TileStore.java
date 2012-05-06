@@ -199,6 +199,7 @@ class TileStore {
       x = _x;
       y = _y;
       map_source = _map_source;
+      setPriority(Thread.MIN_PRIORITY);
     }
 
     @Override
