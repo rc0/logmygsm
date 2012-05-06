@@ -111,7 +111,6 @@ class TowerLine {
   static boolean find_current_tower_pos(Merc28 tower_pos) {
     int cid = Logger.lastCid;
     int lac = 0;
-    cid = 13412;
     String cl = cid + "," + lac;
     if (lut.containsKey(cl)) {
       tower_pos.copy_from(lut.get(cl));
