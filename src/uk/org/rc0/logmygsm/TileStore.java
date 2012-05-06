@@ -25,6 +25,8 @@
 
 package uk.org.rc0.logmygsm;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Color;
@@ -127,10 +129,12 @@ class TileStore {
 
   static private LinkedList<TilePos> bg_queue;
   static private Bitmap loading_bitmap;
+  static private Context mContext;
 
   // -----------
 
-  static void init () {
+  static void init (Context the_app_context) {
+    mContext = the_app_context;
     front = new Entry[SIZE];
     next = 0;
     back = null;
@@ -183,9 +187,12 @@ class TileStore {
         tp = bg_queue.getFirst();
         if (do_log) { Log.i(TAG, "Start next job, queue size is " + bg_queue.size()); }
         (new TilingThread(tp.zoom, tp.x, tp.y, tp.map_source)).start();
+      } else {
+        // Last job done.  Force map redraw
+        Intent intent = new Intent(Logger.UPDATE_GPS);
+        mContext.sendBroadcast(intent);
       }
     }
-
   }
 
   private static class TilingThread extends Thread {
