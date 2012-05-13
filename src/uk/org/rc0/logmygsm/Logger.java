@@ -519,7 +519,7 @@ public class Logger extends Service {
 
   void announce(String text) {
     Context context = getApplicationContext();
-    int duration = Toast.LENGTH_LONG;
+    int duration = Toast.LENGTH_SHORT;
     Toast toast = Toast.makeText(context, text, duration);
     toast.show();
   }
