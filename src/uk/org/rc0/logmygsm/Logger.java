@@ -300,6 +300,25 @@ public class Logger extends Service {
 
   // --------------------------------------------------------------------------------
 
+  // 15mph in m/s
+  static final private float SPEED_THRESHOLD = 6.7f;
+
+  private void check_for_stale_GPS() {
+    // Idea : if we get a callback from the cell radio, we check how long it is
+    // since we had a GPS update.  If we were doing a significant speed, this
+    // interval should not be too long.  This lets us catch the case where the
+    // GPS has "stuck", which happens sometimes...
+    //
+
+    long age = System.currentTimeMillis() - lastFixMillis;
+    if ((lastSpeed > SPEED_THRESHOLD) && (age > 2000)) {
+      validFix = false;
+      // No need to callback to UI as we're in a callback path anyway.
+    }
+  }
+
+  // --------------------------------------------------------------------------------
+
   private void updateUIGPS() {
     updateNotification();
     Intent intent = new Intent(UPDATE_GPS);
@@ -310,6 +329,7 @@ public class Logger extends Service {
   }
 
   private void updateUICell() {
+    check_for_stale_GPS();
     updateNotification();
     Intent intent = new Intent(UPDATE_CELL);
     sendBroadcast(intent);
