@@ -467,7 +467,6 @@ public class Logger extends Service {
         Merc28.update_latitude(lastLat);
       }
       updateUIGPS();
-      updateUICell();
     }
 
     public void onProviderDisabled(String provider) {
