@@ -270,19 +270,25 @@ public class Logger extends Service {
         PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
     // Don't use continuous updates.  You keep getting callbacks, even if
     // you're stationary.
-    myLocationManager.requestLocationUpdates(myProvider,
-        GPS_MIN_MILLISECONDS,
-        GPS_MIN_DISTANCE,
-        myLocationListener);
-    myLocationManager.addGpsStatusListener(gpsListener);
+    try {
+      myLocationManager.requestLocationUpdates(myProvider,
+          GPS_MIN_MILLISECONDS,
+          GPS_MIN_DISTANCE,
+          myLocationListener);
+      myLocationManager.addGpsStatusListener(gpsListener);
+    } catch (Exception e) {
+    }
   }
 
   // --------------------------------------------------------------------------------
 
   private void stopListening() {
     myTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_NONE);
-    myLocationManager.removeGpsStatusListener(gpsListener);
-    myLocationManager.removeUpdates(myLocationListener);
+    try {
+      myLocationManager.removeGpsStatusListener(gpsListener);
+      myLocationManager.removeUpdates(myLocationListener);
+    } catch (Exception e) {
+    }
     stopNotification();
     if (mainlog != null) {
       mainlog.close();
