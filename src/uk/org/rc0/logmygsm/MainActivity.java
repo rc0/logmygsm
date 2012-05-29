@@ -269,7 +269,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
     netmccText.setText(netmccString);
     dBmText.setText(dBmString);
 
-    String countString = String.format("%d pt", Logger.nReadings);
+    String countString = String.format("%dp %dm", Logger.nReadings, (int)Logger.lastAlt);
     countText.setText(countString);
 
     updateCidHistory(current_time);

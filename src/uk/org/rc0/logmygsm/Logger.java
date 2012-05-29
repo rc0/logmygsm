@@ -96,6 +96,8 @@ public class Logger extends Service {
   static int    nHandoffs;
   static double lastLat;
   static double lastLon;
+  static double lastAlt;
+  static long   lastTime;
   static int    lastAcc;
   static int    lastBearing;
   static float  lastSpeed;
@@ -342,12 +344,14 @@ public class Logger extends Service {
 
   private void logToFile() {
     ++nReadings;
-    String data = String.format("%12.7f %12.7f %3d %c %c %10d %10d %3d %s\n",
+    String data = String.format("%12.7f %12.7f %3d %c %c %10d %10d %3d %s %.1f %d\n",
         lastLat, lastLon, lastAcc,
         lastState,
         lastNetworkType, lastCid, lastLac,
         lastdBm,
-        lastMccMnc);
+        lastMccMnc,
+        lastAlt,
+        (int)(lastTime/1000));
     if (mainlog == null) {
       mainlog = new Backend("", this);
     }
@@ -469,6 +473,8 @@ public class Logger extends Service {
         validFix = true;
         lastLat = location.getLatitude();
         lastLon = location.getLongitude();
+        lastAlt = location.getAltitude();
+        lastTime = location.getTime();
         lastBearing = (int) location.getBearing();
         lastSpeed = location.getSpeed();
         if (location.hasAccuracy()) {
