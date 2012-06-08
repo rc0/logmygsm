@@ -89,13 +89,12 @@ class Merc28 {
     double P, Q;
     P = (2.0/9.0) * (lat - 54.5);
     Q = 0.25 * (lon + 2.0);
-    return -50.7 + 4.4*Q + 0.6*Q*Q - 1.7*P - 0.5*P*Q + 2.3*P*P;
+    return alt -50.7 + 4.4*Q + 0.6*Q*Q - 1.7*P - 0.5*P*Q + 2.3*P*P;
   }
 
   // ------------------------------------------------------------------
   // Deal with grid references
 
-  static final char[] letters = "ABCDEFGHJKLMNOPQRSTUVWXYZ" .toCharArray();
   static final char[] letters1 = "VQLFAWRMGBXSNHCYTOJDZUPKE" .toCharArray();
   static final char[] letters0 = "SNHTOJ" .toCharArray();
 
