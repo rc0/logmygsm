@@ -33,6 +33,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -53,6 +54,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
   private TextView countText;
   private TextView tileText;
   private TextView cidHistoryText;
+  private TextView gridRefText;
 
   private CellUpdateReceiver myCellReceiver;
   private GPSUpdateReceiver myGPSReceiver;
@@ -60,6 +62,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
   private Map mMap;
 
   private static final String PREFS_FILE = "prefs.txt";
+  static final private String TAG = "MainActivity";
 
   /** Called when the activity is first created. */
   @Override
@@ -79,6 +82,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
       tileText = (TextView) findViewById(R.id.tile);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
       daOffsetText = (TextView) findViewById(R.id.da_offset);
+      gridRefText = (TextView) findViewById(R.id.grid_ref);
       mMap = (Map) findViewById(R.id.map);
       mMap.restore_state_from_file(PREFS_FILE);
       mMap.register_position_listener(this);
@@ -183,6 +187,8 @@ public class MainActivity extends Activity implements Map.PositionListener {
 
     String tileString = mMap.current_tile_string();
     tileText.setText(tileString);
+    String gridString = mMap.current_grid_ref();
+    gridRefText.setText(gridString);
 
   }
 
@@ -269,7 +275,13 @@ public class MainActivity extends Activity implements Map.PositionListener {
     netmccText.setText(netmccString);
     dBmText.setText(dBmString);
 
-    String countString = String.format("%dp %dm", Logger.nReadings, (int)Logger.lastAlt);
+    String countString;
+    if (Logger.validFix) {
+      countString = String.format("%dp %dm", Logger.nReadings, 
+          (int)Merc28.odn(Logger.lastAlt, Logger.lastLat, Logger.lastLon));
+    } else {
+      countString = String.format("%dp GPS?", Logger.nReadings);
+    }
     countText.setText(countString);
 
     updateCidHistory(current_time);

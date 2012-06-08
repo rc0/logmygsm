@@ -94,6 +94,17 @@
         android:gravity="left">
       </TextView>
 
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/grid_ref"
+        android:typeface="monospace"
+        android:textSize="16sp"
+        android:textColor="@android:color/white"
+        android:text="####"
+        android:gravity="bottom|right">
+      </TextView>
+
     </LinearLayout>
     <!-- The left 2/3 of the block -->
 

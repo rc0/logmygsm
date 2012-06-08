@@ -337,6 +337,14 @@ public class Map extends View {
     return String.format("%5d%5d", X, Y);
   }
 
+  String current_grid_ref() {
+    if (display_pos != null) {
+      return display_pos.grid_ref();
+    } else {
+      return "NO POSITION";
+    }
+  }
+
   // Local UI callbacks
 
   void clear_trail() {

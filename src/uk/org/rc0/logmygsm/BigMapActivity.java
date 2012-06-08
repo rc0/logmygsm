@@ -49,6 +49,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
   private Button mDeleteVisibleButton;
   private Button mDeleteAllButton;
   private TextView summaryText;
+  private TextView gridRefText;
 
   private static final String PREFS_FILE = "prefs2.txt";
 
@@ -63,6 +64,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     mDeleteVisibleButton = (Button) findViewById(R.id.delete_visible_button);
     mDeleteAllButton = (Button) findViewById(R.id.delete_all_button);
     summaryText = (TextView) findViewById(R.id.big_summary);
+    gridRefText = (TextView) findViewById(R.id.big_grid_ref);
 
     mAddButton.setOnClickListener(new OnClickListener () {
       public void onClick(View v) {
@@ -201,6 +203,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     }
 
     summaryText.setText(summaryString);
+    gridRefText.setText(mMap.current_grid_ref());
   }
 
   public void display_position_update() {

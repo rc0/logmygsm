@@ -94,6 +94,17 @@
   </TextView>
 
   <TextView
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:id="@+id/big_grid_ref"
+    android:typeface="monospace"
+    android:textSize="16sp"
+    android:textColor="@android:color/white"
+    android:text="####"
+    android:gravity="left">
+  </TextView>
+
+  <TextView
     android:layout_height="1dp"
     android:layout_width="fill_parent"
     android:id="@+id/shim_over_big_map2">
