@@ -143,7 +143,6 @@ class Trail {
 
   void clear() {
     init();
-    mHistory.clear();
   }
 
   // Move to subclass of service
