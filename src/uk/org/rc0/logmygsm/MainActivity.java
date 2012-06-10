@@ -324,9 +324,9 @@ public class MainActivity extends Activity implements Map.PositionListener {
     public boolean onCreateOptionsMenu(Menu menu) {
       SubMenu sub = menu.addSubMenu(0, 0, Menu.NONE, "Maps");
       sub.setIcon(android.R.drawable.ic_menu_mapmode);
-      sub.add (Menu.NONE, OPTION_MAP_2G,  Menu.NONE, "O2 UK 2G map");
-      sub.add (Menu.NONE, OPTION_MAP_3G,  Menu.NONE, "O2 UK 3G map");
-      sub.add (Menu.NONE, OPTION_MAP_TODO,  Menu.NONE, "O2 UK to-visit map");
+      sub.add (Menu.NONE, OPTION_MAP_2G,  Menu.NONE, "2G map");
+      sub.add (Menu.NONE, OPTION_MAP_3G,  Menu.NONE, "3G map");
+      sub.add (Menu.NONE, OPTION_MAP_TODO,  Menu.NONE, "To-visit map");
       sub.add (Menu.NONE, OPTION_MAP_OS,  Menu.NONE, "Ordnance Survey");
       sub.add (Menu.NONE, OPTION_MAP_MAPNIK, Menu.NONE, "Mapnik (OSM)");
       sub.add (Menu.NONE, OPTION_MAP_CYCLE, Menu.NONE, "OpenCycleMap");
