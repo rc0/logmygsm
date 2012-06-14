@@ -149,19 +149,31 @@ public class Map extends View {
       y1 = yc - (LEN1);
       y2 = yc + (LEN1);
       y3 = yc + (LEN1 + LEN2);
-      c.drawLine(x0, yc, x1, yc, red_paint);
-      c.drawLine(x2, yc, x3, yc, red_paint);
-      c.drawLine(xc, y0, xc, y1, red_paint);
-      c.drawLine(xc, y2, xc, y3, red_paint);
+      c.drawLine(x0, yc, x1, yc, red_double_stroke_paint);
+      c.drawLine(x2, yc, x3, yc, red_double_stroke_paint);
+      c.drawLine(xc, y0, xc, y1, red_double_stroke_paint);
+      c.drawLine(xc, y2, xc, y3, red_double_stroke_paint);
     }
   }
 
   private void draw_centre_circle(Canvas c, int w, int h) {
-    float xc;
-    float yc;
+    float x0, x1, x2, x3, xc;
+    float y0, y1, y2, y3, yc;
     xc = (float)(w/2);
     yc = (float)(h/2);
+    x0 = xc - LEN3;
+    x1 = xc - LEN1;
+    x2 = xc + LEN1;
+    x3 = xc + LEN3;
+    y0 = yc - LEN3;
+    y1 = yc - LEN1;
+    y2 = yc + LEN1;
+    y3 = yc + LEN3;
     c.drawCircle(xc, yc, LEN3, red_stroke_paint);
+    c.drawLine(x0, yc, x1, yc, red_paint);
+    c.drawLine(x2, yc, x3, yc, red_paint);
+    c.drawLine(xc, y0, xc, y1, red_paint);
+    c.drawLine(xc, y2, xc, y3, red_paint);
   }
 
   void draw_bearing(Canvas c, int w, int h) {
