@@ -25,10 +25,15 @@
 
 package uk.org.rc0.logmygsm;
 
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
+
 class MapSource {
   private String menu_name = "";
   private String path_segment = "";
   private int code;
+  private boolean tower_line;
   final private String path_start = "/sdcard/Maverick/tiles";
 
   String get_menu_name() {
@@ -44,10 +49,15 @@ class MapSource {
     return code;
   }
 
-  MapSource(String _menu_name, String _path_segment, int _code) {
+  boolean want_tower_line() {
+    return tower_line;
+  }
+
+  MapSource(String _menu_name, String _path_segment, int _code, boolean _want_tower_line) {
     menu_name = _menu_name;
     path_segment = _path_segment;
     code = _code;
+    tower_line = _want_tower_line;
   }
 
 }
@@ -61,15 +71,15 @@ class MapSources {
   static final int MAP_OPEN_CYCLE = 104;
 
   static final MapSource [] sources = {
-    new MapSource("2G map", "Custom 2", MAP_2G),
-    new MapSource("3G map", "Custom 3", MAP_3G),
-    new MapSource("To-visit map", "logmygsm_todo", MAP_TODO),
-    new MapSource("Ordnance Survey", "Ordnance Survey Explorer Maps (UK)", MAP_OS),
-    new MapSource("Mapnik (OSM)", "mapnik", MAP_MAPNIK),
-    new MapSource("Open Cycle Map", "OSM Cycle Map", MAP_OPEN_CYCLE),
+    new MapSource("2G map", "Custom 2", MAP_2G, true),
+    new MapSource("3G map", "Custom 3", MAP_3G, true),
+    new MapSource("To-visit map", "logmygsm_todo", MAP_TODO, true),
+    new MapSource("Ordnance Survey", "Ordnance Survey Explorer Maps (UK)", MAP_OS, false),
+    new MapSource("Mapnik (OSM)", "mapnik", MAP_MAPNIK, false),
+    new MapSource("Open Cycle Map", "OSM Cycle Map", MAP_OPEN_CYCLE, false),
   };
 
-  MapSource lookup(int code) {
+  static MapSource lookup(int code) {
     for (MapSource source: sources) {
       if (source.get_code() == code) {
         return source;
@@ -77,6 +87,11 @@ class MapSources {
     }
     return null;
   }
+
+  static MapSource get_default() {
+    return lookup(MAP_2G);
+  }
+
 
 }
 

@@ -65,7 +65,7 @@ public class Map extends View {
   private int tile_shift;
   private float drag_scale;
 
-  private int map_source;
+  private MapSource map_source;
 
   // the GPS fix from the logger
   private Merc28 estimated_pos;
@@ -116,7 +116,7 @@ public class Map extends View {
     grey_paint.setColor(Color.GRAY);
 
     setZoom(14);
-    map_source = MAP_2G;
+    map_source = MapSources.get_default();
     estimated_pos = null;
     display_pos = null;
 
@@ -213,19 +213,6 @@ public class Map extends View {
         button_stroke_paint);
   }
 
-  private boolean want_tower_line() {
-    switch (map_source) {
-      case MAP_2G:
-        return true;
-      case MAP_3G:
-        return true;
-      case MAP_TODO:
-        return true;
-      default:
-        return false;
-    }
-  }
-
   private void redraw_map(Canvas canvas) {
     // Decide if we have to rebuild the tile22 cache
     int width = getWidth();
@@ -238,7 +225,7 @@ public class Map extends View {
     draw_buttons(canvas, width, height);
     draw_bearing(canvas, width, height);
     Logger.mMarks.draw(canvas, display_pos, width, height, pixel_shift);
-    if (want_tower_line()) {
+    if (map_source.want_tower_line()) {
       TowerLine.draw_line(canvas, width, height, pixel_shift, display_pos);
     }
   }
@@ -260,7 +247,7 @@ public class Map extends View {
     invalidate();
   }
 
-  void select_map_source(int which) {
+  void select_map_source(MapSource which) {
     map_source = which;
     invalidate();
   }
@@ -289,7 +276,7 @@ public class Map extends View {
     // defaults in case of strife
     display_pos = null;
     setZoom(14);
-    map_source = MAP_2G;
+    map_source = MapSources.get_default();
     if (file.exists()) {
       try {
         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -304,7 +291,10 @@ public class Map extends View {
         // If we survive unexcepted to here we parsed the file OK
         display_pos = new Merc28(x, y);
         line = br.readLine();
-        map_source = Integer.parseInt(line);
+        map_source = MapSources.lookup(Integer.parseInt(line));
+        if (map_source == null) {
+          map_source = MapSources.get_default();
+        }
         br.close();
       } catch (IOException e) {
       } catch (NumberFormatException n) {
@@ -324,7 +314,7 @@ public class Map extends View {
         bw.write(String.format("%d\n", zoom));
         bw.write(String.format("%d\n", display_pos.X));
         bw.write(String.format("%d\n", display_pos.Y));
-        bw.write(String.format("%d\n", map_source));
+        bw.write(String.format("%d\n", map_source.get_code()));
         bw.close();
       } catch (IOException e) {
       }

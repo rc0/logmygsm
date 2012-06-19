@@ -143,12 +143,9 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
   public boolean onCreateOptionsMenu(Menu menu) {
     SubMenu sub = menu.addSubMenu(0, 0, Menu.NONE, "Maps");
     sub.setIcon(android.R.drawable.ic_menu_mapmode);
-    sub.add (Menu.NONE, OPTION_MAP_2G,  Menu.NONE, "2G map");
-    sub.add (Menu.NONE, OPTION_MAP_3G,  Menu.NONE, "3G map");
-      sub.add (Menu.NONE, OPTION_MAP_TODO,  Menu.NONE, "To-visit map");
-    sub.add (Menu.NONE, OPTION_MAP_OS,  Menu.NONE, "Ordnance Survey");
-    sub.add (Menu.NONE, OPTION_MAP_MAPNIK, Menu.NONE, "Mapnik (OSM)");
-    sub.add (Menu.NONE, OPTION_MAP_CYCLE, Menu.NONE, "OpenCycleMap");
+    for (MapSource source : MapSources.sources) {
+      sub.add (Menu.NONE, source.get_code(), Menu.NONE, source.get_menu_name());
+    }
     MenuItem m_exit =
       menu.add (Menu.NONE, OPTION_EXIT,    Menu.NONE, "Exit");
     m_exit.setIcon(android.R.drawable.ic_lock_power_off);
@@ -157,30 +154,20 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case OPTION_MAP_2G:
-        mMap.select_map_source(Map.MAP_2G);
-        return true;
-      case OPTION_MAP_3G:
-        mMap.select_map_source(Map.MAP_3G);
-        return true;
-        case OPTION_MAP_TODO:
-          mMap.select_map_source(Map.MAP_TODO);
-          return true;
-      case OPTION_MAP_MAPNIK:
-        mMap.select_map_source(Map.MAP_MAPNIK);
-        return true;
-      case OPTION_MAP_CYCLE:
-        mMap.select_map_source(Map.MAP_OPEN_CYCLE);
-        return true;
-      case OPTION_MAP_OS:
-        mMap.select_map_source(Map.MAP_OS);
-        return true;
+    int code = item.getItemId();
+    switch (code) {
       case OPTION_EXIT:
         finish();
         return true;
       default:
-        return false;
+        MapSource source;
+        source = MapSources.lookup(code);
+        if (source != null) {
+          mMap.select_map_source(source);
+          return true;
+        } else {
+          return false;
+        }
     }
   }
 

@@ -54,18 +54,18 @@ class TileStore {
     int zoom;
     int x;
     int y;
-    int map_source;
+    MapSource map_source;
 
-    TilePos(int _zoom, int _x, int _y, int _map_source) {
+    TilePos(int _zoom, int _x, int _y, MapSource _map_source) {
       zoom = _zoom;
       x = _x;
       y = _y;
       map_source = _map_source;
     }
 
-    boolean isMatch(int _zoom, int _x, int _y, int _map_source) {
+    boolean isMatch(int _zoom, int _x, int _y, MapSource _map_source) {
       if ((_zoom == zoom) &&
-          (_map_source == map_source) &&
+          (_map_source.get_code() == map_source.get_code()) &&
           (_x == x) &&
           (_y == y)) {
         return true;
@@ -87,7 +87,7 @@ class TileStore {
       return b;
     }
 
-    Entry(int _zoom, int _map_source, int _x, int _y, Bitmap _b) {
+    Entry(int _zoom, MapSource _map_source, int _x, int _y, Bitmap _b) {
       super(_zoom, _x, _y, _map_source);
       pixel_shift = (Merc28.shift - (zoom + bm_log_size));
       tile_shift = (Merc28.shift - zoom);
@@ -199,9 +199,9 @@ class TileStore {
     private int zoom;
     private int x;
     private int y;
-    private int map_source;
+    private MapSource map_source;
 
-    public TilingThread(int _zoom, int _x, int _y, int _map_source) {
+    public TilingThread(int _zoom, int _x, int _y, MapSource _map_source) {
       zoom = _zoom;
       x = _x;
       y = _y;
@@ -258,34 +258,9 @@ class TileStore {
     }
   }
 
-  static private Bitmap render_bitmap(int zoom, int map_source, int x, int y) {
+  static private Bitmap render_bitmap(int zoom, MapSource map_source, int x, int y) {
     String filename = null;
-    switch (map_source) {
-      case Map.MAP_2G:
-        filename = String.format("/sdcard/Maverick/tiles/Custom 2/%d/%d/%d.png.tile",
-            zoom, x, y);
-        break;
-      case Map.MAP_3G:
-        filename = String.format("/sdcard/Maverick/tiles/Custom 3/%d/%d/%d.png.tile",
-            zoom, x, y);
-        break;
-      case Map.MAP_TODO:
-        filename = String.format("/sdcard/Maverick/tiles/logmygsm_todo/%d/%d/%d.png.tile",
-            zoom, x, y);
-        break;
-      case Map.MAP_MAPNIK:
-        filename = String.format("/sdcard/Maverick/tiles/mapnik/%d/%d/%d.png.tile",
-            zoom, x, y);
-        break;
-      case Map.MAP_OPEN_CYCLE:
-        filename = String.format("/sdcard/Maverick/tiles/OSM Cycle Map/%d/%d/%d.png.tile",
-            zoom, x, y);
-        break;
-      case Map.MAP_OS:
-        filename = String.format("/sdcard/Maverick/tiles/Ordnance Survey Explorer Maps (UK)/%d/%d/%d.png.tile",
-            zoom, x, y);
-        break;
-    }
+    filename = map_source.get_tile_path(zoom, x, y);
     File file = new File(filename);
     Bitmap bm;
     if (file.exists()) {
@@ -302,7 +277,7 @@ class TileStore {
     return bm;
   }
 
-  static private void start_bg_load(int zoom, int x, int y, int map_source) {
+  static private void start_bg_load(int zoom, int x, int y, MapSource map_source) {
     // Check if this job is already on the queue
     int i;
     for (i=0; i<bg_queue.size(); i++) {
@@ -319,7 +294,7 @@ class TileStore {
     }
   }
 
-  static private Entry make_entry(int zoom, int map_source, int x, int y, Bitmap b) {
+  static private Entry make_entry(int zoom, MapSource map_source, int x, int y, Bitmap b) {
     return new Entry(zoom, map_source, x, y, b);
   }
 
@@ -332,7 +307,7 @@ class TileStore {
     }
   }
 
-  static private Entry lookup(int zoom, int map_source, int x, int y) {
+  static private Entry lookup(int zoom, MapSource map_source, int x, int y) {
     // front should never be null
     for (int i=next-1; i>=0; i--) {
       if (front[i].isMatch(zoom, x, y, map_source)) {
@@ -389,7 +364,7 @@ class TileStore {
     System.gc();
   }
 
-  static void draw(Canvas c, int w, int h, int zoom, int map_source, Merc28 midpoint) {
+  static void draw(Canvas c, int w, int h, int zoom, MapSource map_source, Merc28 midpoint) {
     int pixel_shift = (Merc28.shift - (zoom + bm_log_size));
 
     // Compute pixels from origin at this zoom level for top-left corner of canvas
