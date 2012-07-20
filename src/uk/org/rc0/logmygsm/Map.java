@@ -51,13 +51,6 @@ public class Map extends View {
   private final Paint button_stroke_paint;
   private final Paint grey_paint;
 
-  static final int MAP_2G  = 100;
-  static final int MAP_3G  = 101;
-  static final int MAP_TODO = 105;
-  static final int MAP_MAPNIK = 102;
-  static final int MAP_OS  = 103;
-  static final int MAP_OPEN_CYCLE = 104;
-
   static final private String TAG = "Map";
 
   private int zoom;

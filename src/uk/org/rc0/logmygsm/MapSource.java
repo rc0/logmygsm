@@ -66,14 +66,16 @@ class MapSources {
   static final int MAP_2G  = 100;
   static final int MAP_3G  = 101;
   static final int MAP_TODO = 105;
+  static final int MAP_AGE3G = 106;
   static final int MAP_MAPNIK = 102;
   static final int MAP_OS  = 103;
   static final int MAP_OPEN_CYCLE = 104;
 
   static final MapSource [] sources = {
-    new MapSource("2G map", "Custom 2", MAP_2G, true),
-    new MapSource("3G map", "Custom 3", MAP_3G, true),
-    new MapSource("To-visit map", "logmygsm_todo", MAP_TODO, true),
+    new MapSource("2G coverage", "Custom 2", MAP_2G, true),
+    new MapSource("3G coverage", "Custom 3", MAP_3G, true),
+    new MapSource("Visited", "logmygsm_todo", MAP_TODO, true),
+    new MapSource("3G data age", "logmygsm_age3g", MAP_AGE3G, true),
     new MapSource("Ordnance Survey", "Ordnance Survey Explorer Maps (UK)", MAP_OS, false),
     new MapSource("Mapnik (OSM)", "mapnik", MAP_MAPNIK, false),
     new MapSource("Open Cycle Map", "OSM Cycle Map", MAP_OPEN_CYCLE, false),

@@ -310,12 +310,6 @@ public class MainActivity extends Activity implements Map.PositionListener {
   // --------------------------------------------------------------------------
   //
 
-  private final int OPTION_MAP_2G   = 1;
-  private final int OPTION_MAP_3G   = 2;
-  private final int OPTION_MAP_TODO = 8;
-  private final int OPTION_MAP_MAPNIK  = 3;
-  private final int OPTION_MAP_CYCLE = 7;
-  private final int OPTION_MAP_OS   = 4;
   private final int OPTION_CLEAR_TRAIL = 5;
   private final int OPTION_EXIT     = 6;
   private final int OPTION_BIG_MAP = 10;
