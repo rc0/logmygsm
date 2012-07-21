@@ -159,9 +159,16 @@ public class MainActivity extends Activity implements Map.PositionListener {
 
   private boolean bad_cid(int cid) {
     switch (cid) {
-      case 50594049:
-        return true;
       case 0:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  private boolean odd_cid(int cid) {
+    switch (cid) {
+      case 50594049:
         return true;
       default:
         return false;
@@ -262,6 +269,8 @@ public class MainActivity extends Activity implements Map.PositionListener {
       case 'A':
         if (bad_cid(Logger.lastCid)) {
           cidText.setTextColor(Color.RED);
+        } else if (odd_cid(Logger.lastCid)) {
+          cidText.setTextColor(Color.YELLOW);
         } else {
           cidText.setTextColor(Color.WHITE);
         }
