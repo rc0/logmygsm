@@ -206,7 +206,7 @@ class TileStore {
       x = _x;
       y = _y;
       map_source = _map_source;
-      setPriority(Thread.MIN_PRIORITY);
+      //setPriority(Thread.MIN_PRIORITY);
     }
 
     @Override
@@ -262,11 +262,16 @@ class TileStore {
     String filename = null;
     filename = map_source.get_tile_path(zoom, x, y);
     File file = new File(filename);
-    Bitmap bm;
-    if (file.exists()) {
-      Bitmap temp_bm = BitmapFactory.decodeFile(filename);
-      bm = temp_bm.copy(Bitmap.Config.ARGB_8888, true);
-    } else {
+    Bitmap bm = null;
+    try {
+      if (file.exists()) {
+        Bitmap temp_bm = BitmapFactory.decodeFile(filename);
+        bm = temp_bm.copy(Bitmap.Config.ARGB_8888, true);
+      }
+    } catch (Exception e) {
+      // to deal with corrupt tile files and such horrors
+    }
+    if (bm == null) {
       // TODO : could attempt a load off the network at this point?
       bm = Bitmap.createBitmap(bm_size, bm_size, Bitmap.Config.ARGB_8888);
       Canvas my_canv = new Canvas(bm);

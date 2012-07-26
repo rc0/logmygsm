@@ -31,6 +31,7 @@ public class LogMyGSM extends Application {
   public void onCreate() {
     super.onCreate();
     TileStore.init(this);
+    Downloader.init(this);
     TowerLine.init();
   }
 

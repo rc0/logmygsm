@@ -98,56 +98,56 @@ class Merc28 {
   static final char[] letters1 = "VQLFAWRMGBXSNHCYTOJDZUPKE" .toCharArray();
   static final char[] letters0 = "SNHTOJ" .toCharArray();
 
-  String grid_ref() {
-    double x, y;
-    x = (double) X / scale;
-    y = (double) Y / scale;
-    x = 72.0 * (x - 0.494444);
-    y = 36.0 * (y - 0.318700);
+//    String grid_ref() {
+//      double x, y;
+//      x = (double) X / scale;
+//      y = (double) Y / scale;
+//      x = 72.0 * (x - 0.494444);
+//      y = 36.0 * (y - 0.318700);
+//  
+//      double y2 = y*y;
+//      double y3 = y*y2;
+//      double y4 = y*y3;
+//      double y5 = y*y4;
+//      double y6 = y*y5;
+//  
+//      double x2 = x*x;
+//      double x3 = x*x2;
+//      double x4 = x*x3;
+//      double x5 = x*x4;
+//  
+//      double E0 = +400087.5 -3.9*y;
+//      double E1 = +323810.0 +45906.2*y +1579.8*y2 -241.1*y3 -37.6*y4 -1.9*y5;
+//      double E3 = -133.5 +60.0*y +18.9*y2 +1.7*y3;
+//      double E5 = -0.5;
+//  
+//      double E = E0 +E1*x +E3*x3 +E5*x5;
+//  
+//      double N0 = +511732.7 -646151.6*y -45594.0*y2 -1016.5*y3 +122.3*y4 +14.8*y5 +0.6*y6;
+//      double N1 = -1.9;
+//      double N2 = +11502.6 +799.1*y -180.0*y2 -37.7*y3 -2.5*y4;
+//      double N4 = +7.5 +4.7*y +0.6*y2;
+//  
+//      double N = N0 +N1*x +N2*x2 +N4*x4;
+//  
+//      if ((E < 0.0) || (E >= 700000.0) || (N < 0.0) || (N >= 1300000)) {
+//        return "NOT IN UK";
+//      }
+//  
+//      int e = (int)(0.5 + E);
+//      int n = (int)(0.5 + N);
+//      int e0 = e / 100000;
+//      int e1 = e % 100000;
+//      int n0 = n / 100000;
+//      int n1 = n % 100000;
+//  
+//      char c0 = letters0[3*(e0/5) + (n0/5)];
+//      char c1 = letters1[5*(e0%5) + (n0%5)];
+//  
+//      return String.format("%1c%1c %05d %05d", c0, c1, e1, n1);
+//    }
 
-    double y2 = y*y;
-    double y3 = y*y2;
-    double y4 = y*y3;
-    double y5 = y*y4;
-    double y6 = y*y5;
-
-    double x2 = x*x;
-    double x3 = x*x2;
-    double x4 = x*x3;
-    double x5 = x*x4;
-
-    double E0 = +400087.5 -3.9*y;
-    double E1 = +323810.0 +45906.2*y +1579.8*y2 -241.1*y3 -37.6*y4 -1.9*y5;
-    double E3 = -133.5 +60.0*y +18.9*y2 +1.7*y3;
-    double E5 = -0.5;
-
-    double E = E0 +E1*x +E3*x3 +E5*x5;
-
-    double N0 = +511732.7 -646151.6*y -45594.0*y2 -1016.5*y3 +122.3*y4 +14.8*y5 +0.6*y6;
-    double N1 = -1.9;
-    double N2 = +11502.6 +799.1*y -180.0*y2 -37.7*y3 -2.5*y4;
-    double N4 = +7.5 +4.7*y +0.6*y2;
-
-    double N = N0 +N1*x +N2*x2 +N4*x4;
-
-    if ((E < 0.0) || (E >= 700000.0) || (N < 0.0) || (N >= 1300000)) {
-      return "NOT IN UK";
-    }
-
-    int e = (int)(0.5 + E);
-    int n = (int)(0.5 + N);
-    int e0 = e / 100000;
-    int e1 = e % 100000;
-    int n0 = n / 100000;
-    int n1 = n % 100000;
-
-    char c0 = letters0[3*(e0/5) + (n0/5)];
-    char c1 = letters1[5*(e0%5) + (n0%5)];
-
-    return String.format("%1c%1c %05d %05d", c0, c1, e1, n1);
-  }
-
-  String grid_ref_5m() {
+  private String inner_grid_ref_5m(String fmt) {
     double x, y;
     x = (double) X / scale;
     y = (double) Y / scale;
@@ -205,7 +205,15 @@ class Merc28 {
     char c0 = letters0[3*(e0/5) + (n0/5)];
     char c1 = letters1[5*(e0%5) + (n0%5)];
 
-    return String.format("%1c%1c %04d %04d", c0, c1, e1, n1);
+    return String.format(fmt, c0, c1, e1, n1);
+  }
+
+  String grid_ref_5m() {
+    return inner_grid_ref_5m("%1c%1c %04d %04d");
+  }
+
+  String grid_ref_5m_nosp() {
+    return inner_grid_ref_5m("%1c%1c%04d%04d");
   }
 }
 

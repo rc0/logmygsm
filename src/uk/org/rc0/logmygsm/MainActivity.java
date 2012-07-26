@@ -319,12 +319,15 @@ public class MainActivity extends Activity implements Map.PositionListener {
   // --------------------------------------------------------------------------
   //
 
-  private final int OPTION_CLEAR_TRAIL = 5;
-  private final int OPTION_EXIT     = 6;
-  private final int OPTION_BIG_MAP = 10;
+  private final int OPTION_CLEAR_TRAIL =  5;
+  private final int OPTION_EXIT        =  6;
+  private final int OPTION_BIG_MAP     = 10;
+  private final int OPTION_DOWNLOAD    = 11;
+  private final int OPTION_SHARE       = 12;
 
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+      // Top row
       SubMenu sub = menu.addSubMenu(0, 0, Menu.NONE, "Maps");
       sub.setIcon(android.R.drawable.ic_menu_mapmode);
       for (MapSource source : MapSources.sources) {
@@ -333,6 +336,14 @@ public class MainActivity extends Activity implements Map.PositionListener {
       MenuItem m_waypoints =
         menu.add (Menu.NONE, OPTION_BIG_MAP, Menu.NONE, "Waypoint map");
       m_waypoints.setIcon(android.R.drawable.ic_menu_myplaces);
+      MenuItem m_download =
+        menu.add (Menu.NONE, OPTION_DOWNLOAD, Menu.NONE, "Download tile");
+      m_download.setIcon(android.R.drawable.ic_menu_view); // REPLACE WITH SUITABLE ICON
+
+      // Bottom row
+      MenuItem m_share =
+        menu.add (Menu.NONE, OPTION_SHARE,  Menu.NONE, "Share grid ref");
+      m_share.setIcon(android.R.drawable.ic_menu_share); // REPLACE WITH SUITABLE ICON
       MenuItem m_clear_waypoints =
         menu.add (Menu.NONE, OPTION_CLEAR_TRAIL,  Menu.NONE, "Clear trail");
       m_clear_waypoints.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
@@ -354,6 +365,12 @@ public class MainActivity extends Activity implements Map.PositionListener {
           return true;
         case OPTION_CLEAR_TRAIL:
           mMap.clear_trail();
+          return true;
+        case OPTION_DOWNLOAD:
+          mMap.trigger_fetch(getApplicationContext());
+          return true;
+        case OPTION_SHARE:
+          mMap.share_grid_ref(this);
           return true;
         case OPTION_BIG_MAP:
           Intent intent = new Intent(this, BigMapActivity.class);

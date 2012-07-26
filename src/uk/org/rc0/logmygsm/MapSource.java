@@ -45,6 +45,11 @@ class MapSource {
         path_start, path_segment, zoom, x, y);
   }
 
+  // Override in sub-classes for map types that can support download
+  String get_download_url(int zoom, int x, int y) {
+    return null;
+  }
+
   int get_code() {
     return code;
   }
@@ -62,6 +67,24 @@ class MapSource {
 
 }
 
+// ------------------------------------------------------------------
+
+class MapSource_Mapnik extends MapSource {
+
+  MapSource_Mapnik(String _menu_name, String _path_segment, int _code, boolean _want_tower_line) {
+    super(_menu_name, _path_segment, _code, _want_tower_line);
+  }
+
+  String get_download_url(int zoom, int x, int y) {
+    return String.format("//a.tile.openstreetmap.org/%d/%d/%d.png", zoom, x, y);
+  }
+
+};
+
+
+
+// ------------------------------------------------------------------
+
 class MapSources {
   static final int MAP_2G  = 100;
   static final int MAP_3G  = 101;
@@ -77,7 +100,7 @@ class MapSources {
     new MapSource("Visited", "logmygsm_todo", MAP_TODO, true),
     new MapSource("3G data age", "logmygsm_age3g", MAP_AGE3G, true),
     new MapSource("Ordnance Survey", "Ordnance Survey Explorer Maps (UK)", MAP_OS, false),
-    new MapSource("Mapnik (OSM)", "mapnik", MAP_MAPNIK, false),
+    new MapSource_Mapnik("Mapnik (OSM)", "mapnik", MAP_MAPNIK, false),
     new MapSource("Open Cycle Map", "OSM Cycle Map", MAP_OPEN_CYCLE, false),
   };
 
@@ -96,4 +119,7 @@ class MapSources {
 
 
 }
+
+//
+// vim:et:sw=2:sts=2
 

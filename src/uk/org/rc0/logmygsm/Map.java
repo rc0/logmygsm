@@ -34,7 +34,9 @@ import java.io.IOException;
 import java.lang.Integer;
 import java.lang.Math;
 import java.lang.NumberFormatException;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.MotionEvent;
@@ -267,7 +269,7 @@ public class Map extends View {
   void restore_state_from_file(String tail) {
     File file = new File("/sdcard/LogMyGsm/prefs/" + tail);
     // defaults in case of strife
-    display_pos = null;
+    display_pos = new Merc28(54.5, -2.0); // in the wilderness
     setZoom(14);
     map_source = MapSources.get_default();
     if (file.exists()) {
@@ -337,6 +339,29 @@ public class Map extends View {
       return display_pos.grid_ref_5m();
     } else {
       return "NO POSITION";
+    }
+  }
+
+  void trigger_fetch(Context context) {
+    if (display_pos != null) {
+      Downloader.start_fetch(zoom, map_source,
+          display_pos.X >> tile_shift,
+          display_pos.Y >> tile_shift,
+          context);
+    }
+  }
+
+  void share_grid_ref(Activity _activity) {
+    if (display_pos != null) {
+      try {
+        Intent the_intent = new Intent();
+        the_intent.setAction(Intent.ACTION_SEND);
+        the_intent.setType("text/plain");
+        the_intent.putExtra(Intent.EXTRA_TEXT,
+            "At " + display_pos.grid_ref_5m_nosp() + " : ");
+        _activity.startActivity(Intent.createChooser(the_intent, "Share grid ref using"));
+      } catch (Exception e) {
+      }
     }
   }
 

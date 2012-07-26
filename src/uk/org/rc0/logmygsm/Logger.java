@@ -554,6 +554,12 @@ public class Logger extends Service {
     Toast toast = Toast.makeText(context, text, duration);
     toast.show();
   }
+
+  static void announce(Context context, String text) {
+    int duration = Toast.LENGTH_SHORT;
+    Toast toast = Toast.makeText(context, text, duration);
+    toast.show();
+  }
 }
 
 
