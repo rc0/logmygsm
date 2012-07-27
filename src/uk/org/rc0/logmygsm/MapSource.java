@@ -81,6 +81,29 @@ class MapSource_Mapnik extends MapSource {
 
 };
 
+// ------------------------------------------------------------------
+
+class MapSource_OS extends MapSource {
+
+  MapSource_OS(String _menu_name, String _path_segment, int _code, boolean _want_tower_line) {
+    super(_menu_name, _path_segment, _code, _want_tower_line);
+  }
+
+  static final char [] qk03 = "0123" . toCharArray();
+
+  String get_download_url(int zoom, int x, int y) {
+    char [] quadkey = new char[zoom];
+    int i;
+    for (i=0; i<zoom; i++) {
+      int j = zoom - 1 - i;
+      int xx = (x >> j) & 1;
+      int yy = (y >> j) & 1;
+      quadkey[i] = qk03[xx + (yy<<1)];
+    }
+    return new String("//ecn.t3.tiles.virtualearth.net/tiles/r" + (new String(quadkey)) + ".png?g=41&productSet=mmOS");
+  }
+
+};
 
 
 // ------------------------------------------------------------------
@@ -99,7 +122,7 @@ class MapSources {
     new MapSource("3G coverage", "Custom 3", MAP_3G, true),
     new MapSource("Visited", "logmygsm_todo", MAP_TODO, true),
     new MapSource("3G data age", "logmygsm_age3g", MAP_AGE3G, true),
-    new MapSource("Ordnance Survey", "Ordnance Survey Explorer Maps (UK)", MAP_OS, false),
+    new MapSource_OS("Ordnance Survey", "Ordnance Survey Explorer Maps (UK)", MAP_OS, false),
     new MapSource_Mapnik("Mapnik (OSM)", "mapnik", MAP_MAPNIK, false),
     new MapSource("Open Cycle Map", "OSM Cycle Map", MAP_OPEN_CYCLE, false),
   };
