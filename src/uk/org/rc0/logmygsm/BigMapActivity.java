@@ -131,7 +131,9 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     super.onPause();
   }
 
-  private final int OPTION_EXIT     = 6;
+  private final int OPTION_CLEAR_TRAIL =  5;
+  private final int OPTION_DOWNLOAD    = 11;
+  private final int OPTION_SHARE       = 12;
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -140,9 +142,17 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     for (MapSource source : MapSources.sources) {
       sub.add (Menu.NONE, source.get_code(), Menu.NONE, source.get_menu_name());
     }
-    MenuItem m_exit =
-      menu.add (Menu.NONE, OPTION_EXIT,    Menu.NONE, "Exit");
-    m_exit.setIcon(android.R.drawable.ic_lock_power_off);
+    MenuItem m_download =
+      menu.add (Menu.NONE, OPTION_DOWNLOAD, Menu.NONE, "Download tile");
+    m_download.setIcon(android.R.drawable.ic_menu_view);
+
+    MenuItem m_share =
+      menu.add (Menu.NONE, OPTION_SHARE,  Menu.NONE, "Share grid ref");
+    m_share.setIcon(android.R.drawable.ic_menu_share);
+    MenuItem m_clear_waypoints =
+      menu.add (Menu.NONE, OPTION_CLEAR_TRAIL,  Menu.NONE, "Clear trail");
+    m_clear_waypoints.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+
     return true;
   }
 
@@ -150,9 +160,15 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
   public boolean onOptionsItemSelected(MenuItem item) {
     int code = item.getItemId();
     switch (code) {
-      case OPTION_EXIT:
-        finish();
-        return true;
+        case OPTION_CLEAR_TRAIL:
+          mMap.clear_trail();
+          return true;
+        case OPTION_DOWNLOAD:
+          mMap.trigger_fetch(getApplicationContext());
+          return true;
+        case OPTION_SHARE:
+          mMap.share_grid_ref(this);
+          return true;
       default:
         MapSource source;
         source = MapSources.lookup(code);

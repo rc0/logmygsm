@@ -338,15 +338,12 @@ public class MainActivity extends Activity implements Map.PositionListener {
       m_waypoints.setIcon(android.R.drawable.ic_menu_myplaces);
       MenuItem m_download =
         menu.add (Menu.NONE, OPTION_DOWNLOAD, Menu.NONE, "Download tile");
-      m_download.setIcon(android.R.drawable.ic_menu_view); // REPLACE WITH SUITABLE ICON
+      m_download.setIcon(android.R.drawable.ic_menu_view);
 
       // Bottom row
       MenuItem m_share =
         menu.add (Menu.NONE, OPTION_SHARE,  Menu.NONE, "Share grid ref");
-      m_share.setIcon(android.R.drawable.ic_menu_share); // REPLACE WITH SUITABLE ICON
-      MenuItem m_clear_waypoints =
-        menu.add (Menu.NONE, OPTION_CLEAR_TRAIL,  Menu.NONE, "Clear trail");
-      m_clear_waypoints.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+      m_share.setIcon(android.R.drawable.ic_menu_share);
       MenuItem m_exit =
         menu.add (Menu.NONE, OPTION_EXIT,    Menu.NONE, "Exit");
       m_exit.setIcon(android.R.drawable.ic_lock_power_off);
@@ -362,9 +359,6 @@ public class MainActivity extends Activity implements Map.PositionListener {
           // avoid holding onto oodles of memory at Application level...
           TileStore.invalidate();
           finish();
-          return true;
-        case OPTION_CLEAR_TRAIL:
-          mMap.clear_trail();
           return true;
         case OPTION_DOWNLOAD:
           mMap.trigger_fetch(getApplicationContext());
