@@ -83,6 +83,20 @@ class MapSource_Mapnik extends MapSource {
 
 // ------------------------------------------------------------------
 
+class MapSource_Cycle extends MapSource {
+
+  MapSource_Cycle(String _menu_name, String _path_segment, int _code, boolean _want_tower_line) {
+    super(_menu_name, _path_segment, _code, _want_tower_line);
+  }
+
+  String get_download_url(int zoom, int x, int y) {
+    return String.format("//a.tile.opencyclemap.org/cycle/%d/%d/%d.png", zoom, x, y);
+  }
+
+};
+
+// ------------------------------------------------------------------
+
 class MapSource_OS extends MapSource {
 
   MapSource_OS(String _menu_name, String _path_segment, int _code, boolean _want_tower_line) {
@@ -124,7 +138,7 @@ class MapSources {
     new MapSource("3G data age", "logmygsm_age3g", MAP_AGE3G, true),
     new MapSource_OS("Ordnance Survey", "Ordnance Survey Explorer Maps (UK)", MAP_OS, false),
     new MapSource_Mapnik("Mapnik (OSM)", "mapnik", MAP_MAPNIK, false),
-    new MapSource("Open Cycle Map", "OSM Cycle Map", MAP_OPEN_CYCLE, false),
+    new MapSource_Cycle("Open Cycle Map", "OSM Cycle Map", MAP_OPEN_CYCLE, false),
   };
 
   static MapSource lookup(int code) {
