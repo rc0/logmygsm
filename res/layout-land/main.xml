@@ -31,61 +31,62 @@
     android:layout_height="fill_parent"
     android:weightSum="1">
 
-  <!-- The block around the numeric table at the top -->
+
+  <!-- The block around the left-hand side fields-->
   <LinearLayout
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_height="fill_parent"
     android:layout_width="wrap_content">
 
-    <!-- The left 2/3 of the block -->
+    <TextView
+      android:layout_height="wrap_content"
+      android:layout_width="match_parent"
+      android:id="@+id/cid"
+      android:typeface="monospace"
+      android:textSize="26sp"
+      android:text="#########"
+      android:gravity="center">
+    </TextView>
+
+    <!-- Containing power and accuracy-->
     <LinearLayout
-      android:orientation="vertical"
-      android:layout_gravity="left"
-      android:layout_width="160dp"
-      android:layout_height="wrap_content">
+      android:orientation="horizontal"
+      android:layout_height="wrap_content"
+      android:layout_width="220dp">
 
       <TextView
         android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/cid"
+        android:layout_width="120dp"
+        android:id="@+id/dBm"
         android:typeface="monospace"
         android:textSize="22sp"
-        android:text="########"
-        android:gravity="center">
+        android:textColor="@android:color/white"
+        android:text="-###dBm"
+        android:gravity="right">
       </TextView>
 
-      <!-- The vertical layout for the dBm/acc block -->
-      <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="90dp"
+        android:id="@+id/accuracy"
+        android:typeface="monospace"
+        android:textSize="22sp"
+        android:text="###m"
+        android:gravity="right">
+      </TextView>
 
-        <TextView
-          android:layout_height="wrap_content"
-          android:layout_width="110dp"
-          android:id="@+id/dBm"
-          android:typeface="monospace"
-          android:textSize="20sp"
-          android:textColor="@android:color/white"
-          android:text="-###dBm"
-          android:gravity="right">
-        </TextView>
+    </LinearLayout>
 
-        <TextView
-          android:layout_height="wrap_content"
-          android:layout_width="50dp"
-          android:id="@+id/accuracy"
-          android:typeface="monospace"
-          android:textSize="18sp"
-          android:text="###m"
-          android:gravity="right">
-        </TextView>
 
-      </LinearLayout>
+    <!-- The block around the history and main field list -->
+    <LinearLayout
+      android:orientation="horizontal"
+      android:layout_height="wrap_content"
+      android:layout_width="wrap_content">
 
       <TextView
-        android:layout_height="105dp"
-        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:layout_width="110dp"
         android:id="@+id/cid_history"
         android:typeface="monospace"
         android:textSize="12sp"
@@ -95,133 +96,128 @@
       </TextView>
 
       <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/grid_ref"
-        android:typeface="monospace"
-        android:textSize="16sp"
-        android:textColor="@android:color/white"
-        android:text="####"
-        android:gravity="bottom|right">
+        android:layout_width="10dp"
+        android:layout_height="fill_parent"
+        android:id="@+id/top_level_shim">
       </TextView>
 
+      <LinearLayout
+        android:orientation="vertical"
+        android:layout_gravity="right"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content">
+
+        <TextView
+          android:layout_height="wrap_content"
+          android:layout_width="match_parent"
+          android:id="@+id/net_mcc"
+          android:typeface="monospace"
+          android:textSize="14sp"
+          android:textColor="@android:color/white"
+          android:text="####"
+          android:layout_gravity="center">
+        </TextView>
+
+        <TextView
+          android:layout_height="wrap_content"
+          android:layout_width="match_parent"
+          android:id="@+id/lac_mnc"
+          android:typeface="monospace"
+          android:textSize="14sp"
+          android:textColor="@android:color/white"
+          android:text="#####"
+          android:layout_gravity="center">
+        </TextView>
+
+        <TextView
+          android:layout_height="wrap_content"
+          android:layout_width="match_parent"
+          android:id="@+id/latitude"
+          android:typeface="monospace"
+          android:textSize="14sp"
+          android:text="-###.####"
+          android:layout_gravity="center">
+        </TextView>
+
+        <TextView
+          android:layout_height="wrap_content"
+          android:layout_width="match_parent"
+          android:id="@+id/longitude"
+          android:typeface="monospace"
+          android:textSize="14sp"
+          android:text="-###.####"
+          android:layout_gravity="center">
+        </TextView>
+
+        <TextView
+          android:layout_height="wrap_content"
+          android:layout_width="match_parent"
+          android:id="@+id/sat"
+          android:typeface="monospace"
+          android:textSize="14sp"
+          android:textColor="@android:color/white"
+          android:text="##-##-##"
+          android:layout_gravity="center">
+        </TextView>
+
+        <TextView
+          android:layout_height="wrap_content"
+          android:layout_width="match_parent"
+          android:id="@+id/age"
+          android:typeface="monospace"
+          android:textSize="14sp"
+          android:text="#####s"
+          android:layout_gravity="center">
+        </TextView>
+
+        <TextView
+          android:layout_height="wrap_content"
+          android:layout_width="match_parent"
+          android:id="@+id/da_offset"
+          android:typeface="monospace"
+          android:textSize="14sp"
+          android:textColor="@android:color/white"
+          android:text="D-A #####m"
+          android:layout_gravity="center">
+        </TextView>
+
+        <TextView
+          android:layout_height="wrap_content"
+          android:layout_width="match_parent"
+          android:id="@+id/count"
+          android:typeface="monospace"
+          android:textSize="14sp"
+          android:textColor="@android:color/white"
+          android:text="####"
+          android:layout_gravity="center">
+        </TextView>
+
+        <TextView
+          android:layout_height="wrap_content"
+          android:layout_width="match_parent"
+          android:id="@+id/tile"
+          android:typeface="monospace"
+          android:textSize="14sp"
+          android:textColor="@android:color/white"
+          android:text="##########"
+          android:layout_gravity="center">
+        </TextView>
+      </LinearLayout>
     </LinearLayout>
-    <!-- The left 2/3 of the block -->
 
     <TextView
-      android:layout_width="15dp"
-      android:layout_height="fill_parent"
-      android:id="@+id/top_level_shim">
+      android:layout_height="wrap_content"
+      android:layout_width="match_parent"
+      android:id="@+id/grid_ref"
+      android:typeface="monospace"
+      android:textSize="16sp"
+      android:textColor="@android:color/white"
+      android:text="####"
+      android:gravity="bottom|right">
     </TextView>
 
-    <!-- The right 2/3 of the block -->
-    <LinearLayout
-      android:orientation="vertical"
-      android:layout_gravity="right"
-      android:layout_width="100dp"
-      android:layout_height="wrap_content">
-
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/net_mcc"
-        android:typeface="monospace"
-        android:textSize="14sp"
-        android:textColor="@android:color/white"
-        android:text="####"
-        android:layout_gravity="center">
-      </TextView>
-
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/lac_mnc"
-        android:typeface="monospace"
-        android:textSize="14sp"
-        android:textColor="@android:color/white"
-        android:text="#####"
-        android:layout_gravity="center">
-      </TextView>
-
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/latitude"
-        android:typeface="monospace"
-        android:textSize="14sp"
-        android:text="-###.####"
-        android:layout_gravity="center">
-      </TextView>
-
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/longitude"
-        android:typeface="monospace"
-        android:textSize="14sp"
-        android:text="-###.####"
-        android:layout_gravity="center">
-      </TextView>
-
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/sat"
-        android:typeface="monospace"
-        android:textSize="14sp"
-        android:textColor="@android:color/white"
-        android:text="##-##-##"
-        android:layout_gravity="center">
-      </TextView>
-
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/age"
-        android:typeface="monospace"
-        android:textSize="14sp"
-        android:text="#####s"
-        android:layout_gravity="center">
-      </TextView>
-
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/da_offset"
-        android:typeface="monospace"
-        android:textSize="14sp"
-        android:textColor="@android:color/white"
-        android:text="D-A #####m"
-        android:layout_gravity="center">
-      </TextView>
-
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/count"
-        android:typeface="monospace"
-        android:textSize="14sp"
-        android:textColor="@android:color/white"
-        android:text="####"
-        android:layout_gravity="center">
-      </TextView>
-
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/tile"
-        android:typeface="monospace"
-        android:textSize="14sp"
-        android:textColor="@android:color/white"
-        android:text="##########"
-        android:layout_gravity="center">
-      </TextView>
-
-    </LinearLayout>
-    <!-- The right 2/3 of the block -->
-
-
   </LinearLayout>
+
   <!-- The block around the numeric table at the top -->
 
   <TextView
