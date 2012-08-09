@@ -261,7 +261,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
         Logger.lastLac, mnc_string);
     String netmccString = String.format("%5s %3s",
         Logger.lastNetworkTypeLong, mcc_string);
-    String dBmString = String.format("%ddBm", Logger.lastdBm);
+    String dBmString = String.format("%dasu", Logger.lastASU);
     satText.setText(satString);
 
     cidText.setText(cidString);
