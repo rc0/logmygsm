@@ -119,9 +119,26 @@ public class Map extends View {
 
   // Main drawing routines...
 
-  final static float LEN1 = 8.0f;
-  final static float LEN2 = 64.0f;
-  final static float LEN3 = 3.0f * LEN1;
+  private float len1, len2, len3;
+
+  private int button_half_line;
+  private int button_radius;
+  private int button_size;
+
+  private void set_lengths(int width, int height) {
+    int t;
+    if (width > height) {
+      t = width;
+    } else {
+      t = height;
+    }
+    button_half_line = (t>>4) - (t>>6); // approx 12 * (t/240)
+    button_radius = (t>>4); // approx 16 * (t/240)
+    button_size = (t>>2) - (t>>3) + (t>>5); // approx 40 * (t/240)
+    len1 = (float)(t>>5); // approx 8 * (t/240)
+    len2 = (float)(t>>2); // approx 64 * (t/240)
+    len3 = (float)((t+t+t)>>5); // approx 3*len1
+  }
 
   private void draw_crosshair(Canvas c, int w, int h) {
     if (estimated_pos != null) {
@@ -136,14 +153,14 @@ public class Map extends View {
         xc += (float) dx;
         yc += (float) dy;
       }
-      x0 = xc - (LEN1 + LEN2);
-      x1 = xc - (LEN1);
-      x2 = xc + (LEN1);
-      x3 = xc + (LEN1 + LEN2);
-      y0 = yc - (LEN1 + LEN2);
-      y1 = yc - (LEN1);
-      y2 = yc + (LEN1);
-      y3 = yc + (LEN1 + LEN2);
+      x0 = xc - (len1 + len2);
+      x1 = xc - (len1);
+      x2 = xc + (len1);
+      x3 = xc + (len1 + len2);
+      y0 = yc - (len1 + len2);
+      y1 = yc - (len1);
+      y2 = yc + (len1);
+      y3 = yc + (len1 + len2);
       c.drawLine(x0, yc, x1, yc, red_double_stroke_paint);
       c.drawLine(x2, yc, x3, yc, red_double_stroke_paint);
       c.drawLine(xc, y0, xc, y1, red_double_stroke_paint);
@@ -156,15 +173,15 @@ public class Map extends View {
     float y0, y1, y2, y3, yc;
     xc = (float)(w/2);
     yc = (float)(h/2);
-    x0 = xc - LEN3;
-    x1 = xc - LEN1;
-    x2 = xc + LEN1;
-    x3 = xc + LEN3;
-    y0 = yc - LEN3;
-    y1 = yc - LEN1;
-    y2 = yc + LEN1;
-    y3 = yc + LEN3;
-    c.drawCircle(xc, yc, LEN3, red_stroke_paint);
+    x0 = xc - len3;
+    x1 = xc - len1;
+    x2 = xc + len1;
+    x3 = xc + len3;
+    y0 = yc - len3;
+    y1 = yc - len1;
+    y2 = yc + len1;
+    y3 = yc + len3;
+    c.drawCircle(xc, yc, len3, red_stroke_paint);
     c.drawLine(x0, yc, x1, yc, red_paint);
     c.drawLine(x2, yc, x3, yc, red_paint);
     c.drawLine(xc, y0, xc, y1, red_paint);
@@ -175,21 +192,17 @@ public class Map extends View {
     if (Logger.validFix) {
       c.save();
       c.rotate((float) Logger.lastBearing, (w>>1), (h>>1));
-      float xl = (float)(w>>1) - (1.0f*LEN1);
+      float xl = (float)(w>>1) - (1.0f*len1);
       float xc = (float)(w>>1);
-      float xr = (float)(w>>1) + (1.0f*LEN1);
-      float yb = (float)(h>>1) - (LEN3 + (0.5f*LEN1));
-      float yt = (float)(h>>1) - (LEN3 + (3.5f*LEN1));
+      float xr = (float)(w>>1) + (1.0f*len1);
+      float yb = (float)(h>>1) - (len3 + (0.5f*len1));
+      float yt = (float)(h>>1) - (len3 + (3.5f*len1));
       c.drawLine(xc, yt, xl, yb, red_double_stroke_paint);
       c.drawLine(xc, yt, xr, yb, red_double_stroke_paint);
       c.drawLine(xl, yb, xr, yb, red_double_stroke_paint);
       c.restore();
     }
   }
-
-  private static final int button_half_line = 12;
-  private static final int button_radius = 16;
-  private static final int button_size = 40;
 
   private void draw_buttons(Canvas c, int w, int h) {
     int button_offset = button_radius + (button_radius >> 1);
@@ -215,6 +228,7 @@ public class Map extends View {
 
     TileStore.draw(canvas, width, height, zoom, map_source, display_pos);
 
+    set_lengths(width, height);
     draw_crosshair(canvas, width, height);
     draw_centre_circle(canvas, width, height);
     draw_buttons(canvas, width, height);
