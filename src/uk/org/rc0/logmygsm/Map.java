@@ -419,6 +419,17 @@ public class Map extends View {
     return false;
   }
 
+  private boolean check_zoom(float x, float y) {
+    if (y < button_size) {
+      if (x < button_size) {
+        return true;
+      } else if (x > (getWidth() - button_size)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private boolean try_recentre(float x, float y) {
     // Hit on the centre cross-hair region to re-centre the map on the GPS fix
     if ((y > ((getHeight() - button_size)>>1)) &&
@@ -477,7 +488,7 @@ public class Map extends View {
         break;
       case MotionEvent.ACTION_MOVE:
         // Prevent a drag starting on a zoom button etc, which would be bogus.
-        if (is_dragged) {
+        if (is_dragged && !check_zoom(x, y)) {
           float dx, dy;
           dx = x - mLastX;
           dy = y - mLastY;
