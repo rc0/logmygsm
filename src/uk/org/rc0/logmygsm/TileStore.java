@@ -108,11 +108,7 @@ class TileStore {
     }
   }
 
-  // Eventually, make this depend on the canvas size and hence on how much welly the phone has
-  // For a 400x240 screen we need 6 tiles for the whole screen or 4 for half the screen
-  // so this will deal with 3 whole pans
-  static private final int SIZE = 12;
-
+  static private int last_w, last_h;
   static private Entry [] front;
   static private int next;
   static private Entry [] back;
@@ -133,9 +129,21 @@ class TileStore {
 
   // -----------
 
+  static Entry [] new_cache() {
+    int ww = (last_w >> 8) + 2;
+    int hh = (last_h >> 8) + 2;
+    int tt = ww * hh;
+    // oversize by 50% to give a little pan space around edges
+    tt += (tt >> 1);
+    if (do_log) { Log.i(TAG, "New cache w=" + ww + " h=" + hh + " tt=" + tt); }
+    return new Entry[tt];
+  }
+
   static void init (Context the_app_context) {
     mContext = the_app_context;
-    front = new Entry[SIZE];
+    last_w = 240;
+    last_h = 400;
+    front = new_cache();
     next = 0;
     back = null;
 
@@ -304,9 +312,9 @@ class TileStore {
   }
 
   static private void check_full () {
-    if (next == SIZE) {
+    if (next == front.length) {
       back = front;
-      front = new Entry[SIZE];
+      front = new_cache();
       next = 0;
       if (do_log) { Log.i(TAG, "Flushed tile store"); }
     }
@@ -322,7 +330,7 @@ class TileStore {
     // Miss. Match in back?
     Entry back_match = null;
     if (back != null) {
-      for (int i=SIZE-1; i>=0; i--) {
+      for (int i=back.length-1; i>=0; i--) {
         if (back[i].isMatch(zoom, x, y, map_source)) {
           if (do_log) { Log.i(TAG, "Back match found at " + i); }
           back_match = back[i];
@@ -358,7 +366,7 @@ class TileStore {
   // Interface with map
 
   static void invalidate() {
-    front = new Entry[SIZE];
+    front = new_cache();
     next = 0;
     back = null;
     // Todo : drop all bar first entry in bg_queue ?
@@ -386,6 +394,10 @@ class TileStore {
     int ox, oy;
     ox = (tx << bm_log_size) - px;
     oy = (ty << bm_log_size) - py;
+
+    // These are used to size the new 'front' cache when it gets re-allocated
+    last_w = w;
+    last_h = h;
 
     // This is used in maintaining the cache so that the most recently used
     // entries are the ones hit first in the search.
