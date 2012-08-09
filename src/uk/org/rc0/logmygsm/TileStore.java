@@ -51,7 +51,7 @@ class TileStore {
   // -----------
   // State
 
-  private static class TilePos {
+  static class TilePos {
     int zoom;
     int x;
     int y;
@@ -62,6 +62,13 @@ class TileStore {
       x = _x;
       y = _y;
       map_source = _map_source;
+    }
+
+    TilePos(TilePos old) {
+      zoom = old.zoom;
+      x = old.x;
+      y = old.y;
+      map_source = old.map_source;
     }
 
     boolean isMatch(int _zoom, int _x, int _y, MapSource _map_source) {
@@ -438,7 +445,22 @@ class TileStore {
 
   static void trigger_fetch(Context context) {
     LinkedList<TilePos> targets;
+    targets = new LinkedList<TilePos> ();
+    for (int i=0; i<next; i++) {
+      if (front[i].is_dummy) {
+        targets.add(new TilePos(front[i]));
+      }
+    }
+    if (back != null) {
+      for (int i=0; i<back.length; i++) {
+        if (back[i].is_dummy) {
+          targets.add(new TilePos(back[i]));
+        }
+      }
+    }
 
+    Downloader.start_multiple_fetch(targets, context);
+    targets = null;
   }
 
 }

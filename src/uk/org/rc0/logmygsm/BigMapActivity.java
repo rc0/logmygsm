@@ -131,9 +131,10 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     super.onPause();
   }
 
-  private final int OPTION_CLEAR_TRAIL =  5;
-  private final int OPTION_DOWNLOAD    = 11;
-  private final int OPTION_SHARE       = 12;
+  private final int OPTION_CLEAR_TRAIL      =  5;
+  private final int OPTION_DOWNLOAD_SINGLE  = 11;
+  private final int OPTION_SHARE            = 12;
+  private final int OPTION_DOWNLOAD_MISSING = 13;
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -142,9 +143,11 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     for (MapSource source : MapSources.sources) {
       sub.add (Menu.NONE, source.get_code(), Menu.NONE, source.get_menu_name());
     }
-    MenuItem m_download =
-      menu.add (Menu.NONE, OPTION_DOWNLOAD, Menu.NONE, "Download tile");
+    SubMenu m_download =
+      menu.addSubMenu (0, 0, Menu.NONE, "Download tile(s)");
     m_download.setIcon(android.R.drawable.ic_menu_view);
+    m_download.add (Menu.NONE, OPTION_DOWNLOAD_SINGLE, Menu.NONE, "Central tile");
+    m_download.add (Menu.NONE, OPTION_DOWNLOAD_MISSING, Menu.NONE, "Recent missing");
 
     MenuItem m_share =
       menu.add (Menu.NONE, OPTION_SHARE,  Menu.NONE, "Share grid ref");
@@ -163,8 +166,11 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
         case OPTION_CLEAR_TRAIL:
           mMap.clear_trail();
           return true;
-        case OPTION_DOWNLOAD:
+        case OPTION_DOWNLOAD_SINGLE:
           mMap.trigger_fetch(getApplicationContext());
+          return true;
+        case OPTION_DOWNLOAD_MISSING:
+          TileStore.trigger_fetch(getApplicationContext());
           return true;
         case OPTION_SHARE:
           mMap.share_grid_ref(this);

@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.LinkedList;
 
 class Downloader {
 
@@ -106,22 +107,55 @@ class Downloader {
     }
   }
 
-  private static class DownloadThread extends Thread {
-    private String url;
-    private String dest;
+  private static class OneJob {
+    String url;
+    String dest;
 
-    DownloadThread(String _url, String _dest) {
-      url = new String(_url);
-      dest = new String(_dest);
+    OneJob(String _url, String _dest) {
+      url = _url;
+      dest = _dest;
+    }
+  }
+
+  private static class DownloadThread extends Thread {
+    private LinkedList<OneJob> jobs;
+
+    DownloadThread(LinkedList<OneJob> _jobs) {
+      jobs = _jobs;
       setPriority(Thread.MIN_PRIORITY);
     }
 
     @Override
     public void run () {
       boolean result;
-      result = download(url, dest);
+      result = true; // unused
+      while (jobs.size() > 0) {
+        OneJob job = jobs.removeFirst();
+        result = download(job.url, job.dest);
+      }
       mHandler.post (new DownloadResponse(result));
     }
+  }
+
+  static void start_multiple_fetch(LinkedList<TileStore.TilePos> targets, Context context) {
+    if (is_busy) {
+      Logger.announce(context, "Already downloading");
+      return;
+    }
+
+    LinkedList<OneJob> jobs;
+    jobs = new LinkedList<OneJob> ();
+
+    while (targets.size() > 0) {
+      TileStore.TilePos target = targets.removeFirst();
+      String url = target.map_source.get_download_url(target.zoom, target.x, target.y);
+      String dest = target.map_source.get_tile_path(target.zoom, target.x, target.y);
+      if (url != null) {
+        jobs.add(new OneJob(url, dest));
+      }
+    }
+    is_busy = true;
+    (new DownloadThread(jobs)).start();
   }
 
   static void start_fetch_single(int zoom, MapSource map_source, int tile_x, int tile_y, Context context) {
@@ -130,9 +164,12 @@ class Downloader {
     // Eventually, could have a queue of tiles.
 
     if (is_busy) {
-      Logger.announce(context, "Already fetching a tile");
+      Logger.announce(context, "Already downloading");
       return;
     }
+
+    LinkedList<OneJob> jobs;
+    jobs = new LinkedList<OneJob> ();
 
     String url = map_source.get_download_url(zoom, tile_x, tile_y);
     if (url == null) {
@@ -142,8 +179,10 @@ class Downloader {
 
     String dest = map_source.get_tile_path(zoom, tile_x, tile_y);
 
+    jobs.add(new OneJob(url, dest));
+
     is_busy = true;
-    (new DownloadThread(url, dest)).start();
+    (new DownloadThread(jobs)).start();
   }
 
 }
