@@ -358,7 +358,7 @@ public class Map extends View {
 
   void trigger_fetch(Context context) {
     if (display_pos != null) {
-      Downloader.start_fetch(zoom, map_source,
+      Downloader.start_fetch_single(zoom, map_source,
           display_pos.X >> tile_shift,
           display_pos.Y >> tile_shift,
           context);

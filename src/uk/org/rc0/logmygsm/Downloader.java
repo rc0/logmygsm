@@ -124,7 +124,7 @@ class Downloader {
     }
   }
 
-  static void start_fetch(int zoom, MapSource map_source, int tile_x, int tile_y, Context context) {
+  static void start_fetch_single(int zoom, MapSource map_source, int tile_x, int tile_y, Context context) {
     // If already fetching, post a "busy" toast
     // otherwise start the download in a thread.
     // Eventually, could have a queue of tiles.

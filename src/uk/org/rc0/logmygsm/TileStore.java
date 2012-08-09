@@ -25,6 +25,7 @@
 
 package uk.org.rc0.logmygsm;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -81,17 +82,19 @@ class TileStore {
     int tile_shift;
     int cycle;
     private Trail.Upto upto;
+    boolean is_dummy;
     Bitmap b;
 
     Bitmap getBitmap() {
       return b;
     }
 
-    Entry(int _zoom, MapSource _map_source, int _x, int _y, Bitmap _b) {
+    Entry(int _zoom, MapSource _map_source, int _x, int _y, Bitmap _b, boolean _is_dummy) {
       super(_zoom, _x, _y, _map_source);
       pixel_shift = (Merc28.shift - (zoom + bm_log_size));
       tile_shift = (Merc28.shift - zoom);
       b = _b;
+      is_dummy = _is_dummy;
       upto = new Trail.Upto ();
       touch();
     }
@@ -178,16 +181,18 @@ class TileStore {
 
   private static class TilingResponse implements Runnable {
     private Bitmap bm;
+    private boolean is_dummy;
 
-    public TilingResponse(Bitmap _bm) {
+    public TilingResponse(Bitmap _bm, boolean _is_dummy) {
       bm = _bm;
+      is_dummy = _is_dummy;
     }
 
     @Override
     public void run() {
       check_full();
       TilePos tp = bg_queue.remove(); // head of list
-      Entry e = make_entry(tp.zoom, tp.map_source, tp.x, tp.y, bm);
+      Entry e = make_entry(tp.zoom, tp.map_source, tp.x, tp.y, bm, is_dummy);
       if (do_log) { Log.i(TAG, "Putting load response at position " + next); }
       front[next++] = e;
 
@@ -219,9 +224,9 @@ class TileStore {
 
     @Override
     public void run () {
-      Bitmap bm = render_bitmap(zoom, map_source, x, y);
-      mHandler.post (new TilingResponse(bm));
-      bm = null;
+      TilingResponse resp = render_bitmap(zoom, map_source, x, y);
+      mHandler.post (resp);
+      resp = null;
     }
   }
 
@@ -266,11 +271,12 @@ class TileStore {
     }
   }
 
-  static private Bitmap render_bitmap(int zoom, MapSource map_source, int x, int y) {
+  static private TilingResponse render_bitmap(int zoom, MapSource map_source, int x, int y) {
     String filename = null;
     filename = map_source.get_tile_path(zoom, x, y);
     File file = new File(filename);
     Bitmap bm = null;
+    boolean is_dummy = false;
     try {
       if (file.exists()) {
         Bitmap temp_bm = BitmapFactory.decodeFile(filename);
@@ -280,14 +286,14 @@ class TileStore {
       // to deal with corrupt tile files and such horrors
     }
     if (bm == null) {
-      // TODO : could attempt a load off the network at this point?
       bm = Bitmap.createBitmap(bm_size, bm_size, Bitmap.Config.ARGB_8888);
       Canvas my_canv = new Canvas(bm);
       my_canv.drawRect(0, 0, bm_size, bm_size, gray_paint);
+      is_dummy = true;
     }
     // TODO : Draw trail points into the bitmap
     render_old_trail(bm, zoom, x, y);
-    return bm;
+    return new TilingResponse(bm, is_dummy);
   }
 
   static private void start_bg_load(int zoom, int x, int y, MapSource map_source) {
@@ -307,8 +313,8 @@ class TileStore {
     }
   }
 
-  static private Entry make_entry(int zoom, MapSource map_source, int x, int y, Bitmap b) {
-    return new Entry(zoom, map_source, x, y, b);
+  static private Entry make_entry(int zoom, MapSource map_source, int x, int y, Bitmap b, boolean is_dummy) {
+    return new Entry(zoom, map_source, x, y, b, is_dummy);
   }
 
   static private void check_full () {
@@ -427,6 +433,11 @@ class TileStore {
     }
 
     ripple();
+
+  }
+
+  static void trigger_fetch(Context context) {
+    LinkedList<TilePos> targets;
 
   }
 
