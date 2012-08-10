@@ -33,6 +33,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.os.Debug;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -100,6 +101,8 @@ public class MainActivity extends Activity implements Map.PositionListener {
 
     @Override
     public void onResume () {
+      long current_time = (System.currentTimeMillis() / 1000);
+      Debug.startMethodTracing("lmg_" + current_time);
       Logger.stop_tracing = false;
       startService(new Intent(this, Logger.class));
 
@@ -127,6 +130,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
       // Dump the old tiles that haven't been rescued yet - avoid the most gratuituous memory wastage
       TileStore.semi_invalidate();
       super.onPause();
+      Debug.stopMethodTracing();
     }
 
   private void updateCidHistory(long current_time) {
