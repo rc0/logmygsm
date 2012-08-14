@@ -61,6 +61,8 @@ public class MainActivity extends Activity implements Map.PositionListener {
 
   private Map mMap;
 
+  private MenuItem mTowerlineToggle;
+
   private static final String PREFS_FILE = "prefs.txt";
   static final private String TAG = "MainActivity";
 
@@ -325,6 +327,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
   private final int OPTION_DOWNLOAD_SINGLE  = 11;
   private final int OPTION_SHARE            = 12;
   private final int OPTION_DOWNLOAD_MISSING = 13;
+  private final int OPTION_TOGGLE_TOWERLINE = 15;
 
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -334,22 +337,30 @@ public class MainActivity extends Activity implements Map.PositionListener {
       for (MapSource source : MapSources.sources) {
         sub.add (Menu.NONE, source.get_code(), Menu.NONE, source.get_menu_name());
       }
+      mTowerlineToggle = sub.add (Menu.NONE, OPTION_TOGGLE_TOWERLINE, Menu.NONE, "Show towerline");
+      mTowerlineToggle.setCheckable(true);
       MenuItem m_waypoints =
-        menu.add (Menu.NONE, OPTION_BIG_MAP, Menu.NONE, "Waypoint map");
+        menu.add (Menu.NONE, OPTION_BIG_MAP, Menu.NONE, "Waypoints");
       m_waypoints.setIcon(android.R.drawable.ic_menu_myplaces);
       SubMenu m_download =
-        menu.addSubMenu (0, 0, Menu.NONE, "Download tile(s)");
+        menu.addSubMenu (0, 0, Menu.NONE, "Download(s)");
       m_download.setIcon(android.R.drawable.ic_menu_view);
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_SINGLE, Menu.NONE, "Central tile");
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_MISSING, Menu.NONE, "Recent missing");
 
       // Bottom row
       MenuItem m_share =
-        menu.add (Menu.NONE, OPTION_SHARE,  Menu.NONE, "Share grid ref");
+        menu.add (Menu.NONE, OPTION_SHARE,  Menu.NONE, "Share OS ref");
       m_share.setIcon(android.R.drawable.ic_menu_share);
       MenuItem m_exit =
         menu.add (Menu.NONE, OPTION_EXIT,    Menu.NONE, "Exit");
       m_exit.setIcon(android.R.drawable.ic_lock_power_off);
+      return true;
+    }
+
+  @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+      mTowerlineToggle.setChecked(TowerLine.is_active());
       return true;
     }
 
@@ -375,6 +386,9 @@ public class MainActivity extends Activity implements Map.PositionListener {
         case OPTION_BIG_MAP:
           Intent intent = new Intent(this, BigMapActivity.class);
           startActivity(intent);
+          return true;
+        case OPTION_TOGGLE_TOWERLINE:
+          TowerLine.toggle_active();
           return true;
         default:
           MapSource source;

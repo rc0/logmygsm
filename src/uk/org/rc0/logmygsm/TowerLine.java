@@ -49,9 +49,13 @@ class TowerLine {
 
   static private Merc28 tmp_pos;
 
+  static private boolean mActive;
+
   static void init() {
     lut = new HashMap<String,Merc28>();
     tmp_pos = new Merc28(0,0);
+
+    mActive = false;
 
     line_paint = new Paint();
     line_paint.setStyle(Paint.Style.STROKE);
@@ -118,6 +122,14 @@ class TowerLine {
     } else {
       return false;
     }
+  }
+
+  static boolean is_active() {
+    return mActive;
+  }
+
+  static void toggle_active() {
+    mActive = mActive ? false : true;
   }
 
   static void draw_line(Canvas c, int w, int h, int pixel_shift, Merc28 display_pos) {

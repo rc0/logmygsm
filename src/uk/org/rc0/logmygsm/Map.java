@@ -234,7 +234,7 @@ public class Map extends View {
     draw_buttons(canvas, width, height);
     draw_bearing(canvas, width, height);
     Logger.mMarks.draw(canvas, display_pos, width, height, pixel_shift);
-    if (map_source.want_tower_line()) {
+    if (TowerLine.is_active()) {
       TowerLine.draw_line(canvas, width, height, pixel_shift, display_pos);
     }
   }

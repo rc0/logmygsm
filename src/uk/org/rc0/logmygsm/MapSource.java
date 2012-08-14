@@ -33,7 +33,6 @@ class MapSource {
   private String menu_name = "";
   private String path_segment = "";
   private int code;
-  private boolean tower_line;
   final private String path_start = "/sdcard/Maverick/tiles";
 
   String get_menu_name() {
@@ -54,15 +53,10 @@ class MapSource {
     return code;
   }
 
-  boolean want_tower_line() {
-    return tower_line;
-  }
-
-  MapSource(String _menu_name, String _path_segment, int _code, boolean _want_tower_line) {
+  MapSource(String _menu_name, String _path_segment, int _code) {
     menu_name = _menu_name;
     path_segment = _path_segment;
     code = _code;
-    tower_line = _want_tower_line;
   }
 
 }
@@ -71,8 +65,8 @@ class MapSource {
 
 class MapSource_Mapnik extends MapSource {
 
-  MapSource_Mapnik(String _menu_name, String _path_segment, int _code, boolean _want_tower_line) {
-    super(_menu_name, _path_segment, _code, _want_tower_line);
+  MapSource_Mapnik(String _menu_name, String _path_segment, int _code) {
+    super(_menu_name, _path_segment, _code);
   }
 
   String get_download_url(int zoom, int x, int y) {
@@ -85,8 +79,8 @@ class MapSource_Mapnik extends MapSource {
 
 class MapSource_Cycle extends MapSource {
 
-  MapSource_Cycle(String _menu_name, String _path_segment, int _code, boolean _want_tower_line) {
-    super(_menu_name, _path_segment, _code, _want_tower_line);
+  MapSource_Cycle(String _menu_name, String _path_segment, int _code) {
+    super(_menu_name, _path_segment, _code);
   }
 
   String get_download_url(int zoom, int x, int y) {
@@ -99,8 +93,8 @@ class MapSource_Cycle extends MapSource {
 
 class MapSource_OS extends MapSource {
 
-  MapSource_OS(String _menu_name, String _path_segment, int _code, boolean _want_tower_line) {
-    super(_menu_name, _path_segment, _code, _want_tower_line);
+  MapSource_OS(String _menu_name, String _path_segment, int _code) {
+    super(_menu_name, _path_segment, _code);
   }
 
   static final char [] qk03 = "0123" . toCharArray();
@@ -132,13 +126,13 @@ class MapSources {
   static final int MAP_OPEN_CYCLE = 104;
 
   static final MapSource [] sources = {
-    new MapSource("2G coverage", "Custom 2", MAP_2G, true),
-    new MapSource("3G coverage", "Custom 3", MAP_3G, true),
-    new MapSource("Visited", "logmygsm_todo", MAP_TODO, true),
-    new MapSource("3G data age", "logmygsm_age3g", MAP_AGE3G, true),
-    new MapSource_OS("Ordnance Survey", "Ordnance Survey Explorer Maps (UK)", MAP_OS, false),
-    new MapSource_Mapnik("Mapnik (OSM)", "mapnik", MAP_MAPNIK, false),
-    new MapSource_Cycle("Open Cycle Map", "OSM Cycle Map", MAP_OPEN_CYCLE, false),
+    new MapSource("2G coverage", "Custom 2", MAP_2G),
+    new MapSource("3G coverage", "Custom 3", MAP_3G),
+    new MapSource("Visited", "logmygsm_todo", MAP_TODO),
+    new MapSource("3G data age", "logmygsm_age3g", MAP_AGE3G),
+    new MapSource_OS("Ordnance Survey", "Ordnance Survey Explorer Maps (UK)", MAP_OS),
+    new MapSource_Mapnik("Mapnik (OSM)", "mapnik", MAP_MAPNIK),
+    new MapSource_Cycle("Open Cycle Map", "OSM Cycle Map", MAP_OPEN_CYCLE),
   };
 
   static MapSource lookup(int code) {
@@ -153,7 +147,6 @@ class MapSources {
   static MapSource get_default() {
     return lookup(MAP_2G);
   }
-
 
 }
 
