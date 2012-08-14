@@ -50,6 +50,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
   private Button mDeleteAllButton;
   private TextView summaryText;
   private TextView gridRefText;
+  private MenuItem mTowerlineToggle;
 
   private static final String PREFS_FILE = "prefs2.txt";
 
@@ -135,6 +136,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
   private final int OPTION_DOWNLOAD_SINGLE  = 11;
   private final int OPTION_SHARE            = 12;
   private final int OPTION_DOWNLOAD_MISSING = 13;
+  private final int OPTION_TOGGLE_TOWERLINE = 15;
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -143,6 +145,8 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     for (MapSource source : MapSources.sources) {
       sub.add (Menu.NONE, source.get_code(), Menu.NONE, source.get_menu_name());
     }
+    mTowerlineToggle = sub.add (Menu.NONE, OPTION_TOGGLE_TOWERLINE, Menu.NONE, "Show towerline");
+    mTowerlineToggle.setCheckable(true);
     SubMenu m_download =
       menu.addSubMenu (0, 0, Menu.NONE, "Download tile(s)");
     m_download.setIcon(android.R.drawable.ic_menu_view);
@@ -160,21 +164,30 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
   }
 
   @Override
+  public boolean onPrepareOptionsMenu(Menu menu) {
+    mTowerlineToggle.setChecked(TowerLine.is_active());
+    return true;
+  }
+
+  @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     int code = item.getItemId();
     switch (code) {
-        case OPTION_CLEAR_TRAIL:
-          mMap.clear_trail();
-          return true;
-        case OPTION_DOWNLOAD_SINGLE:
-          mMap.trigger_fetch(getApplicationContext());
-          return true;
-        case OPTION_DOWNLOAD_MISSING:
-          TileStore.trigger_fetch(getApplicationContext());
-          return true;
-        case OPTION_SHARE:
-          mMap.share_grid_ref(this);
-          return true;
+      case OPTION_CLEAR_TRAIL:
+        mMap.clear_trail();
+        return true;
+      case OPTION_DOWNLOAD_SINGLE:
+        mMap.trigger_fetch(getApplicationContext());
+        return true;
+      case OPTION_DOWNLOAD_MISSING:
+        TileStore.trigger_fetch(getApplicationContext());
+        return true;
+      case OPTION_SHARE:
+        mMap.share_grid_ref(this);
+        return true;
+      case OPTION_TOGGLE_TOWERLINE:
+        TowerLine.toggle_active();
+        return true;
       default:
         MapSource source;
         source = MapSources.lookup(code);
