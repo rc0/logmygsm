@@ -114,7 +114,8 @@ public class MainActivity extends Activity implements Map.PositionListener {
       myGPSReceiver = new GPSUpdateReceiver();
       registerReceiver(myGPSReceiver, filter);
 
-      updateDisplay();
+      updateCellDisplay();
+      updateGPSDisplay();
       mMap.update_map();
       super.onResume();
     }
@@ -205,7 +206,61 @@ public class MainActivity extends Activity implements Map.PositionListener {
     position_update();
   }
 
-  private void updateDisplay() {
+  private void updateCellDisplay() {
+    long current_time = System.currentTimeMillis();
+    String cidString = String.format("%d",
+        Logger.lastCid);
+    cidText.setText(cidString);
+    switch (Logger.lastState) {
+      case 'A':
+        if (bad_cid(Logger.lastCid)) {
+          cidText.setTextColor(Color.RED);
+        } else if (odd_cid(Logger.lastCid)) {
+          cidText.setTextColor(Color.YELLOW);
+        } else {
+          cidText.setTextColor(Color.WHITE);
+        }
+        break;
+      default:
+        cidText.setTextColor(Color.RED);
+        break;
+    }
+
+    String mnc_string;
+    String mcc_string;
+    if ((Logger.lastMccMnc != null) &&
+        (Logger.lastMccMnc.length() == 5)) {
+      mnc_string = Logger.lastMccMnc.substring(3, 5);
+      mcc_string = Logger.lastMccMnc.substring(0, 3);
+    } else {
+      mnc_string = "";
+      mcc_string = "";
+    }
+
+    String lacmncString = String.format("%5d %3s",
+        Logger.lastLac, mnc_string);
+    String netmccString = String.format("%5s %3s",
+        Logger.lastNetworkTypeLong, mcc_string);
+    String dBmString = String.format("%dasu", Logger.lastASU);
+    lacmncText.setText(lacmncString);
+    netmccText.setText(netmccString);
+    dBmText.setText(dBmString);
+
+    String countString;
+    // STRICTLY, this is anomalous because the height comes from the GPS side.
+    // But it's so approximate that it can't be used for accurate purposes anyway.
+    if (Logger.validFix) {
+      countString = String.format("%dp %dm", Logger.nReadings, 
+          (int)Merc28.odn(Logger.lastAlt, Logger.lastLat, Logger.lastLon));
+    } else {
+      countString = String.format("%dp GPS?", Logger.nReadings);
+    }
+    countText.setText(countString);
+
+    updateCidHistory(current_time);
+  }
+
+  private void updateGPSDisplay() {
     long current_time = System.currentTimeMillis();
     if (Logger.validFix) {
       long age = (500 + current_time - Logger.lastFixMillis) / 1000;
@@ -239,63 +294,13 @@ public class MainActivity extends Activity implements Map.PositionListener {
       accText.setTextColor(Color.RED);
       ageText.setTextColor(Color.RED);
     }
-
     position_update();
-
     String satString = String.format("%d/%d/%d/%d",
         Logger.last_fix_sats,
         Logger.last_ephem_sats, Logger.last_alman_sats,
         Logger.last_n_sats);
-    String cidString = String.format("%d",
-        Logger.lastCid);
-
-    String mnc_string;
-    String mcc_string;
-    if ((Logger.lastMccMnc != null) &&
-        (Logger.lastMccMnc.length() == 5)) {
-      mnc_string = Logger.lastMccMnc.substring(3, 5);
-      mcc_string = Logger.lastMccMnc.substring(0, 3);
-    } else {
-      mnc_string = "";
-      mcc_string = "";
-    }
-    String lacmncString = String.format("%5d %3s",
-        Logger.lastLac, mnc_string);
-    String netmccString = String.format("%5s %3s",
-        Logger.lastNetworkTypeLong, mcc_string);
-    String dBmString = String.format("%dasu", Logger.lastASU);
     satText.setText(satString);
 
-    cidText.setText(cidString);
-    switch (Logger.lastState) {
-      case 'A':
-        if (bad_cid(Logger.lastCid)) {
-          cidText.setTextColor(Color.RED);
-        } else if (odd_cid(Logger.lastCid)) {
-          cidText.setTextColor(Color.YELLOW);
-        } else {
-          cidText.setTextColor(Color.WHITE);
-        }
-        break;
-      default:
-        cidText.setTextColor(Color.RED);
-        break;
-    }
-
-    lacmncText.setText(lacmncString);
-    netmccText.setText(netmccString);
-    dBmText.setText(dBmString);
-
-    String countString;
-    if (Logger.validFix) {
-      countString = String.format("%dp %dm", Logger.nReadings, 
-          (int)Merc28.odn(Logger.lastAlt, Logger.lastLat, Logger.lastLon));
-    } else {
-      countString = String.format("%dp GPS?", Logger.nReadings);
-    }
-    countText.setText(countString);
-
-    updateCidHistory(current_time);
   }
 
   // --------------------------------------------------------------------------
@@ -305,16 +310,20 @@ public class MainActivity extends Activity implements Map.PositionListener {
     @Override
     public void onReceive(Context context, Intent intent) {
       // update the map in case the current cell has changed.
-      mMap.update_map();
-      updateDisplay();
+      updateCellDisplay();
+      if (TowerLine.is_active()) {
+        // The map only depends on the RF behaviour if there has been a handoff
+        // when the tower-line is shown
+        mMap.update_map();
+      }
     }
   }
 
   public class GPSUpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+      updateGPSDisplay();
       mMap.update_map();
-      updateDisplay();
     }
   }
 
