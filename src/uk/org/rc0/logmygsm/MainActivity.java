@@ -33,6 +33,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -83,6 +84,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
       countText = (TextView) findViewById(R.id.count);
       tileText = (TextView) findViewById(R.id.tile);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
+      cidHistoryText.setMovementMethod(new ScrollingMovementMethod());
       daOffsetText = (TextView) findViewById(R.id.da_offset);
       gridRefText = (TextView) findViewById(R.id.grid_ref);
       mMap = (Map) findViewById(R.id.map);

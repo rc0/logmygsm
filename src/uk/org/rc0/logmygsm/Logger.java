@@ -124,7 +124,7 @@ public class Logger extends Service {
   };
 
 
-  static final int MAX_RECENT = 8;
+  static final int MAX_RECENT = 32;
   static RecentCID[] recent_cids;
 
   // This is only called once for the service lifetime
@@ -229,33 +229,36 @@ public class Logger extends Service {
   // --------------------------------------------------------------------------------
 
   private void logCellHistory() {
-    int match = -1;
+    int pos = -1;
+    RecentCID match = null;
+
     for (int i=0; i<MAX_RECENT; i++) {
       if (recent_cids[i].cid == lastCid) {
-        match = i;
+        pos = i;
+        match = recent_cids[i];
         break;
       }
     }
-    if (match == -1) {
-      match = MAX_RECENT - 1;
+    if (pos == -1) {
+      pos = MAX_RECENT - 1;
     }
-    if (match > 0) {
-      for (int i=match; i>0; i--) {
-        recent_cids[i].cid = recent_cids[i-1].cid;
-        recent_cids[i].network_type = recent_cids[i-1].network_type;
-        recent_cids[i].state = recent_cids[i-1].state;
-        recent_cids[i].dbm = recent_cids[i-1].dbm;
-        recent_cids[i].handoff = recent_cids[i-1].handoff;
-        recent_cids[i].lastMillis = recent_cids[i-1].lastMillis;
+    if (pos > 0) {
+      for (int i=pos; i>0; i--) {
+        recent_cids[i] = recent_cids[i-1];
       }
     }
-    // If match==0 we just overwrite the newest record anyway
-    recent_cids[0].cid = lastCid;
-    recent_cids[0].network_type = lastNetworkType;
-    recent_cids[0].state = lastState;
-    recent_cids[0].dbm = lastdBm;
-    recent_cids[0].handoff = nHandoffs;
-    recent_cids[0].lastMillis = System.currentTimeMillis();
+    // If pos==0 we just overwrite the newest record anyway
+    if (match != null) {
+      recent_cids[0] = match;
+    } else {
+      recent_cids[0] = new RecentCID();
+      recent_cids[0].cid = lastCid;
+      recent_cids[0].network_type = lastNetworkType;
+      recent_cids[0].state = lastState;
+      recent_cids[0].dbm = lastdBm;
+      recent_cids[0].handoff = nHandoffs;
+      recent_cids[0].lastMillis = System.currentTimeMillis();
+    }
   }
 
   // --------------------------------------------------------------------------------
