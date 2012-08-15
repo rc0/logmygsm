@@ -254,11 +254,11 @@ public class Logger extends Service {
       recent_cids[0] = new RecentCID();
       recent_cids[0].cid = lastCid;
       recent_cids[0].network_type = lastNetworkType;
-      recent_cids[0].state = lastState;
-      recent_cids[0].dbm = lastdBm;
-      recent_cids[0].handoff = nHandoffs;
-      recent_cids[0].lastMillis = System.currentTimeMillis();
     }
+    recent_cids[0].state = lastState;
+    recent_cids[0].dbm = lastdBm;
+    recent_cids[0].handoff = nHandoffs;
+    recent_cids[0].lastMillis = System.currentTimeMillis();
   }
 
   // --------------------------------------------------------------------------------
