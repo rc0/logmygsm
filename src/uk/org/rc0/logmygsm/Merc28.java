@@ -47,7 +47,7 @@ class Merc28 {
     double x, yy, y, XX, YY;
     x = Math.toRadians(lon);
     yy = Math.toRadians(lat);
-    y = Math.log(Math.tan(yy) + 1.0/Math.cos(yy));
+    y = Math.log(Math.tan(0.5*yy + 0.25*Math.PI));
     XX = 0.5 * (1.0 + x/Math.PI);
     YY = 0.5 * (1.0 - y/Math.PI);
     X = (int) Math.floor(XX * scale);
