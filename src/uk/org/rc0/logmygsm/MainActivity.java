@@ -248,17 +248,6 @@ public class MainActivity extends Activity implements Map.PositionListener {
     netmccText.setText(netmccString);
     dBmText.setText(dBmString);
 
-    String countString;
-    // STRICTLY, this is anomalous because the height comes from the GPS side.
-    // But it's so approximate that it can't be used for accurate purposes anyway.
-    if (Logger.validFix) {
-      countString = String.format("%dp %dm", Logger.nReadings, 
-          (int)Merc28.odn(Logger.lastAlt, Logger.lastLat, Logger.lastLon));
-    } else {
-      countString = String.format("%dp GPS?", Logger.nReadings);
-    }
-    countText.setText(countString);
-
     updateCidHistory(current_time);
   }
 
@@ -303,6 +292,15 @@ public class MainActivity extends Activity implements Map.PositionListener {
         Logger.last_n_sats);
     satText.setText(satString);
 
+    String countString;
+    // But it's so approximate that it can't be used for accurate purposes anyway.
+    if (Logger.validFix) {
+      countString = String.format("%dp %dm", Logger.nReadings, 
+          (int)Merc28.odn(Logger.lastAlt, Logger.lastLat, Logger.lastLon));
+    } else {
+      countString = String.format("%dp GPS?", Logger.nReadings);
+    }
+    countText.setText(countString);
   }
 
   // --------------------------------------------------------------------------
