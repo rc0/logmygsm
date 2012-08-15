@@ -222,7 +222,6 @@ public class Map extends View {
   }
 
   private void redraw_map(Canvas canvas) {
-    // Decide if we have to rebuild the tile22 cache
     int width = getWidth();
     int height = getHeight();
 
@@ -260,14 +259,6 @@ public class Map extends View {
     map_source = which;
     invalidate();
   }
-
-  // Save/restore state in bundle
-  //
-
-  static final String ZOOM_KEY      = "LogMyGsm_Map_Zoom";
-  static final String LAST_X_KEY    = "LogMyGsm_Last_X";
-  static final String LAST_Y_KEY    = "LogMyGsm_Last_Y";
-  static final String WHICH_MAP_KEY = "LogMyGsm_Which_Map";
 
   private void setZoom(int z) {
     //tile_cache.setZoom(z);
