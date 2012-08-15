@@ -84,6 +84,10 @@ class Merc28 {
     return zd;
   }
 
+  // See
+  // http://rc0.posterous.com/approximating-os-grid-references
+  // which explains the approximations that follow
+
   // Convert GPS altitude into estimated height above mean sea level
   static double odn(double alt, double lat, double lon) {
     double P, Q;
