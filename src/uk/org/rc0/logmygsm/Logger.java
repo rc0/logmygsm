@@ -318,7 +318,8 @@ public class Logger extends Service {
     long age = System.currentTimeMillis() - lastFixMillis;
     if ((lastSpeed > SPEED_THRESHOLD) && (age > 2000)) {
       validFix = false;
-      // No need to callback to UI as we're in a callback path anyway.
+      Intent intent = new Intent(UPDATE_GPS);
+      sendBroadcast(intent);
     }
   }
 
