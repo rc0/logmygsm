@@ -237,7 +237,9 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     @Override
     public void onReceive(Context context, Intent intent) {
       // update the map in case the current cell has changed.
-      mMap.update_map();
+      if (TowerLine.is_active()) {
+        mMap.update_map();
+      }
       updateDisplay();
     }
   }
