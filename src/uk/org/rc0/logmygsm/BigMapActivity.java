@@ -129,6 +129,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     // It seems wasteful to do this here, but there is no other safe opportunity to do so -
     // in effect we are 'committing' the user's changes at this point.
     mMap.save_state_to_file(PREFS_FILE);
+    TileStore.sleep_invalidate();
     super.onPause();
   }
 

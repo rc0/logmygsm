@@ -379,13 +379,17 @@ class TileStore {
   // Interface with map
 
   static void invalidate() {
+    // Get rid of cache when changes occur in tiles - to force reload
     front = new_cache();
     next = 0;
     back = null;
     // Todo : drop all bar first entry in bg_queue ?
   }
 
-  static void semi_invalidate() {
+  static void sleep_invalidate() {
+    // Get rid of cache to free up memory when activities exit
+    front = new_cache();
+    next = 0;
     back = null;
     System.gc();
   }

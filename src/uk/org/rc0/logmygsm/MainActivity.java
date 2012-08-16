@@ -130,7 +130,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
       // in effect we are 'committing' the user's changes at this point.
       mMap.save_state_to_file(PREFS_FILE);
       // Dump the old tiles that haven't been rescued yet - avoid the most gratuituous memory wastage
-      TileStore.semi_invalidate();
+      TileStore.sleep_invalidate();
       super.onPause();
     }
 
