@@ -127,11 +127,7 @@ public class Map extends View {
 
   private void set_lengths(int width, int height) {
     int t;
-    if (width > height) {
-      t = width;
-    } else {
-      t = height;
-    }
+    t = (width + height) >> 1;
     button_half_line = (t>>4) - (t>>6); // approx 12 * (t/240)
     button_radius = (t>>4); // approx 16 * (t/240)
     button_size = (t>>2) - (t>>3) + (t>>5); // approx 40 * (t/240)
