@@ -205,22 +205,26 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
 
     String summaryString;
     if (Logger.validFix) {
-      summaryString = String.format("%9d %2d %3dm %s",
+      summaryString = String.format("%9d %2dasu %3dm %s",
         Logger.lastCid,
         Logger.lastASU,
         Logger.lastAcc,
         mMap.current_tile_string()
       );
     } else {
-      summaryString = String.format("%9d %2d  GPS? %s",
+      summaryString = String.format("%9d %2dasu  GPS? %s",
         Logger.lastCid,
         Logger.lastASU,
         mMap.current_tile_string()
       );
     }
 
-    summaryText.setText(summaryString);
-    gridRefText.setText(mMap.current_grid_ref());
+    if (gridRefText != null) {
+      summaryText.setText(summaryString);
+      gridRefText.setText(mMap.current_grid_ref());
+    } else {
+      summaryText.setText(summaryString + " " + mMap.current_grid_ref());
+    }
   }
 
   public void display_position_update() {
