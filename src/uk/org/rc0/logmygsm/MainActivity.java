@@ -48,6 +48,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
   private TextView ageText;
   private TextView satText;
   private TextView cidText;
+  private TextView twrText;
   private TextView netlacmncText;
   private TextView dBmText;
   private TextView daOffsetText;
@@ -77,6 +78,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
       ageText = (TextView) findViewById(R.id.age);
       satText = (TextView) findViewById(R.id.sat);
       cidText = (TextView) findViewById(R.id.cid);
+      twrText = (TextView) findViewById(R.id.twr);
       netlacmncText = (TextView) findViewById(R.id.net_lac_mnc);
       dBmText = (TextView) findViewById(R.id.dBm);
       countText = (TextView) findViewById(R.id.count);
@@ -178,6 +180,34 @@ public class MainActivity extends Activity implements Map.PositionListener {
     }
   }
 
+  private void tower_update() {
+    Map.TowerOffset tow_off = mMap.get_tower_offset();
+    if (tow_off.known == false) {
+      twrText.setText("TOWER?");
+    } else {
+      String bearing;
+      String distance;
+      if (Logger.validFix && !tow_off.dragged) {
+        int angle = (int) tow_off.bearing - Logger.lastBearing;
+        if (angle < -180) { angle += 360; }
+        if (angle >= 180) { angle -= 360; }
+        if (angle < 0) {
+          bearing = String.format("%03d\u00B0L", -angle);
+        } else {
+          bearing = String.format("%03d\u00B0R",  angle);
+        }
+      } else {
+        bearing = String.format("%03d\u00B0", (int) tow_off.bearing);
+      }
+      if (tow_off.metres < 1000.0) {
+        distance = String.format("%3dm", (int) tow_off.metres);
+      } else {
+        distance = String.format("%.1fkm", tow_off.metres * 0.001);
+      }
+      twrText.setText(distance + " " + bearing);
+    }
+  }
+
   private void position_update() {
     if (Logger.validFix) {
       String daOffsetString;
@@ -204,6 +234,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
 
   public void display_position_update() {
     position_update();
+    tower_update();
   }
 
   private void updateCellDisplay() {
@@ -283,6 +314,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
       ageText.setTextColor(Color.RED);
     }
     position_update();
+    tower_update();
     String satString = String.format("%d/%d/%d/%d",
         Logger.last_fix_sats,
         Logger.last_ephem_sats, Logger.last_alman_sats,
@@ -308,6 +340,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
     public void onReceive(Context context, Intent intent) {
       // update the map in case the current cell has changed.
       updateCellDisplay();
+      tower_update();
       if (TowerLine.is_active()) {
         // The map only depends on the RF behaviour if there has been a handoff
         // when the tower-line is shown

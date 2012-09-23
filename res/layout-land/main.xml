@@ -43,8 +43,18 @@
       android:layout_width="match_parent"
       android:id="@+id/cid"
       android:typeface="monospace"
-      android:textSize="26sp"
+      android:textSize="24sp"
       android:text="#########"
+      android:gravity="center">
+    </TextView>
+
+    <TextView
+      android:layout_height="wrap_content"
+      android:layout_width="match_parent"
+      android:id="@+id/twr"
+      android:typeface="monospace"
+      android:textSize="20sp"
+      android:text="########"
       android:gravity="center">
     </TextView>
 
@@ -59,7 +69,7 @@
         android:layout_width="110dp"
         android:id="@+id/dBm"
         android:typeface="monospace"
-        android:textSize="22sp"
+        android:textSize="20sp"
         android:textColor="@android:color/white"
         android:text="-###dBm"
         android:gravity="right">
@@ -70,7 +80,7 @@
         android:layout_width="90dp"
         android:id="@+id/accuracy"
         android:typeface="monospace"
-        android:textSize="22sp"
+        android:textSize="20sp"
         android:text="###m"
         android:gravity="right">
       </TextView>

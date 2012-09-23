@@ -84,6 +84,16 @@ class Merc28 {
     return zd;
   }
 
+  double bearing_to(Merc28 other) {
+    double zx = (double)(other.X - X);
+    double zy = (double)(other.Y - Y);
+    double za = (180 / Math.PI) * Math.atan2(zx, -zy);
+    if (za < 0.0) {
+      za += 360.0;
+    }
+    return za;
+  }
+
   // See
   // http://rc0.posterous.com/approximating-os-grid-references
   // which explains the approximations that follow

@@ -516,6 +516,35 @@ public class Map extends View {
     }
   }
 
+  // -----------
+
+  class TowerOffset {
+    public boolean known;
+    public boolean dragged;
+    public double metres;
+    public double bearing;
+  };
+
+  TowerOffset get_tower_offset () {
+    TowerOffset result = new TowerOffset();
+    if (display_pos == null) {
+      result.known = false;
+    } else {
+      Merc28 tower_pos = new Merc28(0,0);
+      if (TowerLine.find_current_tower_pos(tower_pos)) {
+        result.metres = display_pos.metres_away(tower_pos);
+        result.bearing = display_pos.bearing_to(tower_pos);
+        result.known = true;
+        result.dragged = is_dragged;
+      } else {
+        result.known = false;
+      }
+    }
+    return result;
+  }
+
+  // -----------
+
 
   void add_landmark() {
     Logger.mMarks.add(display_pos);

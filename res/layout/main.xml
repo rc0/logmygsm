@@ -54,6 +54,16 @@
         android:gravity="center">
       </TextView>
 
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/twr"
+        android:typeface="monospace"
+        android:textSize="22sp"
+        android:text="########"
+        android:gravity="center">
+      </TextView>
+
       <!-- The vertical layout for the dBm/acc block -->
       <LinearLayout
         android:orientation="horizontal"
