@@ -94,17 +94,6 @@
         android:gravity="left">
       </TextView>
 
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/grid_ref"
-        android:typeface="monospace"
-        android:textSize="16sp"
-        android:textColor="@android:color/white"
-        android:text="####"
-        android:gravity="bottom|right">
-      </TextView>
-
     </LinearLayout>
     <!-- The left 2/3 of the block -->
 
@@ -124,22 +113,11 @@
       <TextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:id="@+id/net_mcc"
+        android:id="@+id/net_lac_mnc"
         android:typeface="monospace"
         android:textSize="16sp"
         android:textColor="@android:color/white"
         android:text="####"
-        android:layout_gravity="center">
-      </TextView>
-
-      <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/lac_mnc"
-        android:typeface="monospace"
-        android:textSize="16sp"
-        android:textColor="@android:color/white"
-        android:text="#####"
         android:layout_gravity="center">
       </TextView>
 
@@ -210,6 +188,17 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:id="@+id/tile"
+        android:typeface="monospace"
+        android:textSize="16sp"
+        android:textColor="@android:color/white"
+        android:text="##########"
+        android:layout_gravity="center">
+      </TextView>
+
+      <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/grid_ref"
         android:typeface="monospace"
         android:textSize="16sp"
         android:textColor="@android:color/white"

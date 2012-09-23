@@ -48,8 +48,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
   private TextView ageText;
   private TextView satText;
   private TextView cidText;
-  private TextView lacmncText;
-  private TextView netmccText;
+  private TextView netlacmncText;
   private TextView dBmText;
   private TextView daOffsetText;
   private TextView countText;
@@ -78,8 +77,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
       ageText = (TextView) findViewById(R.id.age);
       satText = (TextView) findViewById(R.id.sat);
       cidText = (TextView) findViewById(R.id.cid);
-      netmccText = (TextView) findViewById(R.id.net_mcc);
-      lacmncText = (TextView) findViewById(R.id.lac_mnc);
+      netlacmncText = (TextView) findViewById(R.id.net_lac_mnc);
       dBmText = (TextView) findViewById(R.id.dBm);
       countText = (TextView) findViewById(R.id.count);
       tileText = (TextView) findViewById(R.id.tile);
@@ -239,13 +237,12 @@ public class MainActivity extends Activity implements Map.PositionListener {
       mcc_string = "";
     }
 
-    String lacmncString = String.format("%5d %3s",
-        Logger.lastLac, mnc_string);
-    String netmccString = String.format("%5s %3s",
-        Logger.lastNetworkTypeLong, mcc_string);
+    String netlacmncString = String.format("%1c%5d %3s",
+        Logger.lastNetworkType,
+        Logger.lastLac,
+        mnc_string);
     String dBmString = String.format("%dasu", Logger.lastASU);
-    lacmncText.setText(lacmncString);
-    netmccText.setText(netmccString);
+    netlacmncText.setText(netlacmncString);
     dBmText.setText(dBmString);
 
     updateCidHistory(current_time);

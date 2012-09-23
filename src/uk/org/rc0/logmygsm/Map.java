@@ -337,7 +337,7 @@ public class Map extends View {
 
   String current_grid_ref() {
     if (display_pos != null) {
-      return display_pos.grid_ref_5m();
+      return display_pos.grid_ref_5m_nosp();
     } else {
       return "NO POSITION";
     }
