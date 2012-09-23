@@ -90,12 +90,11 @@ class TowerLine {
           int cid = Integer.parseInt(line);
           line = br.readLine();
           int lac = Integer.parseInt(line);
-          lac = 0;
           line = br.readLine();
           int x = Integer.parseInt(line);
           line = br.readLine();
           int y = Integer.parseInt(line);
-          lut.put(cid + "," + lac, new Merc28(x, y));
+          lut.put(lac + "," + cid, new Merc28(x, y));
           ++actual;
         }
         br.close();
@@ -114,8 +113,8 @@ class TowerLine {
 
   static boolean find_current_tower_pos(Merc28 tower_pos) {
     int cid = Logger.lastCid;
-    int lac = 0;
-    String cl = cid + "," + lac;
+    int lac = Logger.lastLac;
+    String cl = lac + "," + cid;
     if (lut.containsKey(cl)) {
       tower_pos.copy_from(lut.get(cl));
       return true;
