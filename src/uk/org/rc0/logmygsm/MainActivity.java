@@ -184,27 +184,31 @@ public class MainActivity extends Activity implements Map.PositionListener {
     Map.TowerOffset tow_off = mMap.get_tower_offset();
     if (tow_off.known == false) {
       twrText.setText("TOWER?");
+      twrText.setTextColor(Color.RED);
     } else {
-      String bearing;
       String distance;
-      if (Logger.validFix && !tow_off.dragged) {
-        int angle = (int) tow_off.bearing - Logger.lastBearing;
-        if (angle < -180) { angle += 360; }
-        if (angle >= 180) { angle -= 360; }
-        if (angle < 0) {
-          bearing = String.format("%03d\u00B0L", -angle);
-        } else {
-          bearing = String.format("%03d\u00B0R",  angle);
-        }
-      } else {
-        bearing = String.format("%03d\u00B0", (int) tow_off.bearing);
-      }
+      String bearing;
+      String relative;
       if (tow_off.metres < 1000.0) {
         distance = String.format("%3dm", (int) tow_off.metres);
       } else {
         distance = String.format("%.1fkm", tow_off.metres * 0.001);
       }
-      twrText.setText(distance + " " + bearing);
+      bearing = String.format("%03d\u00B0", (int) tow_off.bearing);
+      if (Logger.validFix && !tow_off.dragged) {
+        int angle = (int) tow_off.bearing - Logger.lastBearing;
+        if (angle < -180) { angle += 360; }
+        if (angle >= 180) { angle -= 360; }
+        if (angle < 0) {
+          relative = String.format(" %03dL", -angle);
+        } else {
+          relative = String.format(" %03dR",  angle);
+        }
+      } else {
+        relative = "";
+      }
+      twrText.setText(distance + " " + bearing + relative);
+      twrText.setTextColor(Color.WHITE);
     }
   }
 
