@@ -317,8 +317,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
       accText.setTextColor(Color.RED);
       ageText.setTextColor(Color.RED);
     }
-    position_update();
-    tower_update();
+    display_position_update();
     String satString = String.format("%d/%d/%d/%d",
         Logger.last_fix_sats,
         Logger.last_ephem_sats, Logger.last_alman_sats,
