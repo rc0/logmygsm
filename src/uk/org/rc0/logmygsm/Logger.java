@@ -113,6 +113,7 @@ public class Logger extends Service {
 
   class RecentCID {
     int cid;
+    int lac;
     char network_type;
     char state;
     int dbm;
@@ -233,6 +234,7 @@ public class Logger extends Service {
     RecentCID match = null;
 
     for (int i=0; i<MAX_RECENT; i++) {
+      // should LAC be checked too?
       if (recent_cids[i].cid == lastCid) {
         pos = i;
         match = recent_cids[i];
@@ -253,6 +255,7 @@ public class Logger extends Service {
     } else {
       recent_cids[0] = new RecentCID();
       recent_cids[0].cid = lastCid;
+      recent_cids[0].lac = lastLac;
       recent_cids[0].network_type = lastNetworkType;
     }
     recent_cids[0].state = lastState;

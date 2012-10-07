@@ -40,8 +40,8 @@ import java.util.HashMap;
 class TowerLine {
 
   static private HashMap<String, Merc28> lut;
-  static private Paint line_paint;
-  static private Paint thin_line_paint;
+  static private Paint [] line_paint;
+  static private Paint [] thin_line_paint;
   static private Paint text_paint;
 
   static final private String TAIL = "cidxy.txt";
@@ -57,16 +57,27 @@ class TowerLine {
 
     mActive = false;
 
-    line_paint = new Paint();
-    line_paint.setStyle(Paint.Style.STROKE);
-    line_paint.setStrokeWidth(8);
-    //line_paint.setColor(Color.argb(128, 0xa0, 0x0, 0x4d));
-    line_paint.setColor(Color.argb(176, 0x00, 0x30, 0x10));
+    line_paint = new Paint[3];
+    line_paint[0].setStyle(Paint.Style.STROKE);
+    line_paint[0].setStrokeWidth(8);
+    line_paint[0].setColor(Color.argb(176, 0x00, 0x30, 0x10));
+    line_paint[1].setStyle(Paint.Style.STROKE);
+    line_paint[1].setStrokeWidth(4);
+    line_paint[1].setColor(Color.argb(128, 0x00, 0x30, 0x10));
+    line_paint[2].setStyle(Paint.Style.STROKE);
+    line_paint[2].setStrokeWidth(4);
+    line_paint[2].setColor(Color.argb(64, 0x00, 0x30, 0x10));
 
-    thin_line_paint = new Paint();
-    thin_line_paint.setStyle(Paint.Style.STROKE);
-    thin_line_paint.setStrokeWidth(2);
-    thin_line_paint.setColor(Color.argb(192, 0xff, 0xff, 0xff));
+    thin_line_paint = new Paint[3];
+    thin_line_paint[0].setStyle(Paint.Style.STROKE);
+    thin_line_paint[0].setStrokeWidth(2);
+    thin_line_paint[0].setColor(Color.argb(192, 0xff, 0xff, 0xff));
+    thin_line_paint[1].setStyle(Paint.Style.STROKE);
+    thin_line_paint[1].setStrokeWidth(1);
+    thin_line_paint[1].setColor(Color.argb(128, 0xff, 0xff, 0xff));
+    thin_line_paint[2].setStyle(Paint.Style.STROKE);
+    thin_line_paint[2].setStrokeWidth(1);
+    thin_line_paint[2].setColor(Color.argb(64, 0xff, 0xff, 0xff));
 
     text_paint = new Paint();
     text_paint.setColor(Color.argb(224, 0x38, 0x0, 0x58));
@@ -111,9 +122,11 @@ class TowerLine {
   static final float BASE = 16.0f;
   static final float TEXT_RADIUS = 70.0f;
 
-  static boolean find_current_tower_pos(Merc28 tower_pos) {
-    int cid = Logger.lastCid;
-    int lac = Logger.lastLac;
+  static boolean find_tower_pos(int index, Merc28 tower_pos) {
+    int cid = Logger.recent_cids[index].cid;
+    int lac = Logger.recent_cids[index].lac;
+    // uninitialised history entries have cid==-1 : this will never match in
+    // the LUT
     String cl = lac + "," + cid;
     if (lut.containsKey(cl)) {
       tower_pos.copy_from(lut.get(cl));
@@ -132,37 +145,41 @@ class TowerLine {
   }
 
   static void draw_line(Canvas c, int w, int h, int pixel_shift, Merc28 display_pos) {
-    if (find_current_tower_pos(tmp_pos)) {
-      int dx = (tmp_pos.X - display_pos.X) >> pixel_shift;
-      int dy = (tmp_pos.Y - display_pos.Y) >> pixel_shift;
+    int i;
+    for (i=2; i>=0; i--) {
+      if (find_tower_pos(i, tmp_pos)) {
+        int dx = (tmp_pos.X - display_pos.X) >> pixel_shift;
+        int dy = (tmp_pos.Y - display_pos.Y) >> pixel_shift;
 
-      float fx = (float) dx;
-      float fy = (float) dy;
-      float f = (float) Math.sqrt(fx*fx + fy*fy);
-      if (f > BASE) { // else tower is in centre of view
-        float x0 = (float)(w>>1) + BASE * (fx / f);
-        float y0 = (float)(h>>1) + BASE * (fy / f);
-        float x1 = (float)(w>>1) + fx;
-        float y1 = (float)(h>>1) + fy;
-        c.drawLine(x0, y0, x1, y1, line_paint);
-        c.drawLine(x0, y0, x1, y1, thin_line_paint);
+        float fx = (float) dx;
+        float fy = (float) dy;
+        float f = (float) Math.sqrt(fx*fx + fy*fy);
+        if (f > BASE) { // else tower is in centre of view
+          float x0 = (float)(w>>1) + BASE * (fx / f);
+          float y0 = (float)(h>>1) + BASE * (fy / f);
+          float x1 = (float)(w>>1) + fx;
+          float y1 = (float)(h>>1) + fy;
+          c.drawLine(x0, y0, x1, y1, line_paint[i]);
+          c.drawLine(x0, y0, x1, y1, thin_line_paint[i]);
 
-        double zd = tmp_pos.metres_away(display_pos);
+          if (i == 0) {
+            double zd = tmp_pos.metres_away(display_pos);
 
-        String caption;
-        if (zd < 1000) {
-          caption = String.format("%dm", (int)zd);
-        } else {
-          caption = String.format("%.1fkm", 0.001*zd);
+            String caption;
+            if (zd < 1000) {
+              caption = String.format("%dm", (int)zd);
+            } else {
+              caption = String.format("%.1fkm", 0.001*zd);
+            }
+            float tw = text_paint.measureText(caption);
+            float xt = (float)(w>>1) + TEXT_RADIUS * (fx / f);
+            float yt = (float)(h>>1) + TEXT_RADIUS * (fy / f);
+            c.drawText(caption, xt-(0.5f*tw), yt, text_paint);
+          }
         }
-        float tw = text_paint.measureText(caption);
-        float xt = (float)(w>>1) + TEXT_RADIUS * (fx / f);
-        float yt = (float)(h>>1) + TEXT_RADIUS * (fy / f);
-        c.drawText(caption, xt-(0.5f*tw), yt, text_paint);
       }
     }
   }
-
 
 }
 
