@@ -58,6 +58,12 @@ class TowerLine {
     mActive = false;
 
     line_paint = new Paint[3];
+    thin_line_paint = new Paint[3];
+    for (int i = 0; i<3; i++) {
+      line_paint[i] = new Paint();
+      thin_line_paint[i] = new Paint();
+    }
+
     line_paint[0].setStyle(Paint.Style.STROKE);
     line_paint[0].setStrokeWidth(8);
     line_paint[0].setColor(Color.argb(176, 0x00, 0x30, 0x10));
@@ -68,7 +74,6 @@ class TowerLine {
     line_paint[2].setStrokeWidth(4);
     line_paint[2].setColor(Color.argb(64, 0x00, 0x30, 0x10));
 
-    thin_line_paint = new Paint[3];
     thin_line_paint[0].setStyle(Paint.Style.STROKE);
     thin_line_paint[0].setStrokeWidth(2);
     thin_line_paint[0].setColor(Color.argb(192, 0xff, 0xff, 0xff));
@@ -123,6 +128,10 @@ class TowerLine {
   static final float TEXT_RADIUS = 70.0f;
 
   static boolean find_tower_pos(int index, Merc28 tower_pos) {
+    if (Logger.recent_cids == null) {
+      // catch the early initialisation case before the service has started
+      return false;
+    }
     int cid = Logger.recent_cids[index].cid;
     int lac = Logger.recent_cids[index].lac;
     // uninitialised history entries have cid==-1 : this will never match in

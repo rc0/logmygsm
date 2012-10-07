@@ -433,7 +433,7 @@ public class Map extends View {
         return true;
       } else {
         Merc28 tower_pos = new Merc28(0,0);
-        if (TowerLine.find_current_tower_pos(tower_pos)) {
+        if (TowerLine.find_tower_pos(0, tower_pos)) {
           display_pos = tower_pos;
           is_dragged = false;
           notify_position_update();
@@ -531,7 +531,7 @@ public class Map extends View {
       result.known = false;
     } else {
       Merc28 tower_pos = new Merc28(0,0);
-      if (TowerLine.find_current_tower_pos(tower_pos)) {
+      if (TowerLine.find_tower_pos(0, tower_pos)) {
         result.metres = display_pos.metres_away(tower_pos);
         result.bearing = display_pos.bearing_to(tower_pos);
         result.known = true;
