@@ -138,6 +138,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
   private final int OPTION_SHARE            = 12;
   private final int OPTION_DOWNLOAD_MISSING = 13;
   private final int OPTION_TOGGLE_TOWERLINE = 15;
+  private final int OPTION_LOG_MARKER       = 20;
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -154,6 +155,9 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     m_download.add (Menu.NONE, OPTION_DOWNLOAD_SINGLE, Menu.NONE, "Central tile");
     m_download.add (Menu.NONE, OPTION_DOWNLOAD_MISSING, Menu.NONE, "Recent missing");
 
+    MenuItem m_logmark =
+      menu.add (Menu.NONE, OPTION_LOG_MARKER, Menu.NONE, "Bookmark");
+    m_logmark.setIcon(android.R.drawable.ic_menu_save);
     MenuItem m_share =
       menu.add (Menu.NONE, OPTION_SHARE,  Menu.NONE, "Share grid ref");
     m_share.setIcon(android.R.drawable.ic_menu_share);
@@ -182,6 +186,9 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
         return true;
       case OPTION_DOWNLOAD_MISSING:
         TileStore.trigger_fetch(getApplicationContext());
+        return true;
+      case OPTION_LOG_MARKER:
+        Logger.do_bookmark(this);
         return true;
       case OPTION_SHARE:
         mMap.share_grid_ref(this);

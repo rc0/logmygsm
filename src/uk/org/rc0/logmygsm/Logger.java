@@ -124,6 +124,9 @@ public class Logger extends Service {
     RecentCID() { cid = -1; }
   };
 
+  // --- Bookmarks
+  static private int bookmark_count;
+  static private boolean bookmark_next_time;
 
   static final int MAX_RECENT = 32;
   static RecentCID[] recent_cids;
@@ -139,6 +142,9 @@ public class Logger extends Service {
     rawlog = new RawLogger(false); // 'true' to re-enable raw logs for debug
     mTrail = new Trail(this);
     mMarks = new Landmarks();
+
+    bookmark_count = 1;
+    bookmark_next_time = false;
 
     myProvider = LocationManager.GPS_PROVIDER;
     myNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -350,6 +356,14 @@ public class Logger extends Service {
   // --------------------------------------------------------------------------------
 
   private void logToFile() {
+    if (mainlog == null) {
+      mainlog = new Backend("", this);
+    }
+    if (bookmark_next_time) {
+      mainlog.write("## MARKER " + bookmark_count + "\n");
+      bookmark_next_time = false;
+      ++bookmark_count;
+    }
     ++nReadings;
     String data = String.format("%12.7f %12.7f %3d %c %c %10d %10d %3d %s %.1f %d\n",
         lastLat, lastLon, lastAcc,
@@ -359,10 +373,12 @@ public class Logger extends Service {
         lastMccMnc,
         lastAlt,
         (int)(lastTime/1000));
-    if (mainlog == null) {
-      mainlog = new Backend("", this);
-    }
     mainlog.write(data);
+  }
+
+  static void do_bookmark(Context context) {
+    bookmark_next_time = true;
+    announce(context, "Marker " + bookmark_count);
   }
 
   // --------------------------------------------------------------------------------
