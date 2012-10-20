@@ -32,6 +32,12 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.ObjectInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -153,41 +159,31 @@ class Trail {
     if (!dir.exists()) {
       dir.mkdirs();
     }
-    File file = new File(dir, "trail.txt");
+    File file = new File(dir, "trail.dat");
     try {
-      BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-      bw.write(String.format("%d\n", n_old));
-      for (int i=0; i < n_old; i++) {
-        bw.write(String.format("%d\n", x_old[i]));
-        bw.write(String.format("%d\n", y_old[i]));
-      }
-      bw.close();
-    } catch (IOException e) {
+      ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+      oos.writeInt(n_old);
+      oos.writeObject(x_old);
+      oos.writeObject(y_old);
+      oos.close();
+    } catch (Exception e) {
     }
   }
 
   void restore_state_from_file() {
-    File file = new File("/sdcard/LogMyGsm/prefs/trail.txt");
+    File file = new File("/sdcard/LogMyGsm/prefs/trail.dat");
     boolean failed = false;
     init();
     if (file.exists()) {
       try {
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        String line;
-        line = br.readLine();
-        n_old = Integer.parseInt(line);
-        x_old = new int[n_old];
-        y_old = new int[n_old];
-        for (int i = 0; i < n_old; i++) {
-          line = br.readLine();
-          x_old[i] = Integer.parseInt(line);
-          line = br.readLine();
-          y_old[i] = Integer.parseInt(line);
-        }
-        br.close();
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+        n_old = ois.readInt();
+        x_old = (int []) ois.readObject();
+        y_old = (int []) ois.readObject();
+        ois.close();
       } catch (IOException e) {
         failed = true;
-      } catch (NumberFormatException n) {
+      } catch (ClassNotFoundException e) {
         failed = true;
       }
     }
