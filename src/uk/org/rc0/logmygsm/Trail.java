@@ -199,10 +199,11 @@ class Trail {
     mHistory.add(p);
     boolean do_add = true;
     if (last_point != null) {
-      // 4 is (28 - (16+8)), i.e. the pixel size at the highest zoom level.
+      // 4 is (28 - (16+8)), i.e. the pixel size at zoom level = 16.
+      // 3 is (28 - (17+8)), i.e. the pixel size at zoom level = 17.
       // Also, round it.
-      int sx = (((p.X - last_point.X) >> 3) + 1) >> 1;
-      int sy = (((p.Y - last_point.Y) >> 3) + 1) >> 1;
+      int sx = (((p.X - last_point.X) >> 2) + 1) >> 1;
+      int sy = (((p.Y - last_point.Y) >> 2) + 1) >> 1;
       int manhattan = Math.abs(sx) + Math.abs(sy);
       if (manhattan < splot_gap) {
         do_add = false;

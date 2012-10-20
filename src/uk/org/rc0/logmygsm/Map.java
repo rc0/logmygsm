@@ -332,7 +332,12 @@ public class Map extends View {
       X = 0;
       Y = 0;
     }
-    return String.format("%5d%5d", X, Y);
+    // guard against over-filling a 10-character field if zoom level is maxed.
+    if ((X > 99999) || (Y > 99999)) {
+      return "too deep";
+    } else {
+      return String.format("%5d%5d", X, Y);
+    }
   }
 
   String current_grid_ref() {
@@ -375,7 +380,7 @@ public class Map extends View {
   }
 
   void zoom_out() {
-    if (zoom > 7) {
+    if (zoom > 5) {
       setZoom(zoom - 1);
       notify_position_update();
       invalidate();
@@ -383,7 +388,7 @@ public class Map extends View {
   }
 
   void zoom_in() {
-    if (zoom < 16) {
+    if (zoom < 17) {
       setZoom(zoom + 1);
       notify_position_update();
       invalidate();
