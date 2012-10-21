@@ -56,6 +56,7 @@ following:
 * cell ID (coloured red if the phone currently has no service or emergency calls only)
 * signal power level (in ASU)
 * LAC
+* the range and bearing from the centre of the map to the tower location, if known
 * connection type (GPRS, EDGE, UMTS, HSDPA)
 * MCC and MNC (country and operator codes)
 * history of recently used cells (showing cell ID, time since last use)
