@@ -272,8 +272,8 @@ public class Logger extends Service {
 
   // --------------------------------------------------------------------------------
 
-  static final private long GPS_MIN_MILLISECONDS = 1000;
-  static final private float GPS_MIN_DISTANCE = 2.0f;
+  static final private long GPS_MIN_MILLISECONDS = 500;
+  static final private float GPS_MIN_DISTANCE = 1.0f;
 
   private void startListening() {
     startNotification();
