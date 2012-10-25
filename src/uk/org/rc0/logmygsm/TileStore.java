@@ -137,6 +137,10 @@ class TileStore {
   static private Bitmap loading_bitmap;
   static private Context mContext;
 
+  static private long start_time;
+  static Paint highlight_border_paint;
+  final static private int HIGHLIGHT_WIDTH = 12;
+
   // -----------
 
   static Entry [] new_cache() {
@@ -150,6 +154,9 @@ class TileStore {
   }
 
   static void init (Context the_app_context) {
+
+    start_time = System.currentTimeMillis();
+
     mContext = the_app_context;
     last_w = 240;
     last_h = 400;
@@ -172,6 +179,12 @@ class TileStore {
     trail_dot_paint_1 = new Paint();
     trail_dot_paint_1.setColor(Color.argb(255, 255, 255, 255));
     trail_dot_paint_1.setStyle(Paint.Style.FILL);
+
+    highlight_border_paint = new Paint();
+    highlight_border_paint.setColor(Color.argb(96,0x00,0x00,0xff));
+    highlight_border_paint.setStyle(Paint.Style.STROKE);
+    highlight_border_paint.setStrokeWidth(HIGHLIGHT_WIDTH);
+    highlight_border_paint.setStrokeCap(Paint.Cap.SQUARE);
 
     mHandler = new Handler();
     bg_queue = new LinkedList<TilePos> ();
@@ -278,6 +291,18 @@ class TileStore {
     }
   }
 
+  static private void render_highlight_border(Bitmap bm)
+  {
+    Canvas my_canv = new Canvas(bm);
+    int hw, hw2;
+    hw = HIGHLIGHT_WIDTH - (HIGHLIGHT_WIDTH>>2);
+    hw2 = 256 - hw;
+    my_canv.drawLine(hw, hw, hw2, hw, highlight_border_paint);
+    my_canv.drawLine(hw, hw2, hw2, hw2, highlight_border_paint);
+    my_canv.drawLine(hw, hw, hw, hw2, highlight_border_paint);
+    my_canv.drawLine(hw2, hw, hw2, hw2, highlight_border_paint);
+  }
+
   static private TilingResponse render_bitmap(int zoom, MapSource map_source, int x, int y) {
     String filename = null;
     filename = map_source.get_tile_path(zoom, x, y);
@@ -288,6 +313,10 @@ class TileStore {
       if (file.exists()) {
         Bitmap temp_bm = BitmapFactory.decodeFile(filename);
         bm = temp_bm.copy(Bitmap.Config.ARGB_8888, true);
+
+        if (file.lastModified() > start_time) {
+          render_highlight_border(bm);
+        }
       }
     } catch (Exception e) {
       // to deal with corrupt tile files and such horrors
