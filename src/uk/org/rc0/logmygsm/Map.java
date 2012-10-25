@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.lang.Integer;
 import java.lang.Math;
 import java.lang.NumberFormatException;
+import java.util.LinkedList;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -348,14 +349,38 @@ public class Map extends View {
     }
   }
 
-  void trigger_fetch(Context context) {
+  void trigger_fetch_around(int delta, Context context) {
     if (display_pos != null) {
-      Downloader.start_fetch_single(zoom, map_source,
-          display_pos.X >> tile_shift,
-          display_pos.Y >> tile_shift,
-          context);
+      int i, j;
+      int x0, x1, y0, y1;
+      LinkedList<TileStore.TilePos> targets;
+      targets = new LinkedList<TileStore.TilePos> ();
+      x0 = display_pos.X >> tile_shift;
+      y0 = display_pos.Y >> tile_shift;
+      x1 = x0 + delta;
+      y1 = y0 + delta;
+      x0 -= delta;
+      y0 -= delta;
+
+      for (i=x0; i<=x1; i++) {
+        for (j=y0; j<=y1; j++) {
+          targets.add(new TileStore.TilePos(zoom, i, j, map_source));
+        }
+      }
+      Downloader.start_multiple_fetch(targets, context);
     }
   }
+
+
+//  void trigger_fetch(Context context) {
+//    if (display_pos != null) {
+//
+//      Downloader.start_fetch_single(zoom, map_source,
+//          display_pos.X >> tile_shift,
+//          display_pos.Y >> tile_shift,
+//          context);
+//    }
+//  }
 
   void share_grid_ref(Activity _activity) {
     if (display_pos != null) {

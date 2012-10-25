@@ -371,6 +371,8 @@ public class MainActivity extends Activity implements Map.PositionListener {
   private final int OPTION_DOWNLOAD_MISSING = 13;
   private final int OPTION_TOGGLE_TOWERLINE = 15;
   private final int OPTION_LOG_MARKER       = 20;
+  private final int OPTION_DOWNLOAD_33      = 21;
+  private final int OPTION_DOWNLOAD_55      = 22;
 
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -390,6 +392,8 @@ public class MainActivity extends Activity implements Map.PositionListener {
       m_download.setIcon(android.R.drawable.ic_menu_view);
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_SINGLE, Menu.NONE, "Central tile");
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_MISSING, Menu.NONE, "Recent missing");
+      m_download.add (Menu.NONE, OPTION_DOWNLOAD_33, Menu.NONE, "3x3 region");
+      m_download.add (Menu.NONE, OPTION_DOWNLOAD_55, Menu.NONE, "5x5 region");
 
       // Bottom row
       MenuItem m_logmark =
@@ -421,10 +425,16 @@ public class MainActivity extends Activity implements Map.PositionListener {
           finish();
           return true;
         case OPTION_DOWNLOAD_SINGLE:
-          mMap.trigger_fetch(getApplicationContext());
+          mMap.trigger_fetch_around(0, getApplicationContext());
           return true;
         case OPTION_DOWNLOAD_MISSING:
           TileStore.trigger_fetch(getApplicationContext());
+          return true;
+        case OPTION_DOWNLOAD_33:
+          mMap.trigger_fetch_around(1, getApplicationContext());
+          return true;
+        case OPTION_DOWNLOAD_55:
+          mMap.trigger_fetch_around(2, getApplicationContext());
           return true;
         case OPTION_SHARE:
           mMap.share_grid_ref(this);
