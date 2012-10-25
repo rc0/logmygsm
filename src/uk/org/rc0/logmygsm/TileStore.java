@@ -496,6 +496,10 @@ class TileStore {
     targets = null;
   }
 
+  static long get_epoch() {
+    return start_time;
+  }
+
 }
 
 

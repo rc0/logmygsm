@@ -63,25 +63,28 @@ class Downloader {
     result = false;
 
     try {
-      URI uri = new URI("http", the_url, null);
-      HttpGet get = new HttpGet(uri);
-      HttpClient client = new DefaultHttpClient();
-      HttpResponse response = client.execute(get);
-      HttpEntity entity = response.getEntity();
-
       File file = new File(the_dest);
       File dir = file.getParentFile();
       if (!dir.exists()) {
         dir.mkdirs();
       }
-      OutputStream out = null;
-      try {
-        out = new BufferedOutputStream(new FileOutputStream(file));
-        entity.writeTo(out);
-        result = true;
-      } finally {
-        if (out != null) {
-          out.close();
+      if (!file.exists() ||
+          (file.lastModified() < TileStore.get_epoch())) {
+        URI uri = new URI("http", the_url, null);
+        HttpGet get = new HttpGet(uri);
+        HttpClient client = new DefaultHttpClient();
+        HttpResponse response = client.execute(get);
+        HttpEntity entity = response.getEntity();
+
+        OutputStream out = null;
+        try {
+          out = new BufferedOutputStream(new FileOutputStream(file));
+          entity.writeTo(out);
+          result = true;
+        } finally {
+          if (out != null) {
+            out.close();
+          }
         }
       }
     } catch (Exception e) {
