@@ -419,7 +419,7 @@ public class Map extends View {
   }
 
   void zoom_in() {
-    if (zoom < 17) {
+    if (zoom < 18) {
       setZoom(zoom + 1);
       notify_position_update();
       invalidate();
