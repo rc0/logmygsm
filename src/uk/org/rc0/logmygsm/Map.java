@@ -333,9 +333,15 @@ public class Map extends View {
       X = 0;
       Y = 0;
     }
-    // guard against over-filling a 10-character field if zoom level is maxed.
-    if ((X > 99999) || (Y > 99999)) {
-      return "too deep";
+    if (zoom >= 17) {
+      int x0 = X / 10000;
+      int y0 = Y / 10000;
+      int x1 = X % 10000;
+      int y1 = Y % 10000;
+      char xc = (char)('@' + x0);
+      char yc = (char)('@' + y0);
+      return String.format("%1c%04d%1c%04d",
+          xc, x1, yc, y1);
     } else {
       return String.format("%5d%5d", X, Y);
     }
