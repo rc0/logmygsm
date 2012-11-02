@@ -34,6 +34,11 @@ import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.FileInputStream;
 import java.lang.Math;
 import java.util.HashMap;
 
@@ -44,7 +49,8 @@ class TowerLine {
   static private Paint [] thin_line_paint;
   static private Paint text_paint;
 
-  static final private String TAIL = "cidxy.txt";
+  static final private String TEXT = "cidxy.txt";
+  static final private String BINARY = "cidxy.dat";
   static final private String TAG = "TowerLine";
 
   static private Merc28 tmp_pos;
@@ -61,7 +67,7 @@ class TowerLine {
 
   static final private void load_lut_from_text() {
     lut = new HashMap<String,Merc28>();
-    File file = new File("/sdcard/LogMyGsm/prefs/" + TAIL);
+    File file = new File("/sdcard/LogMyGsm/prefs/" + TEXT);
     int n = 0;
     if (file.exists()) {
       try {
@@ -84,6 +90,64 @@ class TowerLine {
       } catch (IOException e) {
       } catch (NumberFormatException e) {
       }
+    }
+  }
+
+  static final private void write_lut_to_binary() {
+    File file = new File("/sdcard/LogMyGsm/prefs/" + BINARY);
+    try {
+      ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+      int n = lut.size();
+      oos.writeInt(n);
+      if (n > 0) {
+        for (String key : lut.keySet()) {
+          oos.writeObject(key);
+          Merc28 temp = lut.get(key);
+          oos.writeInt(temp.X);
+          oos.writeInt(temp.Y);
+        }
+        //Log.i(TAG, "Wrote " + n + " entries to binary cidxy file");
+      }
+      oos.close();
+    } catch (IOException e) {
+      //Log.i(TAG, "binary write excepted : " + e.getClass().getName() + " : " + e.getMessage());
+    }
+  }
+
+  static final private void read_lut_from_binary() {
+    File file = new File("/sdcard/LogMyGsm/prefs/" + BINARY);
+    int i = -1;
+    lut = new HashMap<String,Merc28>();
+    try {
+      ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+      int n_obj = ois.readInt();
+      //Log.i(TAG, n_obj + " objects in file header");
+      for (i = 0; i < n_obj; i++) {
+        String key = (String) ois.readObject();
+        int X = ois.readInt();
+        int Y = ois.readInt();
+        //Log.i(TAG, "KEY:" + key + " X:" + X + "Y:" + Y);
+        lut.put(key, new Merc28(X, Y));
+      }
+      ois.close();
+      //Log.i(TAG, "Read " + n_obj + " entries from binary cidxy file");
+    } catch (IOException e) {
+      //Log.i(TAG, "binary read excepted after " + i + " entries : " + e.getClass().getName() + " : " + e.getMessage());
+    } catch (ClassNotFoundException e) {
+      //Log.i(TAG, "binary read got class not found : " + e.getClass().getName() + " : " + e.getMessage());
+    }
+  }
+
+  static final private void load_tower_xy_data() {
+
+    File text = new File("/sdcard/LogMyGsm/prefs/" + TEXT);
+    File binary = new File("/sdcard/LogMyGsm/prefs/" + BINARY);
+    if (!binary.exists() ||
+        (binary.lastModified() < text.lastModified())) {
+      load_lut_from_text();
+      write_lut_to_binary();
+    } else {
+      read_lut_from_binary();
     }
   }
 
@@ -110,7 +174,8 @@ class TowerLine {
     text_paint.setAntiAlias(true);
     text_paint.setTextSize(22);
 
-    load_lut_from_text();
+    load_tower_xy_data();
+
   }
 
   static final float BASE = 16.0f;
