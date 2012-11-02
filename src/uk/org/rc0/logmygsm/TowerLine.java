@@ -51,6 +51,11 @@ class TowerLine {
 
   static private boolean mActive;
 
+  static final private int [] opacity      = {176, 128, 64};
+  static final private int [] thin_opacity = {192, 128, 64};
+  static final private int [] line_widths      = {8, 4, 4};
+  static final private int [] thin_line_widths = {2, 1, 1};
+
   static void init() {
     lut = new HashMap<String,Merc28>();
     tmp_pos = new Merc28(0,0);
@@ -61,28 +66,14 @@ class TowerLine {
     thin_line_paint = new Paint[3];
     for (int i = 0; i<3; i++) {
       line_paint[i] = new Paint();
+      line_paint[i].setStyle(Paint.Style.STROKE);
+      line_paint[i].setStrokeWidth(line_widths[i]);
+      line_paint[i].setColor(Color.argb(opacity[i], 0x00, 0x30, 0x10));
       thin_line_paint[i] = new Paint();
+      thin_line_paint[i].setStyle(Paint.Style.STROKE);
+      thin_line_paint[i].setStrokeWidth(thin_line_widths[i]);
+      thin_line_paint[i].setColor(Color.argb(thin_opacity[i], 0xff, 0xff, 0xff));
     }
-
-    line_paint[0].setStyle(Paint.Style.STROKE);
-    line_paint[0].setStrokeWidth(8);
-    line_paint[0].setColor(Color.argb(176, 0x00, 0x30, 0x10));
-    line_paint[1].setStyle(Paint.Style.STROKE);
-    line_paint[1].setStrokeWidth(4);
-    line_paint[1].setColor(Color.argb(128, 0x00, 0x30, 0x10));
-    line_paint[2].setStyle(Paint.Style.STROKE);
-    line_paint[2].setStrokeWidth(4);
-    line_paint[2].setColor(Color.argb(64, 0x00, 0x30, 0x10));
-
-    thin_line_paint[0].setStyle(Paint.Style.STROKE);
-    thin_line_paint[0].setStrokeWidth(2);
-    thin_line_paint[0].setColor(Color.argb(192, 0xff, 0xff, 0xff));
-    thin_line_paint[1].setStyle(Paint.Style.STROKE);
-    thin_line_paint[1].setStrokeWidth(1);
-    thin_line_paint[1].setColor(Color.argb(128, 0xff, 0xff, 0xff));
-    thin_line_paint[2].setStyle(Paint.Style.STROKE);
-    thin_line_paint[2].setStrokeWidth(1);
-    thin_line_paint[2].setColor(Color.argb(64, 0xff, 0xff, 0xff));
 
     text_paint = new Paint();
     text_paint.setColor(Color.argb(224, 0x38, 0x0, 0x58));
