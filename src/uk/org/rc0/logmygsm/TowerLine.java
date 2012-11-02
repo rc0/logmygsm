@@ -51,20 +51,48 @@ class TowerLine {
 
   static private boolean mActive;
 
+  static final private int N_PAINTS = 3;
   static final private int [] opacity      = {176, 128, 64};
   static final private int [] thin_opacity = {192, 128, 64};
   static final private int [] line_widths      = {8, 4, 4};
   static final private int [] thin_line_widths = {2, 1, 1};
 
-  static void init() {
+  // -------------------------
+
+  static final private void load_lut_from_text() {
     lut = new HashMap<String,Merc28>();
+    File file = new File("/sdcard/LogMyGsm/prefs/" + TAIL);
+    int n = 0;
+    if (file.exists()) {
+      try {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        String line;
+        line = br.readLine();
+        n = Integer.parseInt(line);
+        for (int i = 0; i < n; i++) {
+          line = br.readLine();
+          int cid = Integer.parseInt(line);
+          line = br.readLine();
+          int lac = Integer.parseInt(line);
+          line = br.readLine();
+          int x = Integer.parseInt(line);
+          line = br.readLine();
+          int y = Integer.parseInt(line);
+          lut.put(lac + "," + cid, new Merc28(x, y));
+        }
+        br.close();
+      } catch (IOException e) {
+      } catch (NumberFormatException e) {
+      }
+    }
+  }
+
+  static void init() {
     tmp_pos = new Merc28(0,0);
-
     mActive = false;
-
-    line_paint = new Paint[3];
-    thin_line_paint = new Paint[3];
-    for (int i = 0; i<3; i++) {
+    line_paint = new Paint[N_PAINTS];
+    thin_line_paint = new Paint[N_PAINTS];
+    for (int i = 0; i<N_PAINTS; i++) {
       line_paint[i] = new Paint();
       line_paint[i].setStyle(Paint.Style.STROKE);
       line_paint[i].setStrokeWidth(line_widths[i]);
@@ -82,37 +110,7 @@ class TowerLine {
     text_paint.setAntiAlias(true);
     text_paint.setTextSize(22);
 
-    File file = new File("/sdcard/LogMyGsm/prefs/" + TAIL);
-    boolean failed = false;
-    int n = 0;
-    int actual = 0;
-    if (file.exists()) {
-      try {
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        String line;
-        line = br.readLine();
-        n = Integer.parseInt(line);
-        for (int i = 0; i < n; i++) {
-          line = br.readLine();
-          int cid = Integer.parseInt(line);
-          line = br.readLine();
-          int lac = Integer.parseInt(line);
-          line = br.readLine();
-          int x = Integer.parseInt(line);
-          line = br.readLine();
-          int y = Integer.parseInt(line);
-          lut.put(lac + "," + cid, new Merc28(x, y));
-          ++actual;
-        }
-        br.close();
-      } catch (IOException e) {
-        failed = true;
-      } catch (NumberFormatException e) {
-        failed = true;
-      }
-    }
-    // Log.i(TAG, "Read " + actual + " points out of " + n);
-
+    load_lut_from_text();
   }
 
   static final float BASE = 16.0f;
