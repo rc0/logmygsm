@@ -139,7 +139,7 @@ class TileStore {
 
   static private long start_time;
   static Paint highlight_border_paint;
-  final static private int HIGHLIGHT_WIDTH = 12;
+  final static private int HIGHLIGHT_WIDTH = 16;
 
   // -----------
 
@@ -155,7 +155,7 @@ class TileStore {
 
   static void init (Context the_app_context) {
 
-    start_time = System.currentTimeMillis();
+    refresh_epoch();
 
     mContext = the_app_context;
     last_w = 240;
@@ -181,7 +181,7 @@ class TileStore {
     trail_dot_paint_1.setStyle(Paint.Style.FILL);
 
     highlight_border_paint = new Paint();
-    highlight_border_paint.setColor(Color.argb(96,0x00,0x00,0xff));
+    highlight_border_paint.setColor(Color.argb(32,0x00,0x00,0xff));
     highlight_border_paint.setStyle(Paint.Style.STROKE);
     highlight_border_paint.setStrokeWidth(HIGHLIGHT_WIDTH);
     highlight_border_paint.setStrokeCap(Paint.Cap.SQUARE);
@@ -295,7 +295,7 @@ class TileStore {
   {
     Canvas my_canv = new Canvas(bm);
     int hw, hw2;
-    hw = HIGHLIGHT_WIDTH - (HIGHLIGHT_WIDTH>>2);
+    hw = HIGHLIGHT_WIDTH - (HIGHLIGHT_WIDTH>>4);
     hw2 = 256 - hw;
     my_canv.drawLine(hw, hw, hw2, hw, highlight_border_paint);
     my_canv.drawLine(hw, hw2, hw2, hw2, highlight_border_paint);
@@ -498,6 +498,10 @@ class TileStore {
 
   static long get_epoch() {
     return start_time;
+  }
+
+  static void refresh_epoch() {
+    start_time = System.currentTimeMillis();
   }
 
 }

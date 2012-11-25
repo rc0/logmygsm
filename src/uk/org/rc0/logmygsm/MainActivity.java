@@ -420,6 +420,8 @@ public class MainActivity extends Activity implements Map.PositionListener {
       switch (code) {
         case OPTION_EXIT:
           Logger.stop_tracing = true;
+          // If app stays in memory, start 'clean' next time wrt tile downloading
+          TileStore.refresh_epoch();
           // avoid holding onto oodles of memory at Application level...
           TileStore.invalidate();
           finish();
