@@ -492,7 +492,7 @@ class TileStore {
       }
     }
 
-    Downloader.start_multiple_fetch(targets, context);
+    Downloader.start_multiple_fetch(targets, true, context);
     targets = null;
   }
 

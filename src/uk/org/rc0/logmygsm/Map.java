@@ -55,11 +55,15 @@ public class Map extends View {
   private final Paint grey_paint;
 
   static final private String TAG = "Map";
+  static final private int MAX_ZOOM = 18;
+  static final private int MIN_ZOOM = 5;
 
   private int zoom;
   private int pixel_shift;
   private int tile_shift;
   private float drag_scale;
+
+  private int last_w, last_h;
 
   private MapSource map_source;
 
@@ -115,6 +119,8 @@ public class Map extends View {
     map_source = MapSources.get_default();
     estimated_pos = null;
     display_pos = null;
+
+    last_w = last_h = 0;
 
   }
 
@@ -221,6 +227,9 @@ public class Map extends View {
   private void redraw_map(Canvas canvas) {
     int width = getWidth();
     int height = getHeight();
+
+    last_w = width;
+    last_h = height;
 
     TileStore.draw(canvas, width, height, zoom, map_source, display_pos);
 
@@ -373,20 +382,45 @@ public class Map extends View {
           targets.add(new TileStore.TilePos(zoom, i, j, map_source));
         }
       }
-      Downloader.start_multiple_fetch(targets, context);
+      Downloader.start_multiple_fetch(targets, true, context);
     }
   }
 
-
-//  void trigger_fetch(Context context) {
-//    if (display_pos != null) {
-//
-//      Downloader.start_fetch_single(zoom, map_source,
-//          display_pos.X >> tile_shift,
-//          display_pos.Y >> tile_shift,
-//          context);
-//    }
-//  }
+  // Considering the area in view on-screen, consider that same area
+  // at zoom+1, zoom+2, ..., zoom+levels, and download any missing
+  // map tiles in those regions.  If forced=true, download them again
+  // whether they're missing or not
+  void trigger_fetch_tree(int levels, boolean forced, Context context) {
+    int dw = (last_w >> 1);
+    int dh = (last_h >> 1);
+    LinkedList<TileStore.TilePos> tiles;
+    tiles = new LinkedList<TileStore.TilePos> ();
+    if (display_pos == null) {
+      return;
+    }
+    int px0 = display_pos.X - (dw << pixel_shift);
+    int px1 = display_pos.X + (dw << pixel_shift);
+    int py0 = display_pos.Y - (dh << pixel_shift);
+    int py1 = display_pos.Y + (dh << pixel_shift);
+    for (int dz=0; dz<=levels; dz++) {
+      int z = zoom + dz;
+      if (z <= MAX_ZOOM) {
+        int tile_shift = Merc28.shift - z;
+        int tx0 = (px0 >> tile_shift);
+        int tx1 = (px1 >> tile_shift);
+        int ty0 = (py0 >> tile_shift);
+        int ty1 = (py1 >> tile_shift);
+        // Log.i(TAG, "Got z=" + z + " tx0=" + tx0 + " ty0=" + ty0 + " tx1=" + tx1 + " ty1=" + ty1);
+        for (int x=tx0; x<=tx1; x++) {
+          for (int y=ty0; y<=ty1; y++) {
+            tiles.add(new TileStore.TilePos(z, x, y, map_source));
+            // Log.i(TAG, "Added z=" + z + " x=" + x + " y=" + y);
+          }
+        }
+      }
+    }
+    Downloader.start_multiple_fetch(tiles, false, context);
+  }
 
   void share_grid_ref(Activity _activity) {
     if (display_pos != null) {
@@ -411,7 +445,7 @@ public class Map extends View {
   }
 
   void zoom_out() {
-    if (zoom > 5) {
+    if (zoom > MIN_ZOOM) {
       setZoom(zoom - 1);
       notify_position_update();
       invalidate();
@@ -419,7 +453,7 @@ public class Map extends View {
   }
 
   void zoom_in() {
-    if (zoom < 18) {
+    if (zoom < MAX_ZOOM) {
       setZoom(zoom + 1);
       notify_position_update();
       invalidate();

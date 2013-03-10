@@ -373,6 +373,8 @@ public class MainActivity extends Activity implements Map.PositionListener {
   private final int OPTION_LOG_MARKER       = 20;
   private final int OPTION_DOWNLOAD_33      = 21;
   private final int OPTION_DOWNLOAD_55      = 22;
+  private final int OPTION_DOWNLOAD_LEV_1   = 31;
+  private final int OPTION_DOWNLOAD_LEV_2   = 32;
 
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -394,6 +396,8 @@ public class MainActivity extends Activity implements Map.PositionListener {
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_MISSING, Menu.NONE, "Recent missing");
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_33, Menu.NONE, "3x3 region");
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_55, Menu.NONE, "5x5 region");
+      m_download.add (Menu.NONE, OPTION_DOWNLOAD_LEV_1, Menu.NONE, "Missing 0,1 levels");
+      m_download.add (Menu.NONE, OPTION_DOWNLOAD_LEV_2, Menu.NONE, "Missing 0,1,2 levels");
 
       // Bottom row
       MenuItem m_logmark =
@@ -437,6 +441,12 @@ public class MainActivity extends Activity implements Map.PositionListener {
           return true;
         case OPTION_DOWNLOAD_55:
           mMap.trigger_fetch_around(2, getApplicationContext());
+          return true;
+        case OPTION_DOWNLOAD_LEV_1:
+          mMap.trigger_fetch_tree(1, false, getApplicationContext());
+          return true;
+        case OPTION_DOWNLOAD_LEV_2:
+          mMap.trigger_fetch_tree(2, false, getApplicationContext());
           return true;
         case OPTION_SHARE:
           mMap.share_grid_ref(this);

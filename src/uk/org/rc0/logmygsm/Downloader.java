@@ -58,7 +58,7 @@ class Downloader {
     is_busy = false;
   }
 
-  private static boolean download(String the_url, String the_dest) {
+  private static boolean download(String the_url, String the_dest, boolean forced) {
     boolean result;
     result = false;
 
@@ -68,7 +68,7 @@ class Downloader {
       if (!dir.exists()) {
         dir.mkdirs();
       }
-      if (!file.exists() ||
+      if ((forced || !file.exists()) &&
           (file.lastModified() < TileStore.get_epoch())) {
         URI uri = new URI("http", the_url, null);
         HttpGet get = new HttpGet(uri);
@@ -113,10 +113,12 @@ class Downloader {
   private static class OneJob {
     String url;
     String dest;
+    boolean forced;
 
-    OneJob(String _url, String _dest) {
+    OneJob(String _url, String _dest, boolean _forced) {
       url = _url;
       dest = _dest;
+      forced = _forced;
     }
   }
 
@@ -134,13 +136,17 @@ class Downloader {
       result = true; // unused
       while (jobs.size() > 0) {
         OneJob job = jobs.removeFirst();
-        result = download(job.url, job.dest);
+        result = download(job.url, job.dest, job.forced);
       }
       mHandler.post (new DownloadResponse(result));
     }
   }
 
-  static void start_multiple_fetch(LinkedList<TileStore.TilePos> targets, Context context) {
+  // forced=1 means download even if tile exists (e.g. if you know the map has been updated)
+  // forced=0 means download only if the tile is missing
+  // in either case, never download more than once during a run of the app
+
+  static void start_multiple_fetch(LinkedList<TileStore.TilePos> targets, boolean forced, Context context) {
     if (is_busy) {
       Logger.announce(context, "Already downloading");
       return;
@@ -154,36 +160,9 @@ class Downloader {
       String url = target.map_source.get_download_url(target.zoom, target.x, target.y);
       String dest = target.map_source.get_tile_path(target.zoom, target.x, target.y);
       if (url != null) {
-        jobs.add(new OneJob(url, dest));
+        jobs.add(new OneJob(url, dest, forced));
       }
     }
-    is_busy = true;
-    (new DownloadThread(jobs)).start();
-  }
-
-  static void start_fetch_single(int zoom, MapSource map_source, int tile_x, int tile_y, Context context) {
-    // If already fetching, post a "busy" toast
-    // otherwise start the download in a thread.
-    // Eventually, could have a queue of tiles.
-
-    if (is_busy) {
-      Logger.announce(context, "Already downloading");
-      return;
-    }
-
-    LinkedList<OneJob> jobs;
-    jobs = new LinkedList<OneJob> ();
-
-    String url = map_source.get_download_url(zoom, tile_x, tile_y);
-    if (url == null) {
-      Logger.announce(context, "Cannot download this map");
-      return;
-    }
-
-    String dest = map_source.get_tile_path(zoom, tile_x, tile_y);
-
-    jobs.add(new OneJob(url, dest));
-
     is_busy = true;
     (new DownloadThread(jobs)).start();
   }
