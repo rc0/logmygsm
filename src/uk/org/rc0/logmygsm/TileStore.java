@@ -303,6 +303,16 @@ class TileStore {
     my_canv.drawLine(hw2, hw, hw2, hw2, highlight_border_paint);
   }
 
+  static private void render_coarse_zoom_cross(Bitmap bm)
+  {
+    Canvas my_canv = new Canvas(bm);
+    int hw, hw2;
+    hw = HIGHLIGHT_WIDTH - (HIGHLIGHT_WIDTH>>4);
+    hw2 = 256 - hw;
+    my_canv.drawLine(hw, hw, hw2, hw2, highlight_border_paint);
+    my_canv.drawLine(hw, hw2, hw2, hw, highlight_border_paint);
+  }
+
   static private TilingResponse render_bitmap(int zoom, MapSource map_source, int x, int y) {
     String filename = null;
     filename = map_source.get_tile_path(zoom, x, y);
@@ -317,7 +327,44 @@ class TileStore {
         if (file.lastModified() > start_time) {
           render_highlight_border(bm);
         }
+      } else {
+        Log.i(TAG, "Missing z=" + zoom + " x=" + x + " y=" + y);
+        // Try to use a sub-region of a zoomed out bitmap instead
+        // NOTE : this could be modified so that the above 'then' clause is the initial iteration,
+        // but that would introduce extra bitmap copy operations to the normal case
+        int x0, y0; // top corner of source bitmap
+        int swh;    // sub width/height
+        int tx, ty; // tile coords
+        tx = x;
+        ty = y;
+        swh = bm_size;
+        x0 = y0 = 0;
+        for (int parent=1; parent<=3; parent++) {
+          int local_zoom = zoom - parent;
+          swh >>= 1;
+          x0 = ((tx & 1) << 7) + (x0 >> 1);
+          y0 = ((ty & 1) << 7) + (y0 >> 1);
+          tx >>= 1;
+          ty >>= 1;
+          filename = map_source.get_tile_path(local_zoom, tx, ty);
+          file = new File(filename);
+          if (file.exists()) {
+            Log.i(TAG, "Found lz=" + local_zoom + " x=" + tx + " y=" + ty + " parent=" + parent);
+            Bitmap temp_bm = BitmapFactory.decodeFile(filename);
+            Bitmap ancestor_bm = temp_bm.copy(Bitmap.Config.ARGB_8888, true);
+            Bitmap sub_bm = Bitmap.createBitmap(ancestor_bm, x0, y0, swh, swh);
+            bm = Bitmap.createScaledBitmap(sub_bm, bm_size, bm_size, false);
+            render_coarse_zoom_cross(bm);
+            if (file.lastModified() > start_time) {
+              render_highlight_border(bm);
+            }
+            break;
+          } else {
+            Log.i(TAG, "Not found lz=" + local_zoom + " x=" + tx + " y=" + ty + " parent=" + parent);
+          }
+        }
       }
+
     } catch (Exception e) {
       // to deal with corrupt tile files and such horrors
     }
