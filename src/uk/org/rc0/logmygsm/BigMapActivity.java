@@ -141,6 +141,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
   private final int OPTION_LOG_MARKER       = 20;
   private final int OPTION_DOWNLOAD_33      = 21;
   private final int OPTION_DOWNLOAD_55      = 22;
+  private final int OPTION_DOWNLOAD_LEV_0   = 30;
   private final int OPTION_DOWNLOAD_LEV_1   = 31;
   private final int OPTION_DOWNLOAD_LEV_2   = 32;
 
@@ -157,11 +158,12 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
       menu.addSubMenu (0, 0, Menu.NONE, "Download tile(s)");
     m_download.setIcon(android.R.drawable.ic_menu_view);
     m_download.add (Menu.NONE, OPTION_DOWNLOAD_SINGLE, Menu.NONE, "Central tile");
+    m_download.add (Menu.NONE, OPTION_DOWNLOAD_LEV_0, Menu.NONE, "Missing 0 levels");
+    m_download.add (Menu.NONE, OPTION_DOWNLOAD_LEV_1, Menu.NONE, "Missing 0,1 levels");
+    m_download.add (Menu.NONE, OPTION_DOWNLOAD_LEV_2, Menu.NONE, "Missing 0,1,2 levels");
     m_download.add (Menu.NONE, OPTION_DOWNLOAD_MISSING, Menu.NONE, "Recent missing");
     m_download.add (Menu.NONE, OPTION_DOWNLOAD_33, Menu.NONE, "3x3 region");
     m_download.add (Menu.NONE, OPTION_DOWNLOAD_55, Menu.NONE, "5x5 region");
-    m_download.add (Menu.NONE, OPTION_DOWNLOAD_LEV_1, Menu.NONE, "Missing 0,1 levels");
-    m_download.add (Menu.NONE, OPTION_DOWNLOAD_LEV_2, Menu.NONE, "Missing 0,1,2 levels");
 
     MenuItem m_logmark =
       menu.add (Menu.NONE, OPTION_LOG_MARKER, Menu.NONE, "Bookmark");
@@ -200,6 +202,9 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
         return true;
       case OPTION_DOWNLOAD_55:
         mMap.trigger_fetch_around(2, getApplicationContext());
+        return true;
+      case OPTION_DOWNLOAD_LEV_0:
+        mMap.trigger_fetch_tree(0, false, getApplicationContext());
         return true;
       case OPTION_DOWNLOAD_LEV_1:
         mMap.trigger_fetch_tree(1, false, getApplicationContext());
