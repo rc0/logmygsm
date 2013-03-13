@@ -28,12 +28,21 @@ package uk.org.rc0.logmygsm;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import java.io.File;
 
 class MapSource {
   private String menu_name = "";
   private String path_segment = "";
   private int code;
-  final private String path_start = "/sdcard/Maverick/tiles";
+  final private static String last_hope_path = "/sdcard/LogMyGsm/tiles";
+  final private static String possible_paths[] = {
+    "/sdcard/external_sd/Maverick/tiles",
+    "/sdcard/Maverick/tiles",
+    "/sdcard/external_sd/LogMyGsm/tiles",
+    last_hope_path
+  };
+
+  private static String path_start = null;
 
   String get_menu_name() {
     return menu_name;
@@ -57,6 +66,26 @@ class MapSource {
     menu_name = _menu_name;
     path_segment = _path_segment;
     code = _code;
+  }
+
+  // Discover where the tiles are stored.  Share tiles with Maverick (-Pro) if
+  // possible, otherwise use our own storage
+  static void init() {
+    for (int i = 0; i < possible_paths.length; i++) {
+      File f = new File(possible_paths[i]);
+      if (f.isDirectory()) {
+        path_start = new String(possible_paths[i]);
+        break;
+      }
+    }
+
+    // We must force a path to exist otherwise there is nowhere to download new
+    // tiles into
+    if (path_start == null) {
+      path_start = new String(last_hope_path);
+      File dir = new File(path_start);
+      dir.mkdirs();
+    }
   }
 
 }

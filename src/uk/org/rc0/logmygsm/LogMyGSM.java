@@ -30,6 +30,7 @@ public class LogMyGSM extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
+    MapSource.init();
     TileStore.init(this);
     Downloader.init(this);
     TowerLine.init();
