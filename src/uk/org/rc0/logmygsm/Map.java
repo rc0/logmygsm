@@ -52,7 +52,6 @@ public class Map extends View {
   private final Paint red_stroke_paint;
   private final Paint red_double_stroke_paint;
   private final Paint button_stroke_paint;
-  private final Paint grey_paint;
 
   static final private String TAG = "Map";
   static final private int MAX_ZOOM = 18;
@@ -93,27 +92,23 @@ public class Map extends View {
     super(context, attrs);
 
     red_paint = new Paint();
-    red_paint.setStrokeWidth(1);
+    red_paint.setStrokeWidth(2);
     red_paint.setColor(Color.RED);
 
     red_stroke_paint = new Paint();
-    red_stroke_paint.setStrokeWidth(1);
+    red_stroke_paint.setStrokeWidth(2);
     red_stroke_paint.setColor(Color.RED);
     red_stroke_paint.setStyle(Paint.Style.STROKE);
 
     red_double_stroke_paint = new Paint();
-    red_double_stroke_paint.setStrokeWidth(2);
+    red_double_stroke_paint.setStrokeWidth(4);
     red_double_stroke_paint.setColor(Color.RED);
     red_double_stroke_paint.setStyle(Paint.Style.STROKE);
 
     button_stroke_paint = new Paint();
-    button_stroke_paint.setStrokeWidth(2);
+    button_stroke_paint.setStrokeWidth(4);
     button_stroke_paint.setColor(Color.BLACK);
     button_stroke_paint.setStyle(Paint.Style.STROKE);
-
-    grey_paint = new Paint();
-    grey_paint.setStrokeWidth(2);
-    grey_paint.setColor(Color.GRAY);
 
     setZoom(14);
     map_source = MapSources.get_default();
