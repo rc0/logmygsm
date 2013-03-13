@@ -349,7 +349,6 @@ class TileStore {
           filename = map_source.get_tile_path(local_zoom, tx, ty);
           file = new File(filename);
           if (file.exists()) {
-            Log.i(TAG, "Found lz=" + local_zoom + " x=" + tx + " y=" + ty + " parent=" + parent);
             Bitmap temp_bm = BitmapFactory.decodeFile(filename);
             Bitmap ancestor_bm = temp_bm.copy(Bitmap.Config.ARGB_8888, true);
             Bitmap sub_bm = Bitmap.createBitmap(ancestor_bm, x0, y0, swh, swh);
@@ -359,8 +358,6 @@ class TileStore {
               render_highlight_border(bm);
             }
             break;
-          } else {
-            Log.i(TAG, "Not found lz=" + local_zoom + " x=" + tx + " y=" + ty + " parent=" + parent);
           }
         }
       }
