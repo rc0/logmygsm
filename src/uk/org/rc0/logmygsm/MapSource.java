@@ -146,13 +146,13 @@ class MapSource_OS extends MapSource {
 // ------------------------------------------------------------------
 
 class MapSources {
-  static final int MAP_2G  = 100;
-  static final int MAP_3G  = 101;
-  static final int MAP_TODO = 105;
-  static final int MAP_AGE3G = 106;
-  static final int MAP_MAPNIK = 102;
-  static final int MAP_OS  = 103;
-  static final int MAP_OPEN_CYCLE = 104;
+  static final int MAP_2G  = 0;
+  static final int MAP_3G  = 1;
+  static final int MAP_TODO = 5;
+  static final int MAP_AGE3G = 6;
+  static final int MAP_MAPNIK = 2;
+  static final int MAP_OS  = 3;
+  static final int MAP_OPEN_CYCLE = 4;
 
   static final MapSource [] sources = {
     new MapSource("2G coverage", "Custom 2", MAP_2G),

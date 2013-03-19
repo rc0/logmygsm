@@ -133,37 +133,14 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     super.onPause();
   }
 
-  private final int OPTION_CLEAR_TRAIL      =  5;
-  private final int OPTION_DOWNLOAD_SINGLE  = 11;
-  private final int OPTION_SHARE            = 12;
-  private final int OPTION_DOWNLOAD_MISSING = 13;
-  private final int OPTION_TOGGLE_TOWERLINE = 15;
-  private final int OPTION_LOG_MARKER       = 20;
-  private final int OPTION_DOWNLOAD_33      = 21;
-  private final int OPTION_DOWNLOAD_55      = 22;
-  private final int OPTION_DOWNLOAD_LEV_0   = 30;
-  private final int OPTION_DOWNLOAD_LEV_1   = 31;
-  private final int OPTION_DOWNLOAD_LEV_2   = 32;
+  private final int OPTION_CLEAR_TRAIL  = Menus2.OPTION_LOCAL_BASE | 0x1;
+  private final int OPTION_SHARE        = Menus2.OPTION_LOCAL_BASE | 0x2;
+  private final int OPTION_LOG_MARKER   = Menus2.OPTION_LOCAL_BASE | 0x3;
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-    SubMenu sub = menu.addSubMenu(0, 0, Menu.NONE, "Maps");
-    sub.setIcon(android.R.drawable.ic_menu_mapmode);
-    for (MapSource source : MapSources.sources) {
-      sub.add (Menu.NONE, source.get_code(), Menu.NONE, source.get_menu_name());
-    }
-    mTowerlineToggle = sub.add (Menu.NONE, OPTION_TOGGLE_TOWERLINE, Menu.NONE, "Show towerline");
-    mTowerlineToggle.setCheckable(true);
-    SubMenu m_download =
-      menu.addSubMenu (0, 0, Menu.NONE, "Download tile(s)");
-    m_download.setIcon(android.R.drawable.ic_menu_view);
-    m_download.add (Menu.NONE, OPTION_DOWNLOAD_SINGLE, Menu.NONE, "Central tile");
-    m_download.add (Menu.NONE, OPTION_DOWNLOAD_LEV_0, Menu.NONE, "Missing 0 levels");
-    m_download.add (Menu.NONE, OPTION_DOWNLOAD_LEV_1, Menu.NONE, "Missing 0,1 levels");
-    m_download.add (Menu.NONE, OPTION_DOWNLOAD_LEV_2, Menu.NONE, "Missing 0,1,2 levels");
-    m_download.add (Menu.NONE, OPTION_DOWNLOAD_MISSING, Menu.NONE, "Recent missing");
-    m_download.add (Menu.NONE, OPTION_DOWNLOAD_33, Menu.NONE, "3x3 region");
-    m_download.add (Menu.NONE, OPTION_DOWNLOAD_55, Menu.NONE, "5x5 region");
+    mTowerlineToggle = Menus2.insert_maps_menu(menu);
+    Menus2.insert_download_menu(menu);
 
     MenuItem m_logmark =
       menu.add (Menu.NONE, OPTION_LOG_MARKER, Menu.NONE, "Bookmark");
@@ -187,49 +164,31 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     int code = item.getItemId();
-    switch (code) {
-      case OPTION_CLEAR_TRAIL:
-        mMap.clear_trail();
-        return true;
-      case OPTION_DOWNLOAD_SINGLE:
-        mMap.trigger_fetch_around(0, getApplicationContext());
-        return true;
-      case OPTION_DOWNLOAD_MISSING:
-        TileStore.trigger_fetch(getApplicationContext());
-        return true;
-      case OPTION_DOWNLOAD_33:
-        mMap.trigger_fetch_around(1, getApplicationContext());
-        return true;
-      case OPTION_DOWNLOAD_55:
-        mMap.trigger_fetch_around(2, getApplicationContext());
-        return true;
-      case OPTION_DOWNLOAD_LEV_0:
-        mMap.trigger_fetch_tree(0, false, getApplicationContext());
-        return true;
-      case OPTION_DOWNLOAD_LEV_1:
-        mMap.trigger_fetch_tree(1, false, getApplicationContext());
-        return true;
-      case OPTION_DOWNLOAD_LEV_2:
-        mMap.trigger_fetch_tree(2, false, getApplicationContext());
-        return true;
-      case OPTION_LOG_MARKER:
-        Logger.do_bookmark(this);
-        return true;
-      case OPTION_SHARE:
-        mMap.share_grid_ref(this);
-        return true;
-      case OPTION_TOGGLE_TOWERLINE:
-        TowerLine.toggle_active();
-        return true;
-      default:
-        MapSource source;
-        source = MapSources.lookup(code);
-        if (source != null) {
-          mMap.select_map_source(source);
+    int group = Menus2.group(code);
+    int option = Menus2.option(code);
+    if (group == Menus2.OPTION_DOWNLOAD_BASE) {
+      return Menus2.decode_download_option(Menus2.option(code), this, mMap);
+    } else if (group == Menus2.OPTION_MAP_BASE) {
+      return Menus2.decode_map_option(option, mMap);
+    } else if (group == Menus2.OPTION_LOCAL_BASE) {
+      switch (code) {
+        case OPTION_CLEAR_TRAIL:
+          mMap.clear_trail();
           return true;
-        } else {
+        case OPTION_LOG_MARKER:
+          Logger.do_bookmark(this);
+          return true;
+        case OPTION_SHARE:
+          mMap.share_grid_ref(this);
+          return true;
+        case Menus2.OPTION_TOGGLE_TOWERLINE:
+          TowerLine.toggle_active();
+          return true;
+        default:
           return false;
-        }
+      }
+    } else {
+      return false;
     }
   }
 
