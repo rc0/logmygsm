@@ -397,24 +397,23 @@ public class Map extends View {
     int px1 = display_pos.X + (dw << pixel_shift);
     int py0 = display_pos.Y - (dh << pixel_shift);
     int py1 = display_pos.Y + (dh << pixel_shift);
-    for (int dz=0; dz<=levels; dz++) {
-      int z = zoom + dz;
-      if (z <= MAX_ZOOM) {
-        int tile_shift = Merc28.shift - z;
-        int tx0 = (px0 >> tile_shift);
-        int tx1 = (px1 >> tile_shift);
-        int ty0 = (py0 >> tile_shift);
-        int ty1 = (py1 >> tile_shift);
-        // Log.i(TAG, "Got z=" + z + " tx0=" + tx0 + " ty0=" + ty0 + " tx1=" + tx1 + " ty1=" + ty1);
-        for (int x=tx0; x<=tx1; x++) {
-          for (int y=ty0; y<=ty1; y++) {
-            tiles.add(new TileStore.TilePos(z, x, y, map_source));
-            // Log.i(TAG, "Added z=" + z + " x=" + x + " y=" + y);
-          }
+    int deepest = zoom + levels;
+    if (deepest > MAX_ZOOM) {
+      deepest = MAX_ZOOM;
+    }
+    for (int my_zoom = MIN_ZOOM; my_zoom <= deepest; my_zoom++) {
+      int tile_shift = Merc28.shift - my_zoom;
+      int tx0 = (px0 >> tile_shift);
+      int tx1 = (px1 >> tile_shift);
+      int ty0 = (py0 >> tile_shift);
+      int ty1 = (py1 >> tile_shift);
+      for (int x=tx0; x<=tx1; x++) {
+        for (int y=ty0; y<=ty1; y++) {
+          tiles.add(new TileStore.TilePos(my_zoom, x, y, map_source));
         }
       }
     }
-    Downloader.start_multiple_fetch(tiles, false, context);
+    Downloader.start_multiple_fetch(tiles, forced, context);
   }
 
   void share_grid_ref(Activity _activity) {

@@ -42,13 +42,14 @@ class Menus2 {
 
   static final int OPTION_TOGGLE_TOWERLINE = OPTION_LOCAL_BASE | 0xf;
 
-  static private final int DOWNLOAD_SINGLE  = 0;
-  static private final int DOWNLOAD_MISSING = 1;
-  static private final int DOWNLOAD_33      = 2;
-  static private final int DOWNLOAD_55      = 3;
-  static private final int DOWNLOAD_LEV_0   = 4;
-  static private final int DOWNLOAD_LEV_1   = 5;
-  static private final int DOWNLOAD_LEV_2   = 6;
+  static private final int DOWNLOAD_SINGLE      = 0;
+  static private final int DOWNLOAD_MISSING     = 1;
+  static private final int DOWNLOAD_33          = 2;
+  static private final int DOWNLOAD_55          = 3;
+  static private final int DOWNLOAD_LEV_0       = 4;
+  static private final int DOWNLOAD_LEV_1       = 5;
+  static private final int DOWNLOAD_LEV_2       = 6;
+  static private final int DOWNLOAD_LEV_0_FORCE = 7;
 
   static MenuItem insert_maps_menu(Menu parent) {
     SubMenu sub = parent.addSubMenu(0, 0, Menu.NONE, "Maps");
@@ -67,10 +68,11 @@ class Menus2 {
         parent.addSubMenu (0, 0, Menu.NONE, "Download(s)");
       m_download.setIcon(android.R.drawable.ic_menu_view);
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_SINGLE, Menu.NONE, "Central tile");
-      m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_LEV_0, Menu.NONE, "Missing 0 levels");
-      m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_LEV_1, Menu.NONE, "Missing 0,1 levels");
-      m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_LEV_2, Menu.NONE, "Missing 0,1,2 levels");
+      m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_LEV_0, Menu.NONE, "Missing ..,0 levels");
+      m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_LEV_1, Menu.NONE, "Missing ..,0,1 levels");
+      m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_LEV_2, Menu.NONE, "Missing ..,0,1,2 levels");
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_MISSING, Menu.NONE, "Recent missing");
+      m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_LEV_0_FORCE, Menu.NONE, "Force ..,0 levels");
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_33, Menu.NONE, "3x3 region");
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_55, Menu.NONE, "5x5 region");
   }
@@ -97,6 +99,9 @@ class Menus2 {
          return true;
        case DOWNLOAD_LEV_2:
          map.trigger_fetch_tree(2, false, context);
+         return true;
+       case DOWNLOAD_LEV_0_FORCE:
+         map.trigger_fetch_tree(0, true, context);
          return true;
        default:
          return false;
