@@ -73,11 +73,11 @@
         <TextView
           android:layout_height="wrap_content"
           android:layout_width="130dp"
-          android:id="@+id/dBm"
+          android:id="@+id/asu"
           android:typeface="monospace"
           android:textSize="24sp"
           android:textColor="@android:color/white"
-          android:text="-###dBm"
+          android:text="###asu"
           android:gravity="right">
         </TextView>
 

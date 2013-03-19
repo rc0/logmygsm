@@ -212,9 +212,9 @@ public class Logger extends Service {
 
   private void updateNotification() {
     Context context = getApplicationContext();
-    String expandedText = String.format("%c%d, %ddBm/%c %dm %d/%d/%d",
+    String expandedText = String.format("%c%d, %dasu/%c %dm %d/%d/%d",
         lastNetworkType, lastCid,
-        lastdBm, lastState,
+        lastASU, lastState,
         lastAcc,
         last_fix_sats, last_ephem_sats, last_alman_sats);
     String expandedTitle = String.format("GSM Logger running (%d)", nReadings);

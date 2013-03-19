@@ -50,7 +50,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
   private TextView cidText;
   private TextView twrText;
   private TextView netlacmncText;
-  private TextView dBmText;
+  private TextView asuText;
   private TextView daOffsetText;
   private TextView countText;
   private TextView tileText;
@@ -80,7 +80,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
       cidText = (TextView) findViewById(R.id.cid);
       twrText = (TextView) findViewById(R.id.twr);
       netlacmncText = (TextView) findViewById(R.id.net_lac_mnc);
-      dBmText = (TextView) findViewById(R.id.dBm);
+      asuText = (TextView) findViewById(R.id.asu);
       countText = (TextView) findViewById(R.id.count);
       tileText = (TextView) findViewById(R.id.tile);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
@@ -276,9 +276,14 @@ public class MainActivity extends Activity implements Map.PositionListener {
         Logger.lastNetworkType,
         Logger.lastLac,
         mnc_string);
-    String dBmString = String.format("%dasu", Logger.lastASU);
+    String asuString = String.format("%dasu", Logger.lastASU);
     netlacmncText.setText(netlacmncString);
-    dBmText.setText(dBmString);
+    asuText.setText(asuString);
+    if (Logger.lastASU == 99) {
+      asuText.setTextColor(Color.RED);
+    } else {
+      asuText.setTextColor(Color.WHITE);
+    }
 
     updateCidHistory(current_time);
   }
