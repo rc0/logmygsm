@@ -328,7 +328,6 @@ class TileStore {
           render_highlight_border(bm);
         }
       } else {
-        Log.i(TAG, "Missing z=" + zoom + " x=" + x + " y=" + y);
         // Try to use a sub-region of a zoomed out bitmap instead
         // NOTE : this could be modified so that the above 'then' clause is the initial iteration,
         // but that would introduce extra bitmap copy operations to the normal case
