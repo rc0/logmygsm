@@ -1,4 +1,4 @@
-// Copyright (c) 2012, Richard P. Curnow
+// Copyright (c) 2012, 2013 Richard P. Curnow
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@ package uk.org.rc0.logmygsm;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Color;
+import android.util.Log;
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -40,6 +41,8 @@ import java.util.ArrayList;
 // Storage for the the waypoints that the user can define
 
 class Landmarks {
+
+  static final private String TAG = "Landmarks";
 
   private class Landmark {
     Merc28 pos;
@@ -57,7 +60,10 @@ class Landmarks {
   }
 
   private ArrayList<Landmark> points;
+  private Merc28[] live_points = null;
+  private Linkages mLinkages = null;
   private Paint marker_paint;
+  private Paint track_paint;
 
   static final private String TAIL = "markers.txt";
 
@@ -68,6 +74,12 @@ class Landmarks {
     marker_paint.setStrokeWidth(4);
     marker_paint.setColor(Color.argb(0xc0, 0x80, 0x00, 0x20));
     marker_paint.setStyle(Paint.Style.STROKE);
+
+    track_paint = new Paint();
+    track_paint.setStrokeWidth(12);
+    track_paint.setColor(Color.argb(0x40, 0x80, 0x00, 0x20));
+    track_paint.setStyle(Paint.Style.STROKE);
+    track_paint.setStrokeCap(Paint.Cap.ROUND);
 
   }
 
@@ -81,6 +93,8 @@ class Landmarks {
     }
     return n;
   }
+
+  // ---------------------------
 
   void save_state_to_file() {
     File dir = new File("/sdcard/LogMyGsm/prefs");
@@ -105,6 +119,7 @@ class Landmarks {
 
   private void restore_state_from_file() {
     points = new ArrayList<Landmark> ();
+    mLinkages = null;
     File file = new File("/sdcard/LogMyGsm/prefs/" + TAIL);
     boolean failed = false;
     if (file.exists()) {
@@ -130,11 +145,13 @@ class Landmarks {
     if (failed) {
       points = new ArrayList<Landmark> ();
     }
-
   }
+
+  // ---------------------------
 
   void add(Merc28 pos) {
     points.add(new Landmark(pos));
+    mLinkages = null;
   }
 
   // Return value is true if a deletion successfully occurred, false if no point was
@@ -161,6 +178,7 @@ class Landmarks {
       return false;
     } else {
       points.get(victim).alive = false;
+      mLinkages = null;
       return true;
     }
   }
@@ -178,6 +196,7 @@ class Landmarks {
             (Math.abs(dy) < h2)) {
           did_any = true;
           points.get(i).alive = false;
+          mLinkages = null;
         }
       }
     }
@@ -186,13 +205,55 @@ class Landmarks {
 
   void delete_all() {
     points = new ArrayList<Landmark> ();
+    mLinkages = null;
   }
+
+  // ---------------------------
+
+  private void update_live_points() {
+    int n = count_alive();
+    int m = points.size();
+    int i, j;
+    live_points = new Merc28[n];
+    for (i=0, j=0; i<m; i++) {
+      Landmark l = points.get(i);
+      if (l.alive) {
+        live_points[j++] = l.pos;
+      }
+    }
+    Log.i(TAG, "Got " + n + " live points in the trail");
+  }
+
+  // ---------------------------
+
+  private static class Transform {
+    Merc28 base;
+    int w2;
+    int h2;
+    int pixel_shift;
+
+    Transform(Merc28 _base, int _w, int _h, int _pixel_shift) {
+      base = _base;
+      w2 = _w>>1;
+      h2 = _h>>1;
+      pixel_shift = _pixel_shift;
+    }
+
+    int X(Merc28 p) {
+      return w2 + ((p.X - base.X) >> pixel_shift);
+    }
+
+    int Y(Merc28 p) {
+      return h2 + ((p.Y - base.Y) >> pixel_shift);
+    }
+  };
+
+  // ---------------------------
 
   private final static int RADIUS = 8;
 
-
   // pos is the position of the centre-screen
-  void draw(Canvas c, Merc28 pos, int w, int h, int pixel_shift) {
+  void draw(Canvas c, Merc28 pos, int w, int h, int pixel_shift, boolean do_show_track) {
     int n = points.size();
     for (int i = 0; i < n; i++) {
       if (points.get(i).alive) {
@@ -205,7 +266,31 @@ class Landmarks {
         c.drawPoint(x, y, marker_paint);
       }
     }
+    if (do_show_track) {
+      draw_track(c, pos, w, h, pixel_shift);
+    }
   }
+
+  // ---------------------------
+
+  private void draw_track(Canvas c, Merc28 pos, int w, int h, int pixel_shift) {
+    if (mLinkages == null) {
+      update_live_points();
+      mLinkages = new Linkages(live_points);
+    }
+    Transform t = new Transform(pos, w, h, pixel_shift);
+    Linkages.Indices[] edges = mLinkages.get_edges();
+    for (int i = 0; i<edges.length; i++) {
+      Merc28 m0 = live_points[edges[i].a];
+      Merc28 m1 = live_points[edges[i].b];
+      int x0 = t.X(m0);
+      int x1 = t.X(m1);
+      int y0 = t.Y(m0);
+      int y1 = t.Y(m1);
+      c.drawLine(x0, y0, x1, y1, track_paint);
+    }
+  }
+
 }
 
 // vim:et:sw=2:sts=2
