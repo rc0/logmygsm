@@ -256,13 +256,12 @@ class Landmarks {
   // pos is the position of the centre-screen
   void draw(Canvas c, Merc28 pos, int w, int h, int pixel_shift, boolean do_show_track) {
     int n = points.size();
+    Transform t = new Transform(pos, w, h, pixel_shift);
     for (int i = 0; i < n; i++) {
       if (points.get(i).alive) {
         Merc28 p = points.get(i).pos;
-        int dx = (p.X - pos.X) >> pixel_shift;
-        int x = (w>>1) + dx;
-        int dy = (p.Y - pos.Y) >> pixel_shift;
-        int y = (h>>1) + dy;
+        int x = t.X(p);
+        int y = t.Y(p);
         c.drawCircle(x, y, (float) RADIUS, marker_paint);
         c.drawPoint(x, y, marker_paint);
       }
