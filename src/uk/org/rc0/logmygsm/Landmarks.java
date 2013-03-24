@@ -76,8 +76,8 @@ class Landmarks {
     marker_paint.setStyle(Paint.Style.STROKE);
 
     track_paint = new Paint();
-    track_paint.setStrokeWidth(12);
-    track_paint.setColor(Color.argb(0x40, 0x80, 0x00, 0x20));
+    track_paint.setStrokeWidth(16);
+    track_paint.setColor(Color.argb(0x50, 0x80, 0x00, 0x20));
     track_paint.setStyle(Paint.Style.STROKE);
     track_paint.setStrokeCap(Paint.Cap.ROUND);
 
