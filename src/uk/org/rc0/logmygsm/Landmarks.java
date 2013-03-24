@@ -60,7 +60,6 @@ class Landmarks {
   }
 
   private ArrayList<Landmark> points;
-  private Merc28[] live_points = null;
   private Linkages mLinkages = null;
   private Paint marker_paint;
   private Paint track_paint;
@@ -210,10 +209,11 @@ class Landmarks {
 
   // ---------------------------
 
-  private void update_live_points() {
+  private Merc28[] get_live_points() {
     int n = count_alive();
     int m = points.size();
     int i, j;
+    Merc28[] live_points;
     live_points = new Merc28[n];
     for (i=0, j=0; i<m; i++) {
       Landmark l = points.get(i);
@@ -221,7 +221,8 @@ class Landmarks {
         live_points[j++] = l.pos;
       }
     }
-    Log.i(TAG, "Got " + n + " live points in the trail");
+    //Log.i(TAG, "Got " + n + " live points in the trail");
+    return live_points;
   }
 
   // ---------------------------
@@ -275,19 +276,15 @@ class Landmarks {
 
   private void draw_track(Canvas c, Merc28 pos, int w, int h, int pixel_shift) {
     if (mLinkages == null) {
-      update_live_points();
+      Merc28[] live_points = get_live_points();
       mLinkages = new Linkages(live_points);
     }
     Transform t = new Transform(pos, w, h, pixel_shift);
-    Linkages.Indices[] edges = mLinkages.get_edges();
+    Linkages.Edge[] edges = mLinkages.get_edges();
     for (int i = 0; i<edges.length; i++) {
-      Merc28 m0 = live_points[edges[i].a];
-      Merc28 m1 = live_points[edges[i].b];
-      int x0 = t.X(m0);
-      int x1 = t.X(m1);
-      int y0 = t.Y(m0);
-      int y1 = t.Y(m1);
-      c.drawLine(x0, y0, x1, y1, track_paint);
+      Merc28 m0 = edges[i].m0;
+      Merc28 m1 = edges[i].m1;
+      c.drawLine(t.X(m0), t.Y(m0), t.X(m1), t.Y(m1), track_paint);
     }
   }
 

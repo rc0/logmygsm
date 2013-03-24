@@ -37,22 +37,28 @@ class Linkages {
   //
   // Coherency (if the set of points changes) must be managed by the caller
 
-  static class Indices {
-    int a;
-    int b;
-    Indices(int _a, int _b) {
-      a = _a;
-      b = _b;
+  // ---------------------------
+
+  static class Edge {
+    Merc28 m0;
+    Merc28 m1;
+    Edge(Merc28 _m0, Merc28 _m1) {
+      m0 = _m0;
+      m1 = _m1;
     }
   };
 
   // ---------------------------
 
-  private static class Edge extends Indices {
+  private static class WorkingEdge extends Edge {
+    int i0;
+    int i1;
     float d2;
     boolean alive;
-    public Edge(int _a, int _b, float _d2) {
-      super(_a, _b);
+    public WorkingEdge(int _a, int _b, Merc28[] points, float _d2) {
+      super(points[_a], points[_b]);
+      i0 = _a;
+      i1 = _b;
       d2 = _d2;
       alive = true;
     }
@@ -60,28 +66,29 @@ class Linkages {
 
   // ---------------------------
 
-  private static final Comparator<Edge> edge_comparator =
-    new Comparator<Edge> () {
+  private static final Comparator<WorkingEdge> edge_comparator =
+    new Comparator<WorkingEdge> () {
 
-      public int compare(Edge e0, Edge e1) {
+      public int compare(WorkingEdge e0, WorkingEdge e1) {
         if (e0.d2 > e1.d2) return -1;
         else if (e0.d2 < e1.d2) return +1;
-        else if (e0.a < e1.a) return -1;
-        else if (e0.a > e1.a) return +1;
-        else if (e0.b < e1.b) return -1;
-        else if (e0.b > e1.b) return +1;
+        else if (e0.i0 < e1.i0) return -1;
+        else if (e0.i0 > e1.i0) return +1;
+        else if (e0.i1 < e1.i1) return -1;
+        else if (e0.i1 > e1.i1) return +1;
         else return 0;
       }
     };
 
   // ---------------------------
 
-  private Indices[] edges;
+  // Cached result for later reads
+  private Edge[] edges;
 
   // ---------------------------
 
-  private static Set<Edge> compute_mesh(Merc28[] p) {
-    Set<Edge> result = new HashSet<Edge>();
+  private static Set<WorkingEdge> compute_mesh(Merc28[] p) {
+    Set<WorkingEdge> result = new HashSet<WorkingEdge>();
     int n = p.length;
     int i, j, k;
 
@@ -106,7 +113,7 @@ class Linkages {
           float dx = (float)(p[i].X - p[j].X);
           float dy = (float)(p[i].Y - p[j].Y);
           float d2 = (dx*dx) + (dy*dy);
-          result.add(new Edge(i, j, d2));
+          result.add(new WorkingEdge(i, j, p, d2));
         }
       }
     }
@@ -115,7 +122,7 @@ class Linkages {
 
   // ---------------------------
 
-  private Edge[] compute_pruned(int np, Set<Edge> fussy) {
+  private Edge[] compute_pruned(int np, Set<WorkingEdge> fussy) {
     // remove edges from the overly-'fussy' initial set.  An edge is surplus to
     // requirements <=> the nodes at both end have >=3 neighbours, and there is
     // another path from one to the other through the network even if this edge
@@ -125,18 +132,18 @@ class Linkages {
     int[] n_neigh = new int[np];
     boolean[] visited = new boolean[np];
 
-    Edge[] working = fussy.toArray(new Edge[0]);
+    WorkingEdge[] working = fussy.toArray(new WorkingEdge[0]);
     Arrays.sort(working, edge_comparator);
 
     for (int i=0; i<np; i++) n_neigh[i] = 0;
     for (int i=0; i<working.length; i++) {
-      ++n_neigh[working[i].a];
-      ++n_neigh[working[i].b];
+      ++n_neigh[working[i].i0];
+      ++n_neigh[working[i].i1];
     }
     int n_alive = working.length;
     for (int candidate=0; candidate<working.length; candidate++) {
-      int i0 = working[candidate].a;
-      int i1 = working[candidate].b;
+      int i0 = working[candidate].i0;
+      int i1 = working[candidate].i1;
       if ((n_neigh[i0] >= 3) && (n_neigh[i1] >= 3)) {
         for (int i=0; i<np; i++) { visited[i] = false; }
         boolean active = false;
@@ -146,8 +153,8 @@ class Linkages {
           for (int e = 0; e < working.length; e++) {
             if (e == candidate) continue;
             if (working[e].alive) {
-              int e0 = working[e].a;
-              int e1 = working[e].b;
+              int e0 = working[e].i0;
+              int e1 = working[e].i1;
               if (visited[e0] != visited[e1]) {
                 visited[e0] = visited[e1] = true;
                 active = true;
@@ -178,18 +185,22 @@ class Linkages {
 
   // ---------------------------
 
-  public Linkages(Merc28[] pts) {
-    Set<Edge> mesh = compute_mesh(pts);
-    Edge[] full_edges = compute_pruned(pts.length, mesh);
-    edges = new Indices[full_edges.length];
-    for (int i=0; i<full_edges.length; i++) {
-      edges[i] = full_edges[i];
+  public Linkages(Merc28[] _points) {
+    Merc28 [] points;
+
+    // defensive copy of the points fed in
+    points = new Merc28[_points.length];
+    for (int i = 0; i < _points.length; i++) {
+      points[i] = new Merc28(_points[i]);
     }
+
+    Set<WorkingEdge> mesh = compute_mesh(points);
+    edges = compute_pruned(points.length, mesh);
   }
 
   // ---------------------------
 
-  public Indices[] get_edges() {
+  public Edge[] get_edges() {
     return edges;
   }
 
