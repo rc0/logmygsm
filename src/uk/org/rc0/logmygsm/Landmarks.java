@@ -287,6 +287,16 @@ class Landmarks {
     }
   }
 
+  // ---------------------------
+
+  Linkages.Edge[] get_edges () {
+    if (mLinkages == null) {
+      Merc28[] live_points = get_live_points();
+      mLinkages = new Linkages(live_points);
+    }
+    return mLinkages.get_edges();
+  }
+
 }
 
 // vim:et:sw=2:sts=2

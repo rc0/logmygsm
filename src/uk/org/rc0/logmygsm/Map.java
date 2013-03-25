@@ -34,6 +34,9 @@ import java.lang.Integer;
 import java.lang.Math;
 import java.lang.NumberFormatException;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Iterator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -430,6 +433,105 @@ public class Map extends View {
     }
     Downloader.start_multiple_fetch(tiles, forced, context);
   }
+
+  // A single map tile that will get fetched
+  static class Target {
+    int zoom;
+    int x;
+    int y;
+    Target(int _zoom, int _x, int _y) {
+      zoom = _zoom;
+      x = _x;
+      y = _y;
+    }
+    @Override
+    public boolean equals(Object other) {
+      Target o = (Target) other;
+      if ((zoom == o.zoom) &&
+          (x == o.x) &&
+          (y == o.y)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    @Override
+    public int hashCode() {
+      int result = 51;
+      result += 23 * zoom;
+      result += 37 * x;
+      result += 43 * y;
+      return result;
+    }
+  }
+
+  static void insert_targets(Set<Target> targets, int z, int x0, int y0) {
+    int dx, dy;
+    for (dx=-1; dx<=1; dx++) {
+      int xx = (x0 + dx) >> 1; // reverse the extra zoom level
+      for (dy=-1; dy<=1; dy++) {
+        int yy = (y0 + dy) >> 1; // reverse the extra zoom level
+        Target t = new Target(z, xx, yy);
+        targets.add(t); // auto-discard targets we already have
+      }
+    }
+  }
+
+  // Consider the 'landmarks' trail (maybe user's intended route) currently on
+  // the map, download the tiles required to cover the whole trail at the
+  // current + all outer zoom levels, with a fuzz of +/- 0.5 tiles in all 8
+  // directions around
+  void trigger_fetch_route(int levels, boolean forced, Context context) {
+    Linkages.Edge[] route_edges = Logger.mMarks.get_edges();
+    Set<Target> targets = new HashSet<Target>();
+
+    int z;
+    for (z = MIN_ZOOM; z <= zoom; z++) {
+      int z1 = z + 1; // work 1 zoom level deeper to get the 0.5 tile fuzz
+      int tile_shift = 28 - z1;
+      for (int j = 0; j < route_edges.length; j++) {
+        Linkages.Edge e = route_edges[j];
+        Merc28 m0 = e.m0;
+        Merc28 m1 = e.m1;
+        int x0 = m0.X >> tile_shift;
+        int y0 = m0.Y >> tile_shift;
+        int x1 = m1.X >> tile_shift;
+        int y1 = m1.Y >> tile_shift;
+
+        // Bresenham algorithm (under 'simplification' on Wikipedia)
+        int dx = Math.abs(x1 - x0);
+        int dy = Math.abs(y1 - y0);
+        int sx = (x0 < x1) ? 1 : -1;
+        int sy = (y0 < y1) ? 1 : -1;
+        int err = dx - dy;
+        while (true) {
+          insert_targets(targets, z, x0, y0);
+          if ((x0 == x1) && (y0 == y1)) break;
+          int e2 = 2*err;
+          if (e2 > -dy) {
+            err -= dy;
+            x0 += sx;
+          } else {
+            err += dx;
+            y0 += sy;
+          }
+        }
+      }
+    }
+
+    LinkedList<TileStore.TilePos> tiles;
+    tiles = new LinkedList<TileStore.TilePos> ();
+    Iterator<Target> iter = targets.iterator();
+    while (iter.hasNext()) {
+      Target t = iter.next();
+      //Log.i(TAG, "Would get z=" + t.zoom + " x=" + t.x + " y=" + t.y);
+      tiles.add(new TileStore.TilePos(t.zoom, t.x, t.y, map_source));
+    }
+    Downloader.start_multiple_fetch(tiles, forced, context);
+
+  }
+
+
 
   void share_grid_ref(Activity _activity) {
     if (display_pos != null) {

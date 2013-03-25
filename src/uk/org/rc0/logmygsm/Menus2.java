@@ -52,6 +52,7 @@ class Menus2 {
   static private final int DOWNLOAD_LEV_1       = 5;
   static private final int DOWNLOAD_LEV_2       = 6;
   static private final int DOWNLOAD_LEV_0_FORCE = 7;
+  static private final int DOWNLOAD_LEV_0_ROUTE = 8;
 
   static MenuItem[] insert_maps_menu(Menu parent) {
     SubMenu sub = parent.addSubMenu(0, 0, Menu.NONE, "Maps");
@@ -77,6 +78,7 @@ class Menus2 {
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_LEV_0, Menu.NONE, "Missing ..,0 levels");
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_LEV_1, Menu.NONE, "Missing ..,0,1 levels");
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_LEV_2, Menu.NONE, "Missing ..,0,1,2 levels");
+      m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_LEV_0_ROUTE, Menu.NONE, "Missing ..,0 on route");
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_MISSING, Menu.NONE, "Recent missing");
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_LEV_0_FORCE, Menu.NONE, "Force ..,0 levels");
       m_download.add (Menu.NONE, OPTION_DOWNLOAD_BASE + DOWNLOAD_33, Menu.NONE, "3x3 region");
@@ -108,6 +110,9 @@ class Menus2 {
          return true;
        case DOWNLOAD_LEV_0_FORCE:
          map.trigger_fetch_tree(0, true, context);
+         return true;
+       case DOWNLOAD_LEV_0_ROUTE:
+         map.trigger_fetch_route(0, false, context);
          return true;
        default:
          return false;
