@@ -1,4 +1,3 @@
-// Copyright (c) 2012, 2013, Richard P. Curnow
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -57,6 +56,8 @@ public class Map extends View {
   static final private int MAX_ZOOM = 18;
   static final private int MIN_ZOOM = 5;
 
+  static final float TILE_SCALING = 2.0f;
+
   private int zoom;
   private int pixel_shift;
   private int tile_shift;
@@ -73,6 +74,8 @@ public class Map extends View {
   private Merc28 display_pos;
   // Set to true if we've off-centred the map
   private boolean is_dragged;
+  // Set to true if map tiles are scaled to make them more legible
+  private boolean mScaled;
 
   // --------------------------------------------------------------------------
 
@@ -116,6 +119,7 @@ public class Map extends View {
     display_pos = null;
 
     last_w = last_h = 0;
+    mScaled = false;
 
   }
 
@@ -225,18 +229,29 @@ public class Map extends View {
 
     last_w = width;
     last_h = height;
-
-    TileStore.draw(canvas, width, height, zoom, map_source, display_pos);
-
     set_lengths(width, height);
-    draw_crosshair(canvas, width, height);
-    draw_centre_circle(canvas, width, height);
-    draw_buttons(canvas, width, height);
-    draw_bearing(canvas, width, height);
+
+    int save_level;
+
+    if (mScaled) {
+      save_level = canvas.save();
+      canvas.scale(TILE_SCALING, TILE_SCALING, (float)(width>>1), (float)(height>>1));
+    }
+
+    TileStore.draw(canvas, width, height, zoom, map_source, display_pos, mScaled);
     Logger.mMarks.draw(canvas, display_pos, width, height, pixel_shift, true);
+    draw_crosshair(canvas, width, height);
     if (TowerLine.is_active()) {
       TowerLine.draw_line(canvas, width, height, pixel_shift, display_pos);
     }
+
+    if (mScaled) {
+      canvas.restore();
+    }
+
+    draw_centre_circle(canvas, width, height);
+    draw_buttons(canvas, width, height);
+    draw_bearing(canvas, width, height);
   }
 
   // Interface with main UI activity
@@ -452,6 +467,14 @@ public class Map extends View {
       notify_position_update();
       invalidate();
     }
+  }
+
+  void toggle_scaled() {
+    mScaled = !mScaled;
+  }
+
+  boolean is_scaled () {
+    return mScaled;
   }
 
   private float mLastX;

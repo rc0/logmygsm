@@ -41,6 +41,8 @@ class Menus2 {
   static final int OPTION_DOWNLOAD_BASE    = 0x30;
 
   static final int OPTION_TOGGLE_TOWERLINE = OPTION_LOCAL_BASE | 0xf;
+  static final int TILE_SCALING            = 0xf;
+  static final int OPTION_TILE_SCALING     = OPTION_MAP_BASE | TILE_SCALING;
 
   static private final int DOWNLOAD_SINGLE      = 0;
   static private final int DOWNLOAD_MISSING     = 1;
@@ -51,16 +53,20 @@ class Menus2 {
   static private final int DOWNLOAD_LEV_2       = 6;
   static private final int DOWNLOAD_LEV_0_FORCE = 7;
 
-  static MenuItem insert_maps_menu(Menu parent) {
+  static MenuItem[] insert_maps_menu(Menu parent) {
     SubMenu sub = parent.addSubMenu(0, 0, Menu.NONE, "Maps");
     MenuItem toggle;
+    MenuItem[] toggles = new MenuItem[2];
     sub.setIcon(android.R.drawable.ic_menu_mapmode);
     for (MapSource source : MapSources.sources) {
       sub.add (Menu.NONE, OPTION_MAP_BASE + source.get_code(), Menu.NONE, source.get_menu_name());
     }
-    toggle = sub.add (Menu.NONE, OPTION_TOGGLE_TOWERLINE, Menu.NONE, "Show towerline");
-    toggle.setCheckable(true);
-    return toggle;
+    toggles[0] = sub.add (Menu.NONE, OPTION_TILE_SCALING, Menu.NONE,
+        String.format("Scale tiles by %.1fx", Map.TILE_SCALING));
+    toggles[0].setCheckable(true);
+    toggles[1] = sub.add (Menu.NONE, OPTION_TOGGLE_TOWERLINE, Menu.NONE, "Show towerline");
+    toggles[1].setCheckable(true);
+    return toggles;
   }
 
   static void insert_download_menu(Menu parent) {
@@ -110,14 +116,21 @@ class Menus2 {
 
    static boolean decode_map_option(int subcode, Map map) {
      MapSource source;
-     source = MapSources.lookup(subcode);
-     if (source != null) {
-       //Log.i("Menus", "Match " + source.get_menu_name());
-       map.select_map_source(source);
-       return true;
-     } else {
-       Log.i("Menus", "No match for code " + subcode);
-       return false;
+     switch (subcode) {
+       case TILE_SCALING:
+         Log.i("Menus", "Tile scaling decoded");
+         map.toggle_scaled();
+         return true;
+       default:
+         source = MapSources.lookup(subcode);
+         if (source != null) {
+           //Log.i("Menus", "Match " + source.get_menu_name());
+           map.select_map_source(source);
+           return true;
+         } else {
+           Log.i("Menus", "No match for code " + subcode);
+           return false;
+         }
      }
    }
 

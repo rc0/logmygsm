@@ -62,6 +62,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
 
   private Map mMap;
 
+  private MenuItem mTileScalingToggle;
   private MenuItem mTowerlineToggle;
 
   private static final String PREFS_FILE = "prefs.txt";
@@ -376,7 +377,9 @@ public class MainActivity extends Activity implements Map.PositionListener {
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
       // Top row
-      mTowerlineToggle = Menus2.insert_maps_menu(menu);
+      MenuItem[] toggles = Menus2.insert_maps_menu(menu);
+      mTileScalingToggle = toggles[0];
+      mTowerlineToggle = toggles[1];
       MenuItem m_waypoints =
         menu.add (Menu.NONE, OPTION_BIG_MAP, Menu.NONE, "Waypoints");
       m_waypoints.setIcon(android.R.drawable.ic_menu_myplaces);
@@ -397,6 +400,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
 
   @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+      mTileScalingToggle.setChecked(mMap.is_scaled());
       mTowerlineToggle.setChecked(TowerLine.is_active());
       return true;
     }

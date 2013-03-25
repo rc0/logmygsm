@@ -141,6 +141,8 @@ class TileStore {
   static Paint highlight_border_paint;
   final static private int HIGHLIGHT_WIDTH = 16;
 
+  static private Paint scaling_paint;
+
   // -----------
 
   static Entry [] new_cache() {
@@ -195,6 +197,8 @@ class TileStore {
     my_canv.drawRect(bm_size>>3, bm_size>>3,
         bm_size - (bm_size>>3), bm_size - (bm_size>>3),
         light_gray_paint);
+
+    Paint scaling_paint = new Paint(Paint.FILTER_BITMAP_FLAG);
   }
 
   // -----------
@@ -466,7 +470,7 @@ class TileStore {
     System.gc();
   }
 
-  static void draw(Canvas c, int w, int h, int zoom, MapSource map_source, Merc28 midpoint) {
+  static void draw(Canvas c, int w, int h, int zoom, MapSource map_source, Merc28 midpoint, boolean is_scaled) {
     int pixel_shift = (Merc28.shift - (zoom + bm_log_size));
 
     // Compute pixels from origin at this zoom level for top-left corner of canvas
@@ -509,7 +513,8 @@ class TileStore {
           bm = loading_bitmap;
         }
         Rect dest = new Rect(xx, yy, xx+bm_size, yy+bm_size);
-        c.drawBitmap(bm, null, dest, null);
+        c.drawBitmap(bm, null, dest,
+            is_scaled ? scaling_paint : null);
         j++;
       }
       i++;

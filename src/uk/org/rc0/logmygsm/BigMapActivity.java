@@ -50,6 +50,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
   private Button mDeleteAllButton;
   private TextView summaryText;
   private TextView gridRefText;
+  private MenuItem mTileScalingToggle;
   private MenuItem mTowerlineToggle;
 
   private static final String PREFS_FILE = "prefs2.txt";
@@ -139,7 +140,9 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-    mTowerlineToggle = Menus2.insert_maps_menu(menu);
+    MenuItem[] toggles = Menus2.insert_maps_menu(menu);
+    mTileScalingToggle = toggles[0];
+    mTowerlineToggle = toggles[1];
     Menus2.insert_download_menu(menu);
 
     MenuItem m_logmark =
@@ -157,6 +160,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
 
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
+    mTileScalingToggle.setChecked(mMap.is_scaled());
     mTowerlineToggle.setChecked(TowerLine.is_active());
     return true;
   }
