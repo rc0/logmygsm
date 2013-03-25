@@ -70,13 +70,13 @@ class Landmarks {
     restore_state_from_file();
 
     marker_paint = new Paint();
-    marker_paint.setStrokeWidth(4);
-    marker_paint.setColor(Color.argb(0xc0, 0x80, 0x00, 0x20));
+    marker_paint.setStrokeWidth(3);
+    marker_paint.setColor(Color.argb(0xa0, 0x80, 0x00, 0x20));
     marker_paint.setStyle(Paint.Style.STROKE);
 
     track_paint = new Paint();
-    track_paint.setStrokeWidth(16);
-    track_paint.setColor(Color.argb(0x50, 0x80, 0x00, 0x20));
+    track_paint.setStrokeWidth(14);
+    track_paint.setColor(Color.argb(0x38, 0x80, 0x00, 0x20));
     track_paint.setStyle(Paint.Style.STROKE);
     track_paint.setStrokeCap(Paint.Cap.ROUND);
 
@@ -251,7 +251,7 @@ class Landmarks {
 
   // ---------------------------
 
-  private final static int RADIUS = 8;
+  private final static int RADIUS = 7;
 
   // pos is the position of the centre-screen
   void draw(Canvas c, Merc28 pos, int w, int h, int pixel_shift, boolean do_show_track) {
