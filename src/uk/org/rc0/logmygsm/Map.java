@@ -46,6 +46,7 @@ import android.view.MotionEvent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.util.Log;
 
 public class Map extends View {
@@ -54,6 +55,8 @@ public class Map extends View {
   private final Paint red_stroke_paint;
   private final Paint red_double_stroke_paint;
   private final Paint button_stroke_paint;
+  private final Paint stats_paint_text;
+  private final Paint stats_paint_line;
 
   static final private String TAG = "Map";
   static final private int MAX_ZOOM = 18;
@@ -75,6 +78,10 @@ public class Map extends View {
 
   // the location at the centre of the screen - may be != estimated_pos if is_dragged is true.
   private Merc28 display_pos;
+
+  // the location used as the 'destination' for the distance to run display
+  private Merc28 target_pos;
+
   // Set to true if we've off-centred the map
   private boolean is_dragged;
   // Set to true if map tiles are scaled to make them more legible
@@ -115,6 +122,17 @@ public class Map extends View {
     button_stroke_paint.setStrokeWidth(4);
     button_stroke_paint.setColor(Color.BLACK);
     button_stroke_paint.setStyle(Paint.Style.STROKE);
+
+    stats_paint_text = new Paint();
+    stats_paint_text.setColor(Color.argb(0xc0, 0x00, 0x30, 0x10));
+    stats_paint_text.setTextSize(32.0f);
+    stats_paint_text.setTextAlign(Paint.Align.CENTER);
+    stats_paint_text.setTypeface(Typeface.DEFAULT_BOLD);
+
+    stats_paint_line = new Paint();
+    stats_paint_line.setColor(Color.argb(0xc0, 0x00, 0x30, 0x10));
+    stats_paint_line.setStrokeWidth(2);
+    stats_paint_line.setStyle(Paint.Style.STROKE);
 
     setZoom(14);
     map_source = MapSources.get_default();
@@ -226,6 +244,51 @@ public class Map extends View {
         button_stroke_paint);
   }
 
+  private void show_target_stats(Canvas c, int w, int h) {
+    LocationOffset offset = new LocationOffset(target_pos);
+    String distance;
+    String bearing;
+    String relative;
+    if (offset.metres < 1000.0) {
+      distance = String.format("%3dm", (int) offset.metres);
+    } else {
+      distance = String.format("%.1fkm", offset.metres * 0.001);
+    }
+    bearing = String.format("%03d\u00B0", (int) offset.bearing);
+    if (Logger.validFix && !offset.dragged) {
+      int angle = (int) offset.bearing - Logger.lastBearing;
+      if (angle < -180) { angle += 360; }
+      if (angle >= 180) { angle -= 360; }
+      if (angle < 0) {
+        relative = String.format(" %03dL", -angle);
+      } else {
+        relative = String.format(" %03dR",  angle);
+      }
+    } else {
+      relative = "";
+    }
+    c.drawText(distance + " " + bearing + relative, (float)(w>>1), (float)(h-16), stats_paint_text);
+    float x0 = (float)(w >> 2);
+    float x1 = (float)(w - (w >> 2));
+    float y0 = (float)h;
+    float y1 = (float)(h - button_size);
+    c.drawLine(x0, y0, x0, y1, stats_paint_line);
+    c.drawLine(x0, y1, x1, y1, stats_paint_line);
+    c.drawLine(x1, y1, x1, y0, stats_paint_line);
+  }
+
+  private void show_target_location(Canvas c, int w, int h) {
+    if (display_pos != null) {
+      int dx = (target_pos.X - display_pos.X) >> pixel_shift;
+      int dy = (target_pos.Y - display_pos.Y) >> pixel_shift;
+      float xc = (float) (dx + (w>>1));
+      float yc = (float) (dy + (h>>1));
+      c.drawCircle(xc, yc, 24.0f, stats_paint_line);
+      c.drawCircle(xc, yc, 18.0f, stats_paint_line);
+      c.drawCircle(xc, yc, 12.0f, stats_paint_line);
+    }
+  }
+
   private void redraw_map(Canvas canvas) {
     int width = getWidth();
     int height = getHeight();
@@ -247,6 +310,9 @@ public class Map extends View {
     if (TowerLine.is_active()) {
       TowerLine.draw_line(canvas, width, height, pixel_shift, display_pos);
     }
+    if (target_pos != null) {
+      show_target_location(canvas, width, height);
+    }
 
     if (mScaled) {
       canvas.restore();
@@ -255,6 +321,9 @@ public class Map extends View {
     draw_centre_circle(canvas, width, height);
     draw_buttons(canvas, width, height);
     draw_bearing(canvas, width, height);
+    if (target_pos != null) {
+      show_target_stats(canvas, width, height);
+    }
   }
 
   // Interface with main UI activity
@@ -634,6 +703,18 @@ public class Map extends View {
     return false;
   }
 
+  private boolean try_get_target(float x, float y) {
+    if ((y > (getHeight() - button_size)) &&
+        (x > ((getWidth() - button_size) >> 1)) &&
+        (x < ((getWidth() + button_size) >> 1))) {
+      if (display_pos != null) {
+        target_pos = new Merc28(display_pos);
+        return true;
+      }
+    }
+    return false;
+  }
+
   private boolean try_start_drag(float x, float y) {
     // Not inside the zoom buttons - initiate drag
     if (display_pos != null) {
@@ -656,6 +737,9 @@ public class Map extends View {
           return true;
         }
         if (try_recentre(x, y)) {
+          return true;
+        }
+        if (try_get_target(x, y)) {
           return true;
         }
         if (try_start_drag(x, y)) {
@@ -707,15 +791,24 @@ public class Map extends View {
 
   // -----------
 
-  class TowerOffset {
+  class LocationOffset {
     public boolean known;
     public boolean dragged;
     public double metres;
     public double bearing;
+
+    LocationOffset(Merc28 other_location) {
+      known = true;
+      metres = display_pos.metres_away(other_location);
+      bearing = display_pos.bearing_to(other_location);
+      dragged = is_dragged;
+    }
+    LocationOffset() {
+    }
   };
 
-  TowerOffset get_tower_offset () {
-    TowerOffset result = new TowerOffset();
+  LocationOffset get_tower_offset () {
+    LocationOffset result = new LocationOffset();
     if (display_pos == null) {
       result.known = false;
     } else {

@@ -182,7 +182,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
   }
 
   private void tower_update() {
-    Map.TowerOffset tow_off = mMap.get_tower_offset();
+    Map.LocationOffset tow_off = mMap.get_tower_offset();
     if (tow_off.known == false) {
       twrText.setText("TOWER?");
       twrText.setTextColor(Color.RED);
