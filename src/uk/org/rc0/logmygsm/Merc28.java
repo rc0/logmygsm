@@ -42,6 +42,7 @@ class Merc28 {
 
   static final int shift = 28;
   static final double scale = (double)(1<<shift);
+  static final double iscale = 1.0 / scale;
 
   Merc28(double lat, double lon) {
     double x, yy, y, XX, YY;
@@ -67,21 +68,29 @@ class Merc28 {
     Y = src.Y;
   }
 
-  static double metres_per_pixel = (25220000.0 / scale);
-  static final double EARTH_RADIUS_IN_METRES = 6378140.0;
-
-  static void update_latitude(double lat) {
-    metres_per_pixel =
-      2.0 * Math.PI *
-      EARTH_RADIUS_IN_METRES *
-      Math.cos(Math.toRadians(lat)) / scale;
-  }
+  static final double EARTH_RADIUS_IN_METRES = 6378137.0;
+  static final double K = (2.0 * Math.PI * EARTH_RADIUS_IN_METRES);
+  static final double K0 = 1.0/K;
+  static final double K2 = 19.42975297/K;
+  static final double K4 = 74.22319781/K;
+  static final double J0 = 0.99330562;
+  static final double J2 = 0.18663111;
+  static final double J4 = -1.45510549;
 
   double metres_away(Merc28 other) {
-    double zx = (double)(X - other.X);
-    double zy = (double)(Y - other.Y);
-    double zd = Math.sqrt(zx*zx + zy*zy) * metres_per_pixel;
-    return zd;
+    // This approximation has worst-case error around 0.1% for distances up to
+    // at least 200km and latitudes up to 71 deg
+    double dx = (double)(X - other.X) * iscale;
+    double dy = (double)(Y - other.Y) * iscale;
+    double ay = (0.5 * iscale) * (double)(Y + other.Y);
+    double az = ay - 0.5;
+    double az2 = az * az;
+    double az4 = az2 * az2;
+    double scale_factor_y = J0 + J2*az2 + J4*az4;
+    double scale_factor_total = K0 + K2*az2 + K4*az4;
+    double Dy = dy * scale_factor_y;
+    double d = Math.sqrt(dx*dx + Dy*Dy);
+    return d / scale_factor_total;
   }
 
   double bearing_to(Merc28 other) {
