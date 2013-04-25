@@ -420,10 +420,17 @@ public class MainActivity extends Activity implements Map.PositionListener {
         switch (code) {
           case OPTION_EXIT:
             Logger.stop_tracing = true;
+
             // If app stays in memory, start 'clean' next time wrt tile downloading
             TileStore.refresh_epoch();
             // avoid holding onto oodles of memory at Application level...
             TileStore.invalidate();
+
+            // Send an intent to the Logger to get it to exit promptly even if there are no
+            // GPS or cell updates soon
+            Intent quit_intent = new Intent(Logger.QUIT_LOGGER);
+            sendBroadcast(quit_intent);
+
             finish();
             return true;
           case OPTION_SHARE:
@@ -433,8 +440,8 @@ public class MainActivity extends Activity implements Map.PositionListener {
             Logger.do_bookmark(this);
             return true;
           case OPTION_BIG_MAP:
-            Intent intent = new Intent(this, BigMapActivity.class);
-            startActivity(intent);
+            Intent launch_intent = new Intent(this, BigMapActivity.class);
+            startActivity(launch_intent);
             return true;
           case Menus2.OPTION_TOGGLE_TOWERLINE:
             TowerLine.toggle_active();

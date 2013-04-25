@@ -29,8 +29,10 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.location.GpsStatus;
@@ -53,6 +55,7 @@ public class Logger extends Service {
   // Flag that's set by the UI to tell us to cut the power when we next get
   // called back by the framework.
   static boolean stop_tracing;
+  private QuitReceiver myQuitReceiver;
 
   private TelephonyManager myTelephonyManager;
   private LocationManager myLocationManager;
@@ -72,8 +75,9 @@ public class Logger extends Service {
   // Variables shared with the Activity
   // -----------------
   //
-  static final String UPDATE_CELL = "LogMyGSM_Update_Cell";
-  static final String UPDATE_GPS  = "LogMyGSM_Update_GPS";
+  static final String UPDATE_CELL  = "LogMyGSM_Update_Cell";
+  static final String UPDATE_GPS   = "LogMyGSM_Update_GPS";
+  static final String QUIT_LOGGER  = "LogMyGSM_Quit_Logger";
 
   // --- Telephony
   static char   lastNetworkType;
@@ -292,6 +296,10 @@ public class Logger extends Service {
       myLocationManager.addGpsStatusListener(gpsListener);
     } catch (Exception e) {
     }
+
+    IntentFilter quit_filter = new IntentFilter(QUIT_LOGGER);
+    myQuitReceiver = new QuitReceiver();
+    registerReceiver(myQuitReceiver, quit_filter);
   }
 
   // --------------------------------------------------------------------------------
@@ -310,6 +318,8 @@ public class Logger extends Service {
     if (rawlog != null) {
       rawlog.close();
     }
+
+    unregisterReceiver(myQuitReceiver);
   }
 
   // --------------------------------------------------------------------------------
@@ -349,6 +359,13 @@ public class Logger extends Service {
     Intent intent = new Intent(UPDATE_CELL);
     sendBroadcast(intent);
     if (stop_tracing) {
+      stopSelf();
+    }
+  }
+
+  class QuitReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
       stopSelf();
     }
   }
