@@ -146,7 +146,7 @@ public class Map extends View {
 
   // Main drawing routines...
 
-  private float len1, len2, len3;
+  private float len1, len3, len4;
 
   private int button_half_line;
   private int button_radius;
@@ -159,36 +159,8 @@ public class Map extends View {
     button_radius = (t>>4); // approx 16 * (t/240)
     button_size = (t>>2) - (t>>3) + (t>>5); // approx 40 * (t/240)
     len1 = (float)(t>>5); // approx 8 * (t/240)
-    len2 = (float)(t>>2); // approx 64 * (t/240)
     len3 = (float)((t+t+t)>>5); // approx 3*len1
-  }
-
-  private void draw_crosshair(Canvas c, int w, int h) {
-    if (estimated_pos != null) {
-      float x0, x1, x2, x3, xc;
-      float y0, y1, y2, y3, yc;
-
-      xc = (float)(w/2);
-      yc = (float)(h/2);
-      if (is_dragged) {
-        int dx = (estimated_pos.X - display_pos.X) >> pixel_shift;
-        int dy = (estimated_pos.Y - display_pos.Y) >> pixel_shift;
-        xc += (float) dx;
-        yc += (float) dy;
-      }
-      x0 = xc - (len1 + len2);
-      x1 = xc - (len1);
-      x2 = xc + (len1);
-      x3 = xc + (len1 + len2);
-      y0 = yc - (len1 + len2);
-      y1 = yc - (len1);
-      y2 = yc + (len1);
-      y3 = yc + (len1 + len2);
-      c.drawLine(x0, yc, x1, yc, red_double_stroke_paint);
-      c.drawLine(x2, yc, x3, yc, red_double_stroke_paint);
-      c.drawLine(xc, y0, xc, y1, red_double_stroke_paint);
-      c.drawLine(xc, y2, xc, y3, red_double_stroke_paint);
-    }
+    len4 = 0.5f*len3; // approx 1.5*len1
   }
 
   private void draw_centre_circle(Canvas c, int w, int h) {
@@ -211,20 +183,38 @@ public class Map extends View {
     c.drawLine(xc, y2, xc, y3, red_paint);
   }
 
-  void draw_bearing(Canvas c, int w, int h) {
-    if (Logger.validFix) {
-      c.save();
-      c.rotate((float) Logger.lastBearing, (w>>1), (h>>1));
-      float xl = (float)(w>>1) - (1.0f*len1);
-      float xc = (float)(w>>1);
-      float xr = (float)(w>>1) + (1.0f*len1);
-      float yb = (float)(h>>1) - (len3 + (0.5f*len1));
-      float yt = (float)(h>>1) - (len3 + (3.5f*len1));
-      c.drawLine(xc, yt, xl, yb, red_double_stroke_paint);
-      c.drawLine(xc, yt, xr, yb, red_double_stroke_paint);
-      c.drawLine(xl, yb, xr, yb, red_double_stroke_paint);
-      c.restore();
+  void draw_position(Canvas c, int w, int h) {
+    if (estimated_pos != null) {
+      float x0, x1, x2, x3, xc;
+      float y0, y1, y2, y3, yc;
+
+      xc = (float)(w>>1);
+      yc = (float)(h>>1);
+      if (is_dragged) {
+        int dx = (estimated_pos.X - display_pos.X) >> pixel_shift;
+        int dy = (estimated_pos.Y - display_pos.Y) >> pixel_shift;
+        xc += (float) dx;
+        yc += (float) dy;
+      }
+      if (Logger.validFix) {
+        c.save();
+        c.rotate((float) Logger.lastBearing, xc, yc);
+
+        float xl = xc - (1.0f*len1);
+        float xr = xc + (1.0f*len1);
+        float yb = yc - (len4 + (0.5f*len1));
+        float yt = yc - (len4 + (3.5f*len1));
+        c.drawLine(xc, yt, xl, yb, red_double_stroke_paint);
+        c.drawLine(xc, yt, xr, yb, red_double_stroke_paint);
+        c.drawLine(xl, yb, xr, yb, red_double_stroke_paint);
+
+        // and draw the position circle
+        c.drawCircle(xc, yc, len4, red_double_stroke_paint);
+
+        c.restore();
+      }
     }
+
   }
 
   private void draw_buttons(Canvas c, int w, int h) {
@@ -306,7 +296,7 @@ public class Map extends View {
 
     TileStore.draw(canvas, width, height, zoom, map_source, display_pos, mScaled);
     Logger.mMarks.draw(canvas, display_pos, width, height, pixel_shift, true);
-    draw_crosshair(canvas, width, height);
+    draw_position(canvas, width, height);
     if (TowerLine.is_active()) {
       TowerLine.draw_line(canvas, width, height, pixel_shift, display_pos);
     }
@@ -320,7 +310,6 @@ public class Map extends View {
 
     draw_centre_circle(canvas, width, height);
     draw_buttons(canvas, width, height);
-    draw_bearing(canvas, width, height);
     if (target_pos != null) {
       show_target_stats(canvas, width, height);
     }
