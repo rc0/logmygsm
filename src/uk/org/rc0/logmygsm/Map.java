@@ -354,6 +354,7 @@ public class Map extends View {
     display_pos = new Merc28(54.5, -2.0); // in the wilderness
     setZoom(14);
     map_source = MapSources.get_default();
+    mScaled = false;
     if (file.exists()) {
       try {
         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -372,6 +373,10 @@ public class Map extends View {
         if (map_source == null) {
           map_source = MapSources.get_default();
         }
+
+        line = br.readLine();
+        int read_scaled = Integer.parseInt(line);
+        mScaled = (read_scaled != 0);
         br.close();
       } catch (IOException e) {
       } catch (NumberFormatException n) {
@@ -392,6 +397,7 @@ public class Map extends View {
         bw.write(String.format("%d\n", display_pos.X));
         bw.write(String.format("%d\n", display_pos.Y));
         bw.write(String.format("%d\n", map_source.get_code()));
+        bw.write(String.format("%d\n", mScaled ? 1 : 0));
         bw.close();
       } catch (IOException e) {
       }
