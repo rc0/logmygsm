@@ -61,7 +61,7 @@
         android:id="@+id/delete_visible_button"
         android:typeface="monospace"
         android:textSize="14sp"
-        android:text="Del vis"
+        android:text="Del []"
         android:gravity="center">
     </Button>
     <Button
@@ -70,7 +70,16 @@
         android:id="@+id/delete_all_button"
         android:typeface="monospace"
         android:textSize="14sp"
-        android:text="Del all"
+        android:text="Del *"
+        android:gravity="center">
+    </Button>
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/set_destination_button"
+        android:typeface="monospace"
+        android:textSize="14sp"
+	android:text="->"
         android:gravity="center">
     </Button>
   </LinearLayout>

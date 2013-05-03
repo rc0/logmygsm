@@ -89,6 +89,15 @@
           android:text="-* "
           android:gravity="center">
       </Button>
+      <Button
+          android:layout_height="wrap_content"
+          android:layout_width="wrap_content"
+          android:id="@+id/set_destination_button"
+          android:typeface="monospace"
+          android:textSize="14sp"
+          android:text="-> "
+          android:gravity="center">
+      </Button>
     </LinearLayout>
     <!-- The block around the buttons at the left -->
 

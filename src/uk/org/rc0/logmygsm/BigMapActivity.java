@@ -48,6 +48,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
   private Button mDeleteButton;
   private Button mDeleteVisibleButton;
   private Button mDeleteAllButton;
+  private Button mSetDestinationButton;
   private TextView summaryText;
   private TextView gridRefText;
   private MenuItem mTileScalingToggle;
@@ -65,6 +66,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     mDeleteButton = (Button) findViewById(R.id.delete_button);
     mDeleteVisibleButton = (Button) findViewById(R.id.delete_visible_button);
     mDeleteAllButton = (Button) findViewById(R.id.delete_all_button);
+    mSetDestinationButton = (Button) findViewById(R.id.set_destination_button);
     summaryText = (TextView) findViewById(R.id.big_summary);
     gridRefText = (TextView) findViewById(R.id.big_grid_ref);
 
@@ -89,6 +91,12 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     mDeleteAllButton.setOnClickListener(new OnClickListener () {
       public void onClick(View v) {
         mMap.delete_all_landmarks();
+      }
+    });
+
+    mSetDestinationButton.setOnClickListener(new OnClickListener () {
+      public void onClick(View v) {
+        mMap.set_destination_landmark();
       }
     });
 
