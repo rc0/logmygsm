@@ -530,7 +530,7 @@ class Linkages {
       return null;
     } else if (points.length == 1) {
       // points[0] is necessarily the destination
-      Routing r0 = new Landmarks.Routing(pos, points[0], calculate_distance(endpoints[0][0]));
+      Routing r0 = new Landmarks.Routing(pos, points[0], 0.0f);
       return gather(r0, null);
     } else {
       // find the segment such that 'pos' subtends the largest angle at its endpoints
@@ -591,14 +591,16 @@ class Linkages {
         Routing r0=null, r1=null;
 
         if (endpoints[best_pt_index].length == 1) {
+          // at the end of the chain
           Endpoint nearest = endpoints[best_pt_index][0];
           Endpoint next = nearest.peer;
-          float dist = calculate_distance(next, nearest.via);
-          if (dist < 0.0f) {
-            // 'nearest' must be the destination
-            r0 = new Routing(pos, points[nearest.index], 0.0f); // no onward distance
+          if (nearest.is_destination()) {
+            r0 = new Routing(pos, points[nearest.index], 0.0f);
+          } else if (next.is_destination()) {
+            r0 = new Routing(pos, points[next.index], 0.0f);
           } else {
-            r0 = new Routing(pos, points[next.index], dist); // no onward distance
+            float dist = calculate_distance(next, nearest.via);
+            r0 = new Routing(pos, points[next.index], dist);
           }
         } else {
           Endpoint[] ea = endpoints[best_pt_index];
