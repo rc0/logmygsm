@@ -33,7 +33,7 @@ public class LogMyGSM extends Application {
     MapSource.init();
     TileStore.init(this);
     Downloader.init(this);
-    TowerLine.init();
+    TowerLine.init(this);
   }
 
   @Override

@@ -146,22 +146,38 @@ class MapSource_OS extends MapSource {
 // ------------------------------------------------------------------
 
 class MapSources {
-  static final int MAP_2G  = 0;
-  static final int MAP_3G  = 1;
-  static final int MAP_TODO = 5;
-  static final int MAP_AGE3G = 6;
-  static final int MAP_MAPNIK = 2;
-  static final int MAP_OS  = 3;
+  static final int MAP_MAPNIK  =  2;
+  static final int MAP_OS      =  3;
   static final int MAP_OPEN_CYCLE = 4;
+  static final int MAP_2G      =  0;
+  static final int MAP_3G      =  1;
+  static final int MAP_AGE2G   =  5;
+  static final int MAP_AGE3G   =  6;
+  static final int MAP_B_2G    =  8;
+  static final int MAP_B_3G    =  9;
+  static final int MAP_B_AGE2G = 10;
+  static final int MAP_B_AGE3G = 11;
+  static final int MAP_C_2G    = 12;
+  static final int MAP_C_3G    = 13;
+  static final int MAP_C_AGE2G = 14;
+  static final int MAP_C_AGE3G = 15;
 
   static final MapSource [] sources = {
-    new MapSource("2G coverage", "Custom 2", MAP_2G),
-    new MapSource("3G coverage", "Custom 3", MAP_3G),
-    new MapSource("Visited", "logmygsm_todo", MAP_TODO),
-    new MapSource("3G data age", "logmygsm_age3g", MAP_AGE3G),
-    new MapSource_OS("Ordnance Survey", "Ordnance Survey Explorer Maps (UK)", MAP_OS),
     new MapSource_Mapnik("Mapnik (OSM)", "mapnik", MAP_MAPNIK),
+    new MapSource_OS("Ordnance Survey", "Ordnance Survey Explorer Maps (UK)", MAP_OS),
+    new MapSource("2G todo",          "logmygsm_age2g",   MAP_AGE2G),
+    new MapSource("3G todo",          "logmygsm_age3g",   MAP_AGE3G),
+    new MapSource("2G coverage",      "Custom 2",         MAP_2G),
+    new MapSource("3G coverage",      "Custom 3",         MAP_3G),
     new MapSource_Cycle("Open Cycle Map", "OSM Cycle Map", MAP_OPEN_CYCLE),
+    new MapSource("NetB 2G todo",     "logmygsm_B_age2g", MAP_B_AGE2G),
+    new MapSource("NetB 3G todo",     "logmygsm_B_age3g", MAP_B_AGE3G),
+    new MapSource("NetB 2G coverage", "logmygsm_B_2g",    MAP_B_2G),
+    new MapSource("NetB 3G coverage", "logmygsm_B_3g",    MAP_B_3G),
+    new MapSource("NetC 2G todo",     "logmygsm_C_age2g", MAP_C_AGE2G),
+    new MapSource("NetC 3G todo",     "logmygsm_C_age3g", MAP_C_AGE3G),
+    new MapSource("NetC 2G coverage", "logmygsm_C_2g",    MAP_C_2G),
+    new MapSource("NetC 3G coverage", "logmygsm_C_3g",    MAP_C_3G),
   };
 
   static MapSource lookup(int code) {

@@ -36,9 +36,11 @@ class Backend {
   private FileWriter writer;
   private Logger mService;
 
-  Backend(String prefix, Logger the_service) {
+  // 'netcode' allows SIMs to be switched in and out of the handset whilst
+  // keeping the logfiles from different operators' SIMs in separate directories
+  Backend(String prefix, String netcode, Logger the_service) {
     String basePath = "/sdcard";
-    String ourDir = "LogMyGsm/logs";
+    String ourDir = "LogMyGsm/logs/" + netcode;
     CharSequence cs = DateFormat.format("yyyyMMdd-kkmmss", System.currentTimeMillis());
     String timedFileName = prefix + cs.toString() + ".log";
     String fullPath = basePath + "/" + ourDir + "/" + timedFileName;

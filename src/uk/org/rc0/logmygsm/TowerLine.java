@@ -25,10 +25,13 @@
 
 package uk.org.rc0.logmygsm;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import java.io.File;
 import java.io.BufferedReader;
@@ -49,8 +52,13 @@ class TowerLine {
   static private Paint [] thin_line_paint;
   static private Paint text_paint;
 
-  static final private String TEXT = "cidxy.txt";
-  static final private String BINARY = "cidxy.dat";
+  static String simOperator;
+  static String text_name;
+  static String binary_name;
+  static final private String PREFS_DIR = "/sdcard/LogMyGsm/prefs/";
+  static final private String STEM = "cidxy_";
+  static final private String TEXT = ".txt";
+  static final private String BINARY = ".dat";
   static final private String TAG = "TowerLine";
 
   static private Merc28 tmp_pos;
@@ -65,9 +73,19 @@ class TowerLine {
 
   // -------------------------
 
+  static final private void setup_filenames(Context _app_context) {
+    TelephonyManager tm;
+    String simOperator;
+
+    tm = (TelephonyManager) _app_context.getSystemService(Context.TELEPHONY_SERVICE);
+    simOperator = tm.getSimOperator();
+    text_name = new String(PREFS_DIR + STEM + simOperator + TEXT);
+    binary_name = new String(PREFS_DIR + STEM + simOperator + BINARY);
+  }
+
   static final private void load_lut_from_text() {
     lut = new HashMap<String,Merc28>();
-    File file = new File("/sdcard/LogMyGsm/prefs/" + TEXT);
+    File file = new File(text_name);
     int n = 0;
     if (file.exists()) {
       try {
@@ -94,7 +112,7 @@ class TowerLine {
   }
 
   static final private void write_lut_to_binary() {
-    File file = new File("/sdcard/LogMyGsm/prefs/" + BINARY);
+    File file = new File(binary_name);
     try {
       ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
       int n = lut.size();
@@ -115,7 +133,7 @@ class TowerLine {
   }
 
   static final private void read_lut_from_binary() {
-    File file = new File("/sdcard/LogMyGsm/prefs/" + BINARY);
+    File file = new File(binary_name);
     int i = -1;
     lut = new HashMap<String,Merc28>();
     try {
@@ -139,9 +157,8 @@ class TowerLine {
   }
 
   static final private void load_tower_xy_data() {
-
-    File text = new File("/sdcard/LogMyGsm/prefs/" + TEXT);
-    File binary = new File("/sdcard/LogMyGsm/prefs/" + BINARY);
+    File text = new File(text_name);
+    File binary = new File(binary_name);
     if (!binary.exists() ||
         (binary.lastModified() < text.lastModified())) {
       load_lut_from_text();
@@ -151,7 +168,8 @@ class TowerLine {
     }
   }
 
-  static void init() {
+  static void init(Context _app_context) {
+    setup_filenames(_app_context);
     tmp_pos = new Merc28(0,0);
     mActive = false;
     line_paint = new Paint[N_PAINTS];

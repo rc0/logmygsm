@@ -1,3 +1,4 @@
+// Copyright (c) 2012, 2013 Richard P. Curnow
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -40,6 +41,7 @@ import java.util.Iterator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.MotionEvent;
@@ -66,10 +68,9 @@ public class Map extends View {
 
   static final float TILE_SCALING = 2.0f;
 
-  static final float DEST_TEXT_SIZE = 32.0f;
-  static final float DEST_REGION_HEIGHT = 1.5f * DEST_TEXT_SIZE;
-  static final float DEST_ARROW = 0.3f * DEST_REGION_HEIGHT;
-  static final float DEST_ARROW_2 = 0.5f * DEST_ARROW;
+  static private float dest_region_height;
+  static private float dest_arrow_1;
+  static private float dest_arrow_2;
 
   private int zoom;
   private int pixel_shift;
@@ -127,9 +128,15 @@ public class Map extends View {
     button_stroke_paint.setColor(Color.BLACK);
     button_stroke_paint.setStyle(Paint.Style.STROKE);
 
+    Resources res = context.getResources();
+    int dest_text_size = res.getDimensionPixelSize(R.dimen.distanceFontSize);
+    dest_region_height = 1.5f * dest_text_size;
+    dest_arrow_1 = 0.3f * dest_region_height;
+    dest_arrow_2 = 0.5f * dest_arrow_1;
+
     dest_text = new Paint();
     dest_text.setColor(Color.argb(0xc0, 0x00, 0x30, 0x10));
-    dest_text.setTextSize(DEST_TEXT_SIZE);
+    dest_text.setTextSize(dest_text_size);
     dest_text.setTextAlign(Paint.Align.CENTER);
     dest_text.setTypeface(Typeface.DEFAULT_BOLD);
 
@@ -244,12 +251,12 @@ public class Map extends View {
   private void draw_arrow(Canvas c, float ox, float oy, Landmarks.Routing route) {
     float ux = route.ux;
     float uy = route.uy;
-    float xx0 = ox + DEST_ARROW * ux;
-    float xx1 = ox - DEST_ARROW * ux - DEST_ARROW_2 * uy;
-    float xx2 = ox - DEST_ARROW * ux + DEST_ARROW_2 * uy;
-    float yy0 = oy + DEST_ARROW * uy;
-    float yy1 = oy - DEST_ARROW * uy + DEST_ARROW_2 * ux;
-    float yy2 = oy - DEST_ARROW * uy - DEST_ARROW_2 * ux;
+    float xx0 = ox + dest_arrow_1 * ux;
+    float xx1 = ox - dest_arrow_1 * ux - dest_arrow_2 * uy;
+    float xx2 = ox - dest_arrow_1 * ux + dest_arrow_2 * uy;
+    float yy0 = oy + dest_arrow_1 * uy;
+    float yy1 = oy - dest_arrow_1 * uy + dest_arrow_2 * ux;
+    float yy2 = oy - dest_arrow_1 * uy - dest_arrow_2 * ux;
     Path path = new Path();
     path.moveTo(xx0, yy0);
     path.lineTo(xx1, yy1);
@@ -257,15 +264,21 @@ public class Map extends View {
     c.drawPath(path, dest_arrow);
   }
 
+  static final float M_PER_MILE     = 1609.3f;
+  static final float M_PER_10MILES  = 16093.0f;
+  static final float M_PER_100MILES = 160930.0f;
+  static final float MILE_PER_M = 1.0f / M_PER_MILE;
+
   static private String render_distance(float d) {
     String result;
     if (d < 1000.0f) {
       result = String.format("%3dm", (int) d);
-    } else if (d > 160930.0f) {
-      // convert to miles
-      result = String.format("%dmi", (int) (d * 0.0006213881811967936f));
+    } else if (d < M_PER_10MILES) {
+      result = String.format("%.2fmi", d * MILE_PER_M);
+    } else if (d < M_PER_100MILES) {
+      result = String.format("%.1fmi", d * MILE_PER_M);
     } else {
-      result = String.format("%.1fmi", d * 0.0006213881811967936f);
+      result = String.format("%dmi", (int) (d * MILE_PER_M));
     }
     return result;
   }
@@ -284,9 +297,9 @@ public class Map extends View {
         float swidth = dest_text.measureText(distance);
         float ox;
         if (routes[0].ux >= 0) {
-          ox = (float) (w>>1) + 0.5f*swidth + DEST_ARROW;
+          ox = (float) (w>>1) + 0.5f*swidth + dest_arrow_1;
         } else {
-          ox = (float) (w>>1) - 0.5f*swidth - DEST_ARROW;
+          ox = (float) (w>>1) - 0.5f*swidth - dest_arrow_1;
         }
         float oy = (float) (h - (button_size >> 1));
         c.drawText(distance, (float)(w>>1), (float)(h-16), dest_text);
@@ -306,8 +319,8 @@ public class Map extends View {
         distanceB = render_distance(right.d);
         String distance = distanceA + " " + distanceB;
         float swidth = dest_text.measureText(distance);
-        float oxA = (float) (w>>1) - 0.5f*swidth - DEST_ARROW;
-        float oxB = (float) (w>>1) + 0.5f*swidth + DEST_ARROW;
+        float oxA = (float) (w>>1) - 0.5f*swidth - dest_arrow_1;
+        float oxB = (float) (w>>1) + 0.5f*swidth + dest_arrow_1;
         float oy = (float) (h - (button_size >> 1));
         c.drawText(distance, (float)(w>>1), (float)(h-16), dest_text);
         draw_arrow(c, oxA, oy, left);

@@ -46,6 +46,7 @@ import android.telephony.CellLocation;
 import android.telephony.SignalStrength;
 import android.telephony.ServiceState;
 import android.telephony.gsm.GsmCellLocation;
+import android.util.Log;
 import android.widget.Toast;
 import java.lang.Iterable;
 import java.util.Iterator;
@@ -80,6 +81,7 @@ public class Logger extends Service {
   static final String QUIT_LOGGER  = "LogMyGSM_Quit_Logger";
 
   // --- Telephony
+  static String simOperator;
   static char   lastNetworkType;
   static String lastNetworkTypeLong;
   static int    lastNetworkTypeRaw;
@@ -154,6 +156,8 @@ public class Logger extends Service {
     myNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     String srvcName = Context.TELEPHONY_SERVICE;
     myTelephonyManager = (TelephonyManager) getSystemService(srvcName);
+    simOperator = myTelephonyManager.getSimOperator();
+    // Log.i("Logger", "SIM operator = " + simOperator);
     String context = Context.LOCATION_SERVICE;
     myLocationManager = (LocationManager) getSystemService(context);
 
@@ -374,7 +378,7 @@ public class Logger extends Service {
 
   private void logToFile() {
     if (mainlog == null) {
-      mainlog = new Backend("", this);
+      mainlog = new Backend("", simOperator, this);
     }
     if (bookmark_next_time) {
       mainlog.write("## MARKER " + bookmark_count + "\n");

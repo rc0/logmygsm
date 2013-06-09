@@ -33,15 +33,15 @@ import android.util.Log;
 
 class Menus2 {
 
-  static private final int OPTION_GROUP_MASK_HI    = 0xf0;
-  static private final int OPTION_GROUP_MASK_LO    = 0x0f;
+  static private final int OPTION_GROUP_MASK_HI    = 0xf00;
+  static private final int OPTION_GROUP_MASK_LO    = 0x0ff;
 
-  static final int OPTION_LOCAL_BASE       = 0x10;
-  static final int OPTION_MAP_BASE         = 0x20;
-  static final int OPTION_DOWNLOAD_BASE    = 0x30;
+  static final int OPTION_LOCAL_BASE       = 0x100;
+  static final int OPTION_MAP_BASE         = 0x200;
+  static final int OPTION_DOWNLOAD_BASE    = 0x300;
 
   static final int OPTION_TOGGLE_TOWERLINE = OPTION_LOCAL_BASE | 0xf;
-  static final int TILE_SCALING            = 0xf;
+  static final int TILE_SCALING            = 0xff;
   static final int OPTION_TILE_SCALING     = OPTION_MAP_BASE | TILE_SCALING;
 
   static private final int DOWNLOAD_SINGLE      = 0;

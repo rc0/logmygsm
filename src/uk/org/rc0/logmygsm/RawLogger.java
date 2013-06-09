@@ -36,7 +36,7 @@ class RawLogger {
 
   private void write(String tag, String data) {
     if (log == null) {
-      log = new Backend("raw_", null);
+      log = new Backend("raw_", "", null);
     }
     long now = System.currentTimeMillis();
     long seconds = now / 1000;
