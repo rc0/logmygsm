@@ -408,6 +408,7 @@ public class Logger extends Service {
 
     public void onCellLocationChanged(CellLocation location) {
       int newCid;
+      super.onCellLocationChanged(location);
       if (location == null) {
         newCid = 0;
         lastLac = 0;
@@ -430,6 +431,7 @@ public class Logger extends Service {
 
     public void onSignalStrengthsChanged(SignalStrength strength) {
       int asu;
+      super.onSignalStrengthsChanged(strength);
       asu = strength.getGsmSignalStrength();
       lastASU = asu;
       rawlog.log_asu();
@@ -444,6 +446,7 @@ public class Logger extends Service {
     };
 
     public void onServiceStateChanged(ServiceState newState) {
+      super.onServiceStateChanged(newState);
       switch (newState.getState()) {
         case ServiceState.STATE_EMERGENCY_ONLY: lastState = 'E'; break;
         case ServiceState.STATE_IN_SERVICE:     lastState = 'A'; break; // available
@@ -488,6 +491,7 @@ public class Logger extends Service {
     };
 
     public void onDataConnectionStateChanged(int state, int network_type) {
+      super.onDataConnectionStateChanged(state, network_type);
       handle_network_type(network_type);
     };
 
