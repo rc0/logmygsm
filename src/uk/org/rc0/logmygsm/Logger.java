@@ -40,6 +40,7 @@ import android.location.GpsSatellite;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
+import android.os.PowerManager;
 import android.telephony.TelephonyManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.CellLocation;
@@ -68,6 +69,9 @@ public class Logger extends Service {
   // logfile needlessly.
   private Backend mainlog;
   private RawLogger rawlog;
+
+  private PowerManager power_manager;
+  private PowerManager.WakeLock wake_lock;
 
   static Trail mTrail;
   static Landmarks mMarks;
@@ -161,6 +165,8 @@ public class Logger extends Service {
     String context = Context.LOCATION_SERVICE;
     myLocationManager = (LocationManager) getSystemService(context);
 
+    power_manager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+    wake_lock = power_manager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "LogMyGSM");
     startListening();
   }
 
@@ -304,11 +310,15 @@ public class Logger extends Service {
     IntentFilter quit_filter = new IntentFilter(QUIT_LOGGER);
     myQuitReceiver = new QuitReceiver();
     registerReceiver(myQuitReceiver, quit_filter);
+
+    wake_lock.acquire();
   }
 
   // --------------------------------------------------------------------------------
 
   private void stopListening() {
+    wake_lock.release();
+
     myTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_NONE);
     try {
       myLocationManager.removeGpsStatusListener(gpsListener);
