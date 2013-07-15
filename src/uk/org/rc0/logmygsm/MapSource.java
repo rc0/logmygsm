@@ -32,7 +32,7 @@ import java.io.File;
 
 class MapSource {
   private String menu_name = "";
-  private String path_segment = "";
+  String path_segment = "";
   private int code;
   final private static String last_hope_path = "/sdcard/LogMyGsm/tiles";
   final private static String possible_paths[] = {
@@ -42,7 +42,7 @@ class MapSource {
     last_hope_path
   };
 
-  private static String path_start = null;
+  static String path_start = null;
 
   String get_menu_name() {
     return menu_name;
@@ -88,6 +88,19 @@ class MapSource {
     }
   }
 
+  static final char [] qk03 = "0123" . toCharArray();
+  static String get_quadkey(int zoom, int x, int y) {
+    char [] quadkey = new char[zoom];
+    int i;
+    for (i=0; i<zoom; i++) {
+      int j = zoom - 1 - i;
+      int xx = (x >> j) & 1;
+      int yy = (y >> j) & 1;
+      quadkey[i] = qk03[xx + (yy<<1)];
+    }
+    return new String(quadkey);
+  }
+
 }
 
 // ------------------------------------------------------------------
@@ -126,18 +139,27 @@ class MapSource_OS extends MapSource {
     super(_menu_name, _path_segment, _code);
   }
 
-  static final char [] qk03 = "0123" . toCharArray();
+  String get_download_url(int zoom, int x, int y) {
+    return new String("//ecn.t3.tiles.virtualearth.net/tiles/r" + get_quadkey(zoom, x, y) + ".png?g=41&productSet=mmOS");
+  }
+
+};
+
+// ------------------------------------------------------------------
+
+class MapSource_Bing_Aerial extends MapSource {
+
+  MapSource_Bing_Aerial(String _menu_name, String _path_segment, int _code) {
+    super(_menu_name, _path_segment, _code);
+  }
 
   String get_download_url(int zoom, int x, int y) {
-    char [] quadkey = new char[zoom];
-    int i;
-    for (i=0; i<zoom; i++) {
-      int j = zoom - 1 - i;
-      int xx = (x >> j) & 1;
-      int yy = (y >> j) & 1;
-      quadkey[i] = qk03[xx + (yy<<1)];
-    }
-    return new String("//ecn.t3.tiles.virtualearth.net/tiles/r" + (new String(quadkey)) + ".png?g=41&productSet=mmOS");
+    return new String("//ak.dynamic.t3.tiles.virtualearth.net/comp/ch/" + get_quadkey(zoom, x, y) + "?mkt=en-gb&it=A,G,L&shading=hill&og=17&n=z");
+  }
+
+  String get_tile_path(int zoom, int x, int y) {
+    return String.format("%s/%s/%d/%d/%d.jpg.tile",
+        path_start, path_segment, zoom, x, y);
   }
 
 };
@@ -161,6 +183,7 @@ class MapSources {
   static final int MAP_C_3G    = 13;
   static final int MAP_C_AGE2G = 14;
   static final int MAP_C_AGE3G = 15;
+  static final int MAP_BING_AERIAL = 32;
 
   static final MapSource [] sources = {
     new MapSource_Mapnik("Mapnik (OSM)", "mapnik", MAP_MAPNIK),
@@ -170,6 +193,7 @@ class MapSources {
     new MapSource("2G coverage",      "Custom 2",         MAP_2G),
     new MapSource("3G coverage",      "Custom 3",         MAP_3G),
     new MapSource_Cycle("Open Cycle Map", "OSM Cycle Map", MAP_OPEN_CYCLE),
+    new MapSource_Bing_Aerial("Bing Aerial", "Microsoft Hybrid", MAP_BING_AERIAL),
     new MapSource("NetB 2G todo",     "logmygsm_B_age2g", MAP_B_AGE2G),
     new MapSource("NetB 3G todo",     "logmygsm_B_age3g", MAP_B_AGE3G),
     new MapSource("NetB 2G coverage", "logmygsm_B_2g",    MAP_B_2G),
