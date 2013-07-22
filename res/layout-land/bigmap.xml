@@ -59,7 +59,7 @@
           android:id="@+id/add_button"
           android:typeface="monospace"
           android:textSize="14sp"
-          android:text=" + "
+          android:text="+1 "
           android:gravity="center">
       </Button>
       <Button
@@ -89,6 +89,11 @@
           android:text="-* "
           android:gravity="center">
       </Button>
+    </LinearLayout>
+    <LinearLayout
+      android:orientation="vertical"
+      android:layout_width="wrap_content"
+      android:layout_height="fill_parent">
       <Button
           android:layout_height="wrap_content"
           android:layout_width="wrap_content"
@@ -96,6 +101,24 @@
           android:typeface="monospace"
           android:textSize="14sp"
           android:text="-> "
+          android:gravity="center">
+      </Button>
+      <Button
+          android:layout_height="wrap_content"
+          android:layout_width="wrap_content"
+          android:id="@+id/add_landmark_button"
+          android:typeface="monospace"
+          android:textSize="14sp"
+          android:text="+@ "
+          android:gravity="center">
+      </Button>
+      <Button
+          android:layout_height="wrap_content"
+          android:layout_width="wrap_content"
+          android:id="@+id/del_landmark_button"
+          android:typeface="monospace"
+          android:textSize="14sp"
+          android:text="-@ "
           android:gravity="center">
       </Button>
     </LinearLayout>
