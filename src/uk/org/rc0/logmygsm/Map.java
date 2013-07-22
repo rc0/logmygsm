@@ -248,7 +248,7 @@ public class Map extends View {
         button_stroke_paint);
   }
 
-  private void draw_arrow(Canvas c, float ox, float oy, Landmarks.Routing route) {
+  private void draw_arrow(Canvas c, float ox, float oy, Waypoints.Routing route) {
     float ux = route.ux;
     float uy = route.uy;
     float xx0 = ox + dest_arrow_1 * ux;
@@ -284,7 +284,7 @@ public class Map extends View {
   }
 
   private void show_routings(Canvas c, int w, int h) {
-    Landmarks.Routing[] routes = Logger.mMarks.get_routings(display_pos);
+    Waypoints.Routing[] routes = Logger.mWaypoints.get_routings(display_pos);
     if (routes != null) {
       float x0 = 0.0f;
       float x1 = (float) w;
@@ -306,7 +306,7 @@ public class Map extends View {
         draw_arrow(c, ox, oy, routes[0]);
       } else {
         // presumably 2
-        Landmarks.Routing left, right;
+        Waypoints.Routing left, right;
         if (routes[0].ux > routes[1].ux) {
           left = routes[1];
           right = routes[0];
@@ -347,7 +347,7 @@ public class Map extends View {
     }
 
     TileStore.draw(canvas, width, height, zoom, map_source, display_pos, mScaled);
-    Logger.mMarks.draw(canvas, display_pos, width, height, pixel_shift, true);
+    Logger.mWaypoints.draw(canvas, display_pos, width, height, pixel_shift, true);
     draw_position(canvas, width, height);
     if (TowerLine.is_active()) {
       TowerLine.draw_line(canvas, width, height, pixel_shift, display_pos);
@@ -593,7 +593,7 @@ public class Map extends View {
   // current + all outer zoom levels, with a fuzz of +/- 0.5 tiles in all 8
   // directions around
   void trigger_fetch_route(int levels, boolean forced, Context context) {
-    Linkages.Edge[] route_edges = Logger.mMarks.get_edges();
+    Linkages.Edge[] route_edges = Logger.mWaypoints.get_edges();
     Set<Target> targets = new HashSet<Target>();
 
     int z;
@@ -856,29 +856,29 @@ public class Map extends View {
 
 
   void add_landmark() {
-    Logger.mMarks.add(display_pos);
+    Logger.mWaypoints.add(display_pos);
     invalidate();
   }
 
   void delete_landmark() {
-    if (Logger.mMarks.delete(display_pos, pixel_shift)) {
+    if (Logger.mWaypoints.delete(display_pos, pixel_shift)) {
       invalidate();
     }
   }
 
   void delete_visible_landmarks() {
-    if (Logger.mMarks.delete_visible(display_pos, pixel_shift, getWidth(), getHeight() )) {
+    if (Logger.mWaypoints.delete_visible(display_pos, pixel_shift, getWidth(), getHeight() )) {
       invalidate();
     }
   }
 
   void delete_all_landmarks() {
-    Logger.mMarks.delete_all();
+    Logger.mWaypoints.delete_all();
     invalidate();
   }
 
   void set_destination_landmark() {
-    Logger.mMarks.set_destination(display_pos, pixel_shift);
+    Logger.mWaypoints.set_destination(display_pos, pixel_shift);
     invalidate();
   }
 

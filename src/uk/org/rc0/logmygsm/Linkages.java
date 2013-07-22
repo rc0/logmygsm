@@ -35,7 +35,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
-import uk.org.rc0.logmygsm.Landmarks.Routing;
+import uk.org.rc0.logmygsm.Waypoints.Routing;
 
 class Linkages {
   static final private String TAG = "Linkages";
@@ -530,7 +530,7 @@ class Linkages {
       return null;
     } else if (points.length == 1) {
       // points[0] is necessarily the destination
-      Routing r0 = new Landmarks.Routing(pos, points[0], 0.0f);
+      Routing r0 = new Waypoints.Routing(pos, points[0], 0.0f);
       return gather(r0, null);
     } else {
       // find the segment such that 'pos' subtends the largest angle at its endpoints
@@ -549,7 +549,7 @@ class Linkages {
       if (best_ca < 0.0) {
         // The best segment subtends > 90 degrees at 'pos' : assume we're close to it
 
-        Landmarks.Routing r0=null, r1=null;
+        Waypoints.Routing r0=null, r1=null;
         Endpoint e0 = segments[best_index].e0;
         Endpoint e1 = segments[best_index].e1;
         if (e0.is_destination()) {

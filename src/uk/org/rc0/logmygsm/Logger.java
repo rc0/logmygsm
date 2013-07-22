@@ -74,7 +74,7 @@ public class Logger extends Service {
   private PowerManager.WakeLock wake_lock;
 
   static Trail mTrail;
-  static Landmarks mMarks;
+  static Waypoints mWaypoints;
 
   // -----------------
   // Variables shared with the Activity
@@ -151,7 +151,7 @@ public class Logger extends Service {
 
     rawlog = new RawLogger(false); // 'true' to re-enable raw logs for debug
     mTrail = new Trail(this);
-    mMarks = new Landmarks();
+    mWaypoints = new Waypoints();
 
     bookmark_count = 1;
     bookmark_next_time = false;
@@ -203,7 +203,7 @@ public class Logger extends Service {
   public void onDestroy() {
     stopListening();
     mTrail.save_state_to_file();
-    mMarks.save_state_to_file();
+    mWaypoints.save_state_to_file();
   }
 
   // --------------------------------------------------------------------------------

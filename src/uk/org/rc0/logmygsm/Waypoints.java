@@ -41,9 +41,9 @@ import java.util.ArrayList;
 
 // Storage for the the waypoints that the user can define
 
-class Landmarks {
+class Waypoints {
 
-  static final private String TAG = "Landmarks";
+  static final private String TAG = "Waypoints";
 
   private ArrayList<Merc28> points;
   private int destination = -1;
@@ -52,9 +52,9 @@ class Landmarks {
   private Paint thick_marker_paint;
   private Paint track_paint;
 
-  static final private String TAIL = "markers.txt";
+  static final private String TAIL = "waypoints.txt";
 
-  Landmarks() {
+  Waypoints() {
     restore_state_from_file();
 
     marker_paint = new Paint();
