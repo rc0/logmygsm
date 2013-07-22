@@ -348,6 +348,7 @@ public class Map extends View {
 
     TileStore.draw(canvas, width, height, zoom, map_source, display_pos, mScaled);
     Logger.mWaypoints.draw(canvas, display_pos, width, height, pixel_shift, true);
+    Logger.mLandmarks.draw(canvas, display_pos, width, height, pixel_shift, true);
     draw_position(canvas, width, height);
     if (TowerLine.is_active()) {
       TowerLine.draw_line(canvas, width, height, pixel_shift, display_pos);
@@ -588,7 +589,7 @@ public class Map extends View {
     }
   }
 
-  // Consider the 'landmarks' trail (maybe user's intended route) currently on
+  // Consider the 'waypoints' trail (maybe user's intended route) currently on
   // the map, download the tiles required to cover the whole trail at the
   // current + all outer zoom levels, with a fuzz of +/- 0.5 tiles in all 8
   // directions around
@@ -855,31 +856,42 @@ public class Map extends View {
   // -----------
 
 
-  void add_landmark() {
+  void add_waypoint() {
     Logger.mWaypoints.add(display_pos);
     invalidate();
   }
 
-  void delete_landmark() {
+  void delete_waypoint() {
     if (Logger.mWaypoints.delete(display_pos, pixel_shift)) {
       invalidate();
     }
   }
 
-  void delete_visible_landmarks() {
+  void delete_visible_waypoints() {
     if (Logger.mWaypoints.delete_visible(display_pos, pixel_shift, getWidth(), getHeight() )) {
       invalidate();
     }
   }
 
-  void delete_all_landmarks() {
+  void delete_all_waypoints() {
     Logger.mWaypoints.delete_all();
     invalidate();
   }
 
-  void set_destination_landmark() {
+  void set_destination_waypoint() {
     Logger.mWaypoints.set_destination(display_pos, pixel_shift);
     invalidate();
+  }
+
+  void add_landmark() {
+    Logger.mLandmarks.add(display_pos);
+    invalidate();
+  }
+
+  void delete_landmark() {
+    if (Logger.mLandmarks.delete(display_pos, pixel_shift)) {
+      invalidate();
+    }
   }
 
 }

@@ -49,6 +49,8 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
   private Button mDeleteVisibleButton;
   private Button mDeleteAllButton;
   private Button mSetDestinationButton;
+  private Button mAddLMButton;
+  private Button mDeleteLMButton;
   private TextView summaryText;
   private TextView gridRefText;
   private MenuItem mTileScalingToggle;
@@ -67,39 +69,52 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     mDeleteVisibleButton = (Button) findViewById(R.id.delete_visible_button);
     mDeleteAllButton = (Button) findViewById(R.id.delete_all_button);
     mSetDestinationButton = (Button) findViewById(R.id.set_destination_button);
+    mAddLMButton = (Button) findViewById(R.id.add_landmark_button);
+    mDeleteLMButton = (Button) findViewById(R.id.del_landmark_button);
     summaryText = (TextView) findViewById(R.id.big_summary);
     gridRefText = (TextView) findViewById(R.id.big_grid_ref);
 
     mAddButton.setOnClickListener(new OnClickListener () {
       public void onClick(View v) {
-        mMap.add_landmark();
+        mMap.add_waypoint();
       }
     });
 
     mDeleteButton.setOnClickListener(new OnClickListener () {
       public void onClick(View v) {
-        mMap.delete_landmark();
+        mMap.delete_waypoint();
       }
     });
 
     mDeleteVisibleButton.setOnClickListener(new OnClickListener () {
       public void onClick(View v) {
-        mMap.delete_visible_landmarks();
+        mMap.delete_visible_waypoints();
       }
     });
 
     mDeleteAllButton.setOnClickListener(new OnClickListener () {
       public void onClick(View v) {
-        mMap.delete_all_landmarks();
+        mMap.delete_all_waypoints();
       }
     });
 
     mSetDestinationButton.setOnClickListener(new OnClickListener () {
       public void onClick(View v) {
-        mMap.set_destination_landmark();
+        mMap.set_destination_waypoint();
       }
     });
 
+    mAddLMButton.setOnClickListener(new OnClickListener () {
+      public void onClick(View v) {
+        mMap.add_landmark();
+      }
+    });
+
+    mDeleteLMButton.setOnClickListener(new OnClickListener () {
+      public void onClick(View v) {
+        mMap.delete_landmark();
+      }
+    });
     mMap.register_position_listener(this);
   }
 

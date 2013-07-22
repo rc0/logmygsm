@@ -75,6 +75,7 @@ public class Logger extends Service {
 
   static Trail mTrail;
   static Waypoints mWaypoints;
+  static Landmarks mLandmarks;
 
   // -----------------
   // Variables shared with the Activity
@@ -152,6 +153,7 @@ public class Logger extends Service {
     rawlog = new RawLogger(false); // 'true' to re-enable raw logs for debug
     mTrail = new Trail(this);
     mWaypoints = new Waypoints();
+    mLandmarks = new Landmarks();
 
     bookmark_count = 1;
     bookmark_next_time = false;
@@ -204,6 +206,7 @@ public class Logger extends Service {
     stopListening();
     mTrail.save_state_to_file();
     mWaypoints.save_state_to_file();
+    mLandmarks.save_state_to_file();
   }
 
   // --------------------------------------------------------------------------------
