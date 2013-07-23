@@ -53,74 +53,60 @@
       android:layout_width="wrap_content"
       android:layout_height="fill_parent">
 
-      <Button
+      <ImageButton
           android:layout_height="wrap_content"
           android:layout_width="wrap_content"
           android:id="@+id/add_button"
-          android:typeface="monospace"
-          android:textSize="14sp"
-          android:text="+1 "
+          android:src="@drawable/add_waypoint_16"
           android:gravity="center">
-      </Button>
-      <Button
+      </ImageButton>
+      <ImageButton
           android:layout_height="wrap_content"
           android:layout_width="wrap_content"
           android:id="@+id/delete_button"
-          android:typeface="monospace"
-          android:textSize="14sp"
-          android:text="-1 "
+          android:src="@drawable/del_waypoint_16"
           android:gravity="center">
-      </Button>
-      <Button
+      </ImageButton>
+      <ImageButton
           android:layout_height="wrap_content"
           android:layout_width="wrap_content"
           android:id="@+id/delete_visible_button"
-          android:typeface="monospace"
-          android:textSize="14sp"
-          android:text="[-]"
+          android:src="@drawable/del_visible_16"
           android:gravity="center">
-      </Button>
-      <Button
+      </ImageButton>
+      <ImageButton
           android:layout_height="wrap_content"
           android:layout_width="wrap_content"
           android:id="@+id/delete_all_button"
-          android:typeface="monospace"
-          android:textSize="14sp"
-          android:text="-* "
+          android:src="@drawable/del_all_16"
           android:gravity="center">
-      </Button>
+      </ImageButton>
+      <ImageButton
+          android:layout_height="wrap_content"
+          android:layout_width="wrap_content"
+          android:id="@+id/set_destination_button"
+          android:src="@drawable/set_destination_16"
+          android:gravity="center">
+      </ImageButton>
     </LinearLayout>
     <LinearLayout
       android:orientation="vertical"
       android:layout_width="wrap_content"
       android:layout_height="fill_parent">
-      <Button
-          android:layout_height="wrap_content"
-          android:layout_width="wrap_content"
-          android:id="@+id/set_destination_button"
-          android:typeface="monospace"
-          android:textSize="14sp"
-          android:text="-> "
-          android:gravity="center">
-      </Button>
-      <Button
+      <ImageButton
           android:layout_height="wrap_content"
           android:layout_width="wrap_content"
           android:id="@+id/add_landmark_button"
-          android:typeface="monospace"
-          android:textSize="14sp"
-          android:text="+@ "
+          android:src="@drawable/add_landmark_16"
           android:gravity="center">
-      </Button>
-      <Button
+      </ImageButton>
+      <ImageButton
           android:layout_height="wrap_content"
           android:layout_width="wrap_content"
           android:id="@+id/del_landmark_button"
-          android:typeface="monospace"
-          android:textSize="14sp"
-          android:text="-@ "
+          android:src="@drawable/del_landmark_16"
           android:gravity="center">
-      </Button>
+      </ImageButton>
     </LinearLayout>
     <!-- The block around the buttons at the left -->
 

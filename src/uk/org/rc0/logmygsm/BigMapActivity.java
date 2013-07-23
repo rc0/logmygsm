@@ -37,6 +37,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 public class BigMapActivity extends Activity implements Map.PositionListener {
@@ -44,13 +45,13 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
   private CellUpdateReceiver myCellReceiver;
   private GPSUpdateReceiver myGPSReceiver;
   private Map mMap;
-  private Button mAddButton;
-  private Button mDeleteButton;
-  private Button mDeleteVisibleButton;
-  private Button mDeleteAllButton;
-  private Button mSetDestinationButton;
-  private Button mAddLMButton;
-  private Button mDeleteLMButton;
+  private ImageButton mAddButton;
+  private ImageButton mDeleteButton;
+  private ImageButton mDeleteVisibleButton;
+  private ImageButton mDeleteAllButton;
+  private ImageButton mSetDestinationButton;
+  private ImageButton mAddLMButton;
+  private ImageButton mDeleteLMButton;
   private TextView summaryText;
   private TextView gridRefText;
   private MenuItem mTileScalingToggle;
@@ -64,13 +65,13 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     setContentView(R.layout.bigmap);
     mMap = (Map) findViewById(R.id.big_map);
     mMap.restore_state_from_file(PREFS_FILE);
-    mAddButton = (Button) findViewById(R.id.add_button);
-    mDeleteButton = (Button) findViewById(R.id.delete_button);
-    mDeleteVisibleButton = (Button) findViewById(R.id.delete_visible_button);
-    mDeleteAllButton = (Button) findViewById(R.id.delete_all_button);
-    mSetDestinationButton = (Button) findViewById(R.id.set_destination_button);
-    mAddLMButton = (Button) findViewById(R.id.add_landmark_button);
-    mDeleteLMButton = (Button) findViewById(R.id.del_landmark_button);
+    mAddButton = (ImageButton) findViewById(R.id.add_button);
+    mDeleteButton = (ImageButton) findViewById(R.id.delete_button);
+    mDeleteVisibleButton = (ImageButton) findViewById(R.id.delete_visible_button);
+    mDeleteAllButton = (ImageButton) findViewById(R.id.delete_all_button);
+    mSetDestinationButton = (ImageButton) findViewById(R.id.set_destination_button);
+    mAddLMButton = (ImageButton) findViewById(R.id.add_landmark_button);
+    mDeleteLMButton = (ImageButton) findViewById(R.id.del_landmark_button);
     summaryText = (TextView) findViewById(R.id.big_summary);
     gridRefText = (TextView) findViewById(R.id.big_grid_ref);
 
