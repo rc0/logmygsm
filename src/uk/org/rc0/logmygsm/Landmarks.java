@@ -158,29 +158,6 @@ class Landmarks {
     }
   }
 
-  // ---------------------------
-
-  private static class Transform {
-    Merc28 base;
-    int w2;
-    int h2;
-    int pixel_shift;
-
-    Transform(Merc28 _base, int _w, int _h, int _pixel_shift) {
-      base = _base;
-      w2 = _w>>1;
-      h2 = _h>>1;
-      pixel_shift = _pixel_shift;
-    }
-
-    int X(Merc28 p) {
-      return w2 + ((p.X - base.X) >> pixel_shift);
-    }
-
-    int Y(Merc28 p) {
-      return h2 + ((p.Y - base.Y) >> pixel_shift);
-    }
-  };
 
   // ---------------------------
 
@@ -189,9 +166,8 @@ class Landmarks {
   private final static float a2 = 0.92f * (float) RADIUS;
 
   // pos is the position of the centre-screen
-  void draw(Canvas c, Merc28 pos, int w, int h, int pixel_shift, boolean do_show_track) {
+  void draw(Canvas c, Transform t, boolean do_show_track) {
     int n = points.size();
-    Transform t = new Transform(pos, w, h, pixel_shift);
     for (int i = 0; i < n; i++) {
       Merc28 p = points.get(i);
       int x = t.X(p);

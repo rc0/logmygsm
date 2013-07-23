@@ -346,9 +346,11 @@ public class Map extends View {
       canvas.scale(TILE_SCALING, TILE_SCALING, (float)(width>>1), (float)(height>>1));
     }
 
+    Transform t = new Transform(display_pos, width, height, pixel_shift);
+
     TileStore.draw(canvas, width, height, zoom, map_source, display_pos, mScaled);
-    Logger.mWaypoints.draw(canvas, display_pos, width, height, pixel_shift, true);
-    Logger.mLandmarks.draw(canvas, display_pos, width, height, pixel_shift, true);
+    Logger.mWaypoints.draw(canvas, t, true);
+    Logger.mLandmarks.draw(canvas, t, true);
     draw_position(canvas, width, height);
     if (TowerLine.is_active()) {
       TowerLine.draw_line(canvas, width, height, pixel_shift, display_pos);

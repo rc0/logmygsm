@@ -217,27 +217,6 @@ class Waypoints {
 
   // ---------------------------
 
-  private static class Transform {
-    Merc28 base;
-    int w2;
-    int h2;
-    int pixel_shift;
-
-    Transform(Merc28 _base, int _w, int _h, int _pixel_shift) {
-      base = _base;
-      w2 = _w>>1;
-      h2 = _h>>1;
-      pixel_shift = _pixel_shift;
-    }
-
-    int X(Merc28 p) {
-      return w2 + ((p.X - base.X) >> pixel_shift);
-    }
-
-    int Y(Merc28 p) {
-      return h2 + ((p.Y - base.Y) >> pixel_shift);
-    }
-  };
 
   // ---------------------------
 
@@ -245,9 +224,8 @@ class Waypoints {
   private final static int RADIUS2 = RADIUS + RADIUS;
 
   // pos is the position of the centre-screen
-  void draw(Canvas c, Merc28 pos, int w, int h, int pixel_shift, boolean do_show_track) {
+  void draw(Canvas c, Transform t, boolean do_show_track) {
     int n = points.size();
-    Transform t = new Transform(pos, w, h, pixel_shift);
     for (int i = 0; i < n; i++) {
       Merc28 p = points.get(i);
       int x = t.X(p);
@@ -259,7 +237,7 @@ class Waypoints {
       c.drawPoint(x, y, marker_paint);
     }
     if (do_show_track) {
-      draw_track(c, pos, w, h, pixel_shift);
+      draw_track(c, t);
     }
   }
 
@@ -277,9 +255,8 @@ class Waypoints {
 
   // ---------------------------
 
-  private void draw_track(Canvas c, Merc28 pos, int w, int h, int pixel_shift) {
+  private void draw_track(Canvas c, Transform t) {
     calculate_linkages();
-    Transform t = new Transform(pos, w, h, pixel_shift);
     Linkages.Edge[] edges = mLinkages.get_edges();
     for (int i = 0; i<edges.length; i++) {
       Merc28 m0 = edges[i].m0;
