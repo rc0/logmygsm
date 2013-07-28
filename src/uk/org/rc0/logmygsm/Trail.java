@@ -46,6 +46,10 @@ class Trail {
 
   private Logger mLogger;
 
+  // If this is too large, it makes tiling too slow
+  // If too low, the historical trail starts to decay too soon.
+  static final private int MAX_HISTORY = 12*1024;
+
   private ArrayList<Merc28> recent;
   private Merc28 last_point;
   private int n_old;
@@ -217,6 +221,26 @@ class Trail {
 
   // Internal
 
+  // Keep alternate points from the history, but don't keep point index[0].
+  // This guarantees that the oldest data eventually has to decay away, even if
+  // the user never clears the trail.  So e.g.
+  // out[0,1,2] = in[1,3,5] or in[2,4,6] for n_old = 6 or 7 respectively.
+  private void decimate() {
+    int n_new = n_old >> 1;
+    int xi, xo;
+
+    int [] x_new = new int[n_new];
+    int [] y_new = new int[n_new];
+    for (xi=n_old-1, xo=n_new-1; xi>0; xi-=2, xo--) {
+      x_new[xo] = x_old[xi];
+      y_new[xo] = y_old[xi];
+    }
+
+    n_old = n_new;
+    x_old = x_new;
+    y_old = y_new;
+  }
+
   private void gather() {
     // accumulate the 'recent' history onto the 'old' arrays
     int n_recent = recent.size();
@@ -240,6 +264,11 @@ class Trail {
       n_old = n_new;
       x_old = x_new;
       y_old = y_new;
+
+      while (n_old > MAX_HISTORY) {
+        decimate();
+      }
+
       recent = new ArrayList<Merc28> ();
       // leave last_point alone
     } else {
