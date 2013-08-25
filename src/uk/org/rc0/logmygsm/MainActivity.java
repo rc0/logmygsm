@@ -230,7 +230,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
       daOffsetText.setText("DA -----");
     }
 
-    String odoString = String.format("%6dm", (int) Logger.metres_covered);
+    String odoString = Util.pretty_distance((float) Logger.get_metres_covered());
     odoText.setText(odoString);
     String gridString = mMap.current_grid_ref();
     gridRefText.setText(gridString);

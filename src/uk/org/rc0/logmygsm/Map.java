@@ -264,25 +264,6 @@ public class Map extends View {
     c.drawPath(path, dest_arrow);
   }
 
-  static final float M_PER_MILE     = 1609.3f;
-  static final float M_PER_10MILES  = 16093.0f;
-  static final float M_PER_100MILES = 160930.0f;
-  static final float MILE_PER_M = 1.0f / M_PER_MILE;
-
-  static private String render_distance(float d) {
-    String result;
-    if (d < 1000.0f) {
-      result = String.format("%3dm", (int) d);
-    } else if (d < M_PER_10MILES) {
-      result = String.format("%.2fmi", d * MILE_PER_M);
-    } else if (d < M_PER_100MILES) {
-      result = String.format("%.1fmi", d * MILE_PER_M);
-    } else {
-      result = String.format("%dmi", (int) (d * MILE_PER_M));
-    }
-    return result;
-  }
-
   private void show_routings(Canvas c, int w, int h) {
     Waypoints.Routing[] routes = Logger.mWaypoints.get_routings(display_pos);
     if (routes != null) {
@@ -293,7 +274,7 @@ public class Map extends View {
       c.drawRect(x0, y0, x1, y1, dest_backdrop);
       if (routes.length == 1) {
         String distance;
-        distance = render_distance(routes[0].d);
+        distance = Util.pretty_distance(routes[0].d);
         float swidth = dest_text.measureText(distance);
         float ox;
         if (routes[0].ux >= 0) {
@@ -315,8 +296,8 @@ public class Map extends View {
           right = routes[1];
         }
         String distanceA, distanceB;
-        distanceA = render_distance(left.d);
-        distanceB = render_distance(right.d);
+        distanceA = Util.pretty_distance(left.d);
+        distanceB = Util.pretty_distance(right.d);
         String distance = distanceA + " " + distanceB;
         float swidth = dest_text.measureText(distance);
         float oxA = (float) (w>>1) - 0.5f*swidth - dest_arrow_1;

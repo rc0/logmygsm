@@ -1,4 +1,4 @@
-// Copyright (c) 2012, Richard P. Curnow
+// Copyright (c) 2012, 2013, Richard P. Curnow
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -74,6 +74,7 @@ public class Logger extends Service {
   private PowerManager.WakeLock wake_lock;
 
   static Trail mTrail;
+  static Odometer mOdometer;
   static Waypoints mWaypoints;
   static Landmarks mLandmarks;
 
@@ -114,9 +115,6 @@ public class Logger extends Service {
   static float  lastSpeed;
   static long   lastFixMillis;
 
-  // --- Computed from GPS
-  static double metres_covered;
-
   // --- GPS fix info
   static int    last_n_sats;
   static int    last_fix_sats;
@@ -155,6 +153,7 @@ public class Logger extends Service {
 
     rawlog = new RawLogger(false); // 'true' to re-enable raw logs for debug
     mTrail = new Trail(this);
+    mOdometer = new Odometer();
     mWaypoints = new Waypoints();
     mLandmarks = new Landmarks();
 
@@ -364,6 +363,16 @@ public class Logger extends Service {
 
   // --------------------------------------------------------------------------------
 
+  static double get_metres_covered() {
+    if (mOdometer != null) {
+      return mOdometer.get_metres_covered();
+    } else {
+      return 0.0;
+    }
+  }
+
+  // --------------------------------------------------------------------------------
+
   private void updateUIGPS() {
     updateNotification();
     Intent intent = new Intent(UPDATE_GPS);
@@ -386,7 +395,7 @@ public class Logger extends Service {
   class QuitReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-      metres_covered = 0.0; // in case the application stays in memory before next use
+      mOdometer.reset();
       stopSelf();
     }
   }
@@ -554,8 +563,9 @@ public class Logger extends Service {
 
         logToFile();
         rawlog.log_raw_location();
-        double metres_this_step = mTrail.add_point(new Merc28(lastLat, lastLon));
-        metres_covered += metres_this_step;
+        Merc28 m28_point = new Merc28(lastLat, lastLon);
+        mTrail.add_point(m28_point);
+        mOdometer.append(m28_point);
       }
       updateUIGPS();
     }
