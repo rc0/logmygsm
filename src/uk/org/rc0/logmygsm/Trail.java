@@ -114,9 +114,14 @@ class Trail {
       x1 = null;
     }
 
-    void add(Merc28 x) {
+    double add(Merc28 x) {
       x1 = x0;
       x0 = new Merc28(x);
+      if (x1 != null) {
+        return x0.metres_away(x1);
+      } else {
+        return 0.0;
+      }
     }
 
     Merc28 estimated_position() {
@@ -132,6 +137,14 @@ class Trail {
         }
       } else {
         return null;
+      }
+    }
+
+    double last_step() {
+      if ((x0 != null) && (x1 != null)) {
+        return x0.metres_away(x1);
+      } else {
+        return 0.0;
       }
     }
   }
@@ -199,8 +212,9 @@ class Trail {
   }
 
   // Skip points that are too close together to ever be visible on the map display
-  void add_point(Merc28 p) {
-    mHistory.add(p);
+  double add_point(Merc28 p) {
+    double result;
+    result = mHistory.add(p);
     boolean do_add = true;
     if (last_point != null) {
       // 4 is (28 - (16+8)), i.e. the pixel size at zoom level = 16.
@@ -217,6 +231,7 @@ class Trail {
       recent.add(new Merc28(p));
       last_point = new Merc28(p);
     }
+    return result;
   }
 
   // Internal

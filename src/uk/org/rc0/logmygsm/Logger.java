@@ -114,6 +114,9 @@ public class Logger extends Service {
   static float  lastSpeed;
   static long   lastFixMillis;
 
+  // --- Computed from GPS
+  static double metres_covered;
+
   // --- GPS fix info
   static int    last_n_sats;
   static int    last_fix_sats;
@@ -383,6 +386,7 @@ public class Logger extends Service {
   class QuitReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+      metres_covered = 0.0; // in case the application stays in memory before next use
       stopSelf();
     }
   }
@@ -550,7 +554,8 @@ public class Logger extends Service {
 
         logToFile();
         rawlog.log_raw_location();
-        mTrail.add_point(new Merc28(lastLat, lastLon));
+        double metres_this_step = mTrail.add_point(new Merc28(lastLat, lastLon));
+        metres_covered += metres_this_step;
       }
       updateUIGPS();
     }

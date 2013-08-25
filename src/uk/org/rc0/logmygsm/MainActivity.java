@@ -53,7 +53,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
   private TextView asuText;
   private TextView daOffsetText;
   private TextView countText;
-  private TextView tileText;
+  private TextView odoText;
   private TextView cidHistoryText;
   private TextView gridRefText;
 
@@ -83,7 +83,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
       netlacmncText = (TextView) findViewById(R.id.net_lac_mnc);
       asuText = (TextView) findViewById(R.id.asu);
       countText = (TextView) findViewById(R.id.count);
-      tileText = (TextView) findViewById(R.id.tile);
+      odoText = (TextView) findViewById(R.id.odo);
       cidHistoryText = (TextView) findViewById(R.id.cid_history);
       cidHistoryText.setMovementMethod(new ScrollingMovementMethod());
       daOffsetText = (TextView) findViewById(R.id.da_offset);
@@ -230,8 +230,8 @@ public class MainActivity extends Activity implements Map.PositionListener {
       daOffsetText.setText("DA -----");
     }
 
-    String tileString = mMap.current_tile_string();
-    tileText.setText(tileString);
+    String odoString = String.format("%6dm", (int) Logger.metres_covered);
+    odoText.setText(odoString);
     String gridString = mMap.current_grid_ref();
     gridRefText.setText(gridString);
 
