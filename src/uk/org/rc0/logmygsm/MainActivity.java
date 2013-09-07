@@ -231,7 +231,8 @@ public class MainActivity extends Activity implements Map.PositionListener {
     }
 
     String odoString = Util.pretty_distance((float) Logger.get_metres_covered());
-    odoText.setText(odoString);
+    String odoString2 = String.format("%7s %2d", odoString, mMap.current_zoom());
+    odoText.setText(odoString2);
     String gridString = mMap.current_grid_ref();
     gridRefText.setText(gridString);
 

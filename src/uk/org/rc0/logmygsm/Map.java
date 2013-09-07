@@ -472,6 +472,10 @@ public class Map extends View {
     }
   }
 
+  int current_zoom() {
+    return zoom;
+  }
+
   void trigger_fetch_around(int delta, Context context) {
     if (display_pos != null) {
       int i, j;
