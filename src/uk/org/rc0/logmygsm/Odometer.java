@@ -29,6 +29,10 @@ class Odometer {
 
   private Merc28 xlast;
 
+  // Distance from starting point to xlast
+  private double distance_ref;
+
+  // Distance from starting point to current point (may go down as well as up!)
   private double distance;
 
   // The amount by which the position has to move to increment the distance
@@ -48,6 +52,7 @@ class Odometer {
   }
 
   void reset() {
+    distance_ref = 0.0;
     distance = 0.0;
     xlast = null;
   }
@@ -57,8 +62,12 @@ class Odometer {
       double step;
       step = xlast.metres_away(xnew);
       if (step > THRESHOLD) {
-        distance += step;
+        distance_ref += step;
+        distance = distance_ref;
         xlast = xnew;
+      } else {
+        // Maintain 'best' estimate of distance on every update
+        distance = distance_ref + step;
       }
     } else {
       xlast = xnew;
