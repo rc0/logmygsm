@@ -374,7 +374,7 @@ class TileStore {
       my_canv.drawRect(0, 0, bm_size, bm_size, gray_paint);
       is_dummy = true;
     }
-    // TODO : Draw trail points into the bitmap
+    map_source.apply_overlay(bm, zoom, x, y);
     render_old_trail(bm, zoom, x, y);
     return new TilingResponse(bm, is_dummy);
   }

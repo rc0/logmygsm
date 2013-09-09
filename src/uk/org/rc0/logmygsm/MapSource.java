@@ -25,6 +25,7 @@
 
 package uk.org.rc0.logmygsm;
 
+import android.graphics.Bitmap;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -56,6 +57,10 @@ class MapSource {
   // Override in sub-classes for map types that can support download
   String get_download_url(int zoom, int x, int y) {
     return null;
+  }
+
+  void apply_overlay(Bitmap bm, int zoom, int tile_x, int tile_y) {
+    return;
   }
 
   int get_code() {
@@ -164,44 +169,62 @@ class MapSource_Bing_Aerial extends MapSource {
 
 };
 
+// ------------------------------------------------------------------
+
+class MapSource_Overlay extends MapSource_Mapnik {
+
+  private String overlay_file;
+  private int overlay_param;
+
+  MapSource_Overlay(String _menu_name, String _path_segment, int _code, String _overlay_file, int _overlay_param) {
+    super(_menu_name, _path_segment, _code);
+    overlay_file = _overlay_file;
+    overlay_param = _overlay_param;
+  }
+
+  void apply_overlay(Bitmap bm, int zoom, int tile_x, int tile_y) {
+    Overlay.apply(bm, overlay_file, overlay_param, zoom, tile_x, tile_y);
+  }
+
+};
 
 // ------------------------------------------------------------------
 
 class MapSources {
-  static final int MAP_MAPNIK  =  2;
+  static final int MAP_OSM     =  2;
   static final int MAP_OS      =  3;
   static final int MAP_OPEN_CYCLE = 4;
-  static final int MAP_2G      =  0;
-  static final int MAP_3G      =  1;
-  static final int MAP_AGE2G   =  5;
-  static final int MAP_AGE3G   =  6;
-  static final int MAP_B_2G    =  8;
-  static final int MAP_B_3G    =  9;
-  static final int MAP_B_AGE2G = 10;
-  static final int MAP_B_AGE3G = 11;
-  static final int MAP_C_2G    = 12;
-  static final int MAP_C_3G    = 13;
-  static final int MAP_C_AGE2G = 14;
-  static final int MAP_C_AGE3G = 15;
-  static final int MAP_BING_AERIAL = 32;
+  static final int MAP_BING_AERIAL = 5;
+  static final int MAP_A_2G_OVL  = 16;
+  static final int MAP_A_3G_OVL  = 17;
+  static final int MAP_A_2G_TODO_OVL  = 20;
+  static final int MAP_A_3G_TODO_OVL  = 21;
+  static final int MAP_B_2G_OVL  = 24;
+  static final int MAP_B_3G_OVL  = 25;
+  static final int MAP_B_2G_TODO_OVL  = 28;
+  static final int MAP_B_3G_TODO_OVL  = 29;
+  static final int MAP_C_2G_OVL  = 32;
+  static final int MAP_C_3G_OVL  = 33;
+  static final int MAP_C_2G_TODO_OVL  = 36;
+  static final int MAP_C_3G_TODO_OVL  = 37;
 
   static final MapSource [] sources = {
-    new MapSource_Mapnik("Mapnik (OSM)", "mapnik", MAP_MAPNIK),
+    new MapSource_Mapnik("OpenStreetMap", "mapnik", MAP_OSM),
     new MapSource_OS("Ordnance Survey", "Ordnance Survey Explorer Maps (UK)", MAP_OS),
-    new MapSource("2G todo",          "logmygsm_age2g",   MAP_AGE2G),
-    new MapSource("3G todo",          "logmygsm_age3g",   MAP_AGE3G),
-    new MapSource("2G coverage",      "Custom 2",         MAP_2G),
-    new MapSource("3G coverage",      "Custom 3",         MAP_3G),
     new MapSource_Cycle("Open Cycle Map", "OSM Cycle Map", MAP_OPEN_CYCLE),
     new MapSource_Bing_Aerial("Bing Aerial", "Microsoft Hybrid", MAP_BING_AERIAL),
-    new MapSource("NetB 2G todo",     "logmygsm_B_age2g", MAP_B_AGE2G),
-    new MapSource("NetB 3G todo",     "logmygsm_B_age3g", MAP_B_AGE3G),
-    new MapSource("NetB 2G coverage", "logmygsm_B_2g",    MAP_B_2G),
-    new MapSource("NetB 3G coverage", "logmygsm_B_3g",    MAP_B_3G),
-    new MapSource("NetC 2G todo",     "logmygsm_C_age2g", MAP_C_AGE2G),
-    new MapSource("NetC 3G todo",     "logmygsm_C_age3g", MAP_C_AGE3G),
-    new MapSource("NetC 2G coverage", "logmygsm_C_2g",    MAP_C_2G),
-    new MapSource("NetC 3G coverage", "logmygsm_C_3g",    MAP_C_3G),
+    new MapSource_Overlay("NetA 2G",      "mapnik", MAP_A_2G_OVL,      "overlay_a.db", 2),
+    new MapSource_Overlay("NetA 3G",      "mapnik", MAP_A_3G_OVL,      "overlay_a.db", 3),
+    new MapSource_Overlay("NetA 2G todo", "mapnik", MAP_A_2G_TODO_OVL, "overlay_a.db", 8|2),
+    new MapSource_Overlay("NetA 3G todo", "mapnik", MAP_A_3G_TODO_OVL, "overlay_a.db", 8|3),
+    new MapSource_Overlay("NetB 2G",      "mapnik", MAP_B_2G_OVL,      "overlay_b.db", 2),
+    new MapSource_Overlay("NetB 3G",      "mapnik", MAP_B_3G_OVL,      "overlay_b.db", 3),
+    new MapSource_Overlay("NetB 2G todo", "mapnik", MAP_B_2G_TODO_OVL, "overlay_b.db", 8|2),
+    new MapSource_Overlay("NetB 3G todo", "mapnik", MAP_B_3G_TODO_OVL, "overlay_b.db", 8|3),
+    new MapSource_Overlay("NetC 2G",      "mapnik", MAP_C_2G_OVL,      "overlay_c.db", 2),
+    new MapSource_Overlay("NetC 3G",      "mapnik", MAP_C_3G_OVL,      "overlay_c.db", 3),
+    new MapSource_Overlay("NetC 2G todo", "mapnik", MAP_C_2G_TODO_OVL, "overlay_c.db", 8|2),
+    new MapSource_Overlay("NetC 3G todo", "mapnik", MAP_C_3G_TODO_OVL, "overlay_c.db", 8|3),
   };
 
   static MapSource lookup(int code) {
@@ -214,7 +237,7 @@ class MapSources {
   }
 
   static MapSource get_default() {
-    return lookup(MAP_2G);
+    return lookup(MAP_OSM);
   }
 
 }
