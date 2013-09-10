@@ -672,6 +672,7 @@ public class Map extends View {
 
   void toggle_scaled() {
     mScaled = !mScaled;
+    invalidate();
   }
 
   boolean is_scaled () {
