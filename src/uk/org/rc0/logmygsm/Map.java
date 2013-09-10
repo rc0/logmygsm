@@ -510,6 +510,12 @@ public class Map extends View {
     if (display_pos == null) {
       return;
     }
+    if (mScaled) {
+      // Viewport is only showing effectively half the number of tiles you'd expect.
+      // Avoid over-fetching
+      dw >>= 1;
+      dh >>= 1;
+    }
     int px0 = display_pos.X - (dw << pixel_shift);
     int px1 = display_pos.X + (dw << pixel_shift);
     int py0 = display_pos.Y - (dh << pixel_shift);
