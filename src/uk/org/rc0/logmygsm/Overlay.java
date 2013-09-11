@@ -45,6 +45,9 @@ class Overlay {
   static final private String PREFDIR = "/sdcard/LogMyGsm/prefs";
   static final private String TAG = "Overlay";
 
+  static final private int VERSION = 2;
+  static final private int MAGIC_NUMBER = 0xfe4f5600 | VERSION;
+
   static Paint p_thick_red;
   static Paint p_thin_red;
   static Paint p_thin_red_noaa;
@@ -383,6 +386,13 @@ class Overlay {
         int offset;
         long len;
         long loc;
+        int magic;
+
+        magic = read32(in, 0);
+        if (magic != MAGIC_NUMBER) {
+          return -1;
+        }
+
         loc = in.length() - 4;
         offset = read32(in, loc);
         //in.seek(loc);
