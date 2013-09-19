@@ -862,7 +862,13 @@ public class Map extends View {
   }
 
   void delete_visible_waypoints() {
-    if (Logger.mWaypoints.delete_visible(display_pos, pixel_shift, getWidth(), getHeight() )) {
+    int adjusted_pixel_shift;
+    if (mScaled) {
+      adjusted_pixel_shift = pixel_shift - 1;
+    } else {
+      adjusted_pixel_shift = pixel_shift;
+    }
+    if (Logger.mWaypoints.delete_visible(display_pos, adjusted_pixel_shift, getWidth(), getHeight() )) {
       invalidate();
     }
   }
