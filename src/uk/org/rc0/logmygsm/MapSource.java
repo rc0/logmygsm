@@ -34,6 +34,7 @@ import java.io.File;
 class MapSource {
   private String menu_name = "";
   String path_segment = "";
+  int index;
   private int code;
   final private static String last_hope_path = "/sdcard/LogMyGsm/tiles";
   final private static String possible_paths[] = {
@@ -71,6 +72,7 @@ class MapSource {
     menu_name = _menu_name;
     path_segment = _path_segment;
     code = _code;
+    index = -1;
   }
 
   // Discover where the tiles are stored.  Share tiles with Maverick (-Pro) if
@@ -209,10 +211,10 @@ class MapSources {
   static final int MAP_C_3G_TODO_OVL  = 37;
 
   static final MapSource [] sources = {
-    new MapSource_Mapnik("OpenStreetMap", "mapnik", MAP_OSM),
-    new MapSource_OS("Ordnance Survey", "Ordnance Survey Explorer Maps (UK)", MAP_OS),
     new MapSource_Cycle("Open Cycle Map", "OSM Cycle Map", MAP_OPEN_CYCLE),
     new MapSource_Bing_Aerial("Bing Aerial", "Microsoft Hybrid", MAP_BING_AERIAL),
+    new MapSource_OS("Ordnance Survey", "Ordnance Survey Explorer Maps (UK)", MAP_OS),
+    new MapSource_Mapnik("OpenStreetMap", "mapnik", MAP_OSM),
     new MapSource_Overlay("NetA 2G",      "mapnik", MAP_A_2G_OVL,      "overlay_a.db", 2),
     new MapSource_Overlay("NetA 3G",      "mapnik", MAP_A_3G_OVL,      "overlay_a.db", 3),
     new MapSource_Overlay("NetA 2G todo", "mapnik", MAP_A_2G_TODO_OVL, "overlay_a.db", 8|2),
@@ -234,6 +236,34 @@ class MapSources {
       }
     }
     return null;
+  }
+
+  static final void init_indices() {
+    for (int i = 0; i < sources.length; i++) {
+      sources[i].index = i;
+    }
+  }
+
+  static MapSource successor(MapSource current) {
+    if (current.index < 0) {
+      init_indices();
+    }
+    int index = current.index + 1;
+    if (index >= sources.length) {
+      index = 0;
+    }
+    return sources[index];
+  }
+
+  static MapSource predecessor(MapSource current) {
+    if (current.index < 0) {
+      init_indices();
+    }
+    int index = current.index - 1;
+    if (index  < 0) {
+      index = sources.length - 1;
+    }
+    return sources[index];
   }
 
   static MapSource get_default() {
