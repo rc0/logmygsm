@@ -741,13 +741,9 @@ public class Map extends View {
     return false;
   }
 
-  private boolean check_zoom(float x, float y) {
+  private boolean check_buttons(float x, float y) {
     if (y < button_size) {
-      if (x < button_size) {
-        return true;
-      } else if (x > (getWidth() - button_size)) {
-        return true;
-      }
+      return true;
     }
     return false;
   }
@@ -813,7 +809,7 @@ public class Map extends View {
         break;
       case MotionEvent.ACTION_MOVE:
         // Prevent a drag starting on a zoom button etc, which would be bogus.
-        if (is_dragged && !check_zoom(x, y)) {
+        if (is_dragged && !check_buttons(x, y)) {
           float dx, dy;
           dx = x - mLastX;
           dy = y - mLastY;
