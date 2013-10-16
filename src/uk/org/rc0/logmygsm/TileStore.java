@@ -149,8 +149,9 @@ class TileStore {
     int ww = (last_w >> 8) + 2;
     int hh = (last_h >> 8) + 2;
     int tt = ww * hh;
-    // oversize by 50% to give a little pan space around edges
-    tt += (tt >> 1);
+    // oversize to give panning space around edges or to allow zoom in, zoom
+    // out etc
+    tt += tt;
     if (do_log) { Log.i(TAG, "New cache w=" + ww + " h=" + hh + " tt=" + tt); }
     return new Entry[tt];
   }
