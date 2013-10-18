@@ -169,6 +169,7 @@ public class Map extends View {
   private int button_size_h;
   private int succ_centre_x;
   private int pred_centre_x;
+  private int tog2x_centre_x;
 
   private void set_lengths(int width, int height) {
     int t;
@@ -181,7 +182,8 @@ public class Map extends View {
     len1 = (float)(t>>5); // approx 8 * (t/240)
     len3 = (float)((t+t+t)>>5); // approx 3*len1
     len4 = 0.5f*len3; // approx 1.5*len1
-    pred_centre_x = width / 3;
+    pred_centre_x = width >> 2;
+    tog2x_centre_x = width >> 1;
     succ_centre_x = width - pred_centre_x;
   }
 
@@ -264,11 +266,21 @@ public class Map extends View {
     c.drawLine(x0, yc, x1, y0, button_stroke_paint);
     c.drawLine(x1, y0, x1, y1, button_stroke_paint);
     c.drawLine(x1, y1, x0, yc, button_stroke_paint);
+    // draw cycle right
     x0 = succ_centre_x + button_size_h;
     x1 = succ_centre_x - button_size_h;
     c.drawLine(x0, yc, x1, y0, button_stroke_paint);
     c.drawLine(x1, y0, x1, y1, button_stroke_paint);
     c.drawLine(x1, y1, x0, yc, button_stroke_paint);
+    // draw toggle 2x
+    x0 = tog2x_centre_x + button_size_h;
+    x1 = tog2x_centre_x - button_size_h;
+    int y2 = yc - (button_size_h >> 1);
+    int y3 = yc + (button_size_h >> 1);
+    c.drawLine(x0, y2, x1, y0, button_stroke_paint);
+    c.drawLine(x1, y0, x1, y1, button_stroke_paint);
+    c.drawLine(x1, y1, x0, y3, button_stroke_paint);
+    c.drawLine(x0, y3, x0, y2, button_stroke_paint);
   }
 
   private void draw_arrow(Canvas c, float ox, float oy, Waypoints.Routing route) {
@@ -753,6 +765,17 @@ public class Map extends View {
     return false;
   }
 
+  private boolean try_toggle_scaling(float x, float y) {
+    if (y < button_size) {
+      if ((x >= (tog2x_centre_x - button_size_2)) &&
+          (x <= (tog2x_centre_x + button_size_2))) {
+        toggle_scaled();
+        return true;
+      }
+    }
+    return false;
+  }
+
   private boolean check_buttons(float x, float y) {
     if (y < button_size) {
       return true;
@@ -810,6 +833,9 @@ public class Map extends View {
           return true;
         }
         if (try_map_cycle(x, y)) {
+          return true;
+        }
+        if (try_toggle_scaling(x, y)) {
           return true;
         }
         if (try_recentre(x, y)) {
