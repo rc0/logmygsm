@@ -397,6 +397,14 @@ class TileStore {
     }
   }
 
+  static boolean loading_is_dormant() {
+    if (bg_queue.size() > 0) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   static private Entry make_entry(int zoom, MapSource map_source, int x, int y, Bitmap b, boolean is_dummy) {
     return new Entry(zoom, map_source, x, y, b, is_dummy);
   }

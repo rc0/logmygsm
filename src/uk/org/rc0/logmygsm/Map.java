@@ -386,9 +386,21 @@ public class Map extends View {
     invalidate();
   }
 
+  private void maybe_invalidate() {
+    // called after a UI action that ought to cause a map redraw.
+    // BUT : if we're still loading tiles from disc after the last redraw,
+    // don't bother.  Rationale : if the user is quickly stepping through zoom
+    // levels, he will quickly get ahead of the loader and there will a huge lag in doing the final redraw,
+    // and many unwanted tiles will get loaded.
+
+    if (TileStore.loading_is_dormant()) {
+      invalidate();
+    }
+  }
+
   void select_map_source(MapSource which) {
     map_source = which;
-    invalidate();
+    maybe_invalidate();
   }
 
   private void setZoom(int z) {
@@ -687,7 +699,7 @@ public class Map extends View {
     if (zoom > MIN_ZOOM) {
       setZoom(zoom - 1);
       notify_position_update();
-      invalidate();
+      maybe_invalidate();
     }
   }
 
@@ -695,7 +707,7 @@ public class Map extends View {
     if (zoom < MAX_ZOOM) {
       setZoom(zoom + 1);
       notify_position_update();
-      invalidate();
+      maybe_invalidate();
     }
   }
 
@@ -729,12 +741,12 @@ public class Map extends View {
       if ((x >= (pred_centre_x - button_size_2)) &&
           (x <= (pred_centre_x + button_size_2))) {
         map_source = MapSources.predecessor(map_source);
-        invalidate();
+        maybe_invalidate();
         return true;
       } else if ((x >= (succ_centre_x - button_size_2)) &&
                  (x <= (succ_centre_x + button_size_2))) {
         map_source = MapSources.successor(map_source);
-        invalidate();
+        maybe_invalidate();
         return true;
       }
     }
