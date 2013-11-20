@@ -593,9 +593,10 @@ public class Map extends View {
       int tx1 = (px1 >> tile_shift);
       int ty0 = (py0 >> tile_shift);
       int ty1 = (py1 >> tile_shift);
+      int mask = (1 << my_zoom) - 1;
       for (int x=tx0; x<=tx1; x++) {
         for (int y=ty0; y<=ty1; y++) {
-          tiles.add(new TileStore.TilePos(my_zoom, x, y, map_source));
+          tiles.add(new TileStore.TilePos(my_zoom, x & mask, y & mask, map_source));
         }
       }
     }

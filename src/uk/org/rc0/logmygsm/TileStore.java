@@ -506,13 +506,14 @@ class TileStore {
     draw_cycle++;
 
     int i, j;
+    int mask = (1<<zoom) - 1;
     i = 0;
     while (ox + (i<<bm_log_size) < w) {
       int xx = ox + (i<<bm_log_size);
       j = 0;
       while (oy + (j<<bm_log_size) < h) {
         int yy = oy + (j<<bm_log_size);
-        Entry e = lookup(zoom, map_source, tx+i, ty+j);
+        Entry e = lookup(zoom, map_source, (tx+i)&mask, ty+j);
         Bitmap bm;
         if (e != null) {
           e.add_recent_trail();

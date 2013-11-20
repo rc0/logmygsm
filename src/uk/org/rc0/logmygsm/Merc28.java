@@ -41,6 +41,7 @@ class Merc28 {
   int Y;
 
   static final int shift = 28;
+  static final int shift_mask = (1<<shift) - 1;
   static final double scale = (double)(1<<shift);
   static final double iscale = 1.0 / scale;
 
@@ -104,7 +105,8 @@ class Merc28 {
   }
 
   double to_lon() {
-    double xx = iscale * (double) X;
+    double xwrap = X & shift_mask;
+    double xx = iscale * (double) xwrap;
     return 360.0 * (xx - 0.5);
   }
 
