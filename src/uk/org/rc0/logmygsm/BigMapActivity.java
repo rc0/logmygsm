@@ -240,9 +240,14 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
 
     if (gridRefText != null) {
       summaryText.setText(summaryString);
-      gridRefText.setText(mMap.current_grid_ref());
+      gridRefText.setText(String.format("%2s / %.4f %.4f",
+            mMap.current_grid_ref(),
+            mMap.current_lat(),
+            mMap.current_lon()));
     } else {
-      summaryText.setText(summaryString + " " + mMap.current_grid_ref());
+      summaryText.setText(String.format("%s %s %.4f %.4f",
+            summaryString, mMap.current_grid_ref(),
+            mMap.current_lat(), mMap.current_lon()));
     }
   }
 

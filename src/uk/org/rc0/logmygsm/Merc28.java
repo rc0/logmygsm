@@ -103,6 +103,17 @@ class Merc28 {
     return za;
   }
 
+  double to_lon() {
+    double xx = iscale * (double) X;
+    return 360.0 * (xx - 0.5);
+  }
+
+  double to_lat() {
+    double t = (1.0 - 2.0*iscale*(double)Y) * Math.PI;
+    double tt = (2.0 * Math.atan(Math.exp(t))) - 0.5*Math.PI;
+    return Math.toDegrees(tt);
+  }
+
   // See
   // http://rc0.posterous.com/approximating-os-grid-references
   // which explains the approximations that follow

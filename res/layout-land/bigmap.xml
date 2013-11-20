@@ -36,7 +36,7 @@
     android:layout_width="match_parent"
     android:id="@+id/big_summary"
     android:typeface="monospace"
-    android:textSize="16sp"
+    android:textSize="14sp"
     android:textColor="@android:color/white"
     android:text="######### ## ###m ##### #####"
     android:layout_gravity="center">

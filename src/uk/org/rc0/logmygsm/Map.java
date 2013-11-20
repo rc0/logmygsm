@@ -519,6 +519,22 @@ public class Map extends View {
     }
   }
 
+  double current_lat() {
+    if (display_pos != null) {
+      return display_pos.to_lat();
+    } else {
+      return 0.0;
+    }
+  }
+
+  double current_lon() {
+    if (display_pos != null) {
+      return display_pos.to_lon();
+    } else {
+      return 0.0;
+    }
+  }
+
   int current_zoom() {
     return zoom;
   }
