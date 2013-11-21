@@ -596,7 +596,7 @@ public class Map extends View {
       int mask = (1 << my_zoom) - 1;
       for (int x=tx0; x<=tx1; x++) {
         for (int y=ty0; y<=ty1; y++) {
-          tiles.add(new TileStore.TilePos(my_zoom, x & mask, y & mask, map_source));
+          tiles.add(new TileStore.TilePos(my_zoom, x & mask, y, map_source));
         }
       }
     }
@@ -868,8 +868,14 @@ public class Map extends View {
           float dx, dy;
           dx = x - mLastX;
           dy = y - mLastY;
-          display_pos.X -= (int)(0.5 + drag_scale * dx);
+          display_pos.X = (display_pos.X - (int)(0.5 + drag_scale * dx)) & Merc28.shift_mask;
           display_pos.Y -= (int)(0.5 + drag_scale * dy);
+          if (display_pos.Y < 0) {
+            display_pos.Y = 0;
+          }
+          if (display_pos.Y > Merc28.shift_mask) {
+            display_pos.Y = Merc28.shift_mask;
+          }
           mLastX = x;
           mLastY = y;
           notify_position_update();
