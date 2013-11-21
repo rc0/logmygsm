@@ -73,7 +73,7 @@ public class Map extends View {
   static private float dest_arrow_2;
 
   private int zoom;
-  private int pixel_shift;
+  protected int pixel_shift;
   private int tile_shift;
   private float drag_scale;
 
@@ -85,12 +85,12 @@ public class Map extends View {
   private Merc28 estimated_pos;
 
   // the location at the centre of the screen - may be != estimated_pos if is_dragged is true.
-  private Merc28 display_pos;
+  protected Merc28 display_pos;
 
   // Set to true if we've off-centred the map
   private boolean is_dragged;
   // Set to true if map tiles are scaled to make them more legible
-  private boolean mScaled;
+  protected boolean mScaled;
 
   // --------------------------------------------------------------------------
 
@@ -945,53 +945,6 @@ public class Map extends View {
       }
     }
     return result;
-  }
-
-  // -----------
-
-
-  void add_waypoint() {
-    Logger.mWaypoints.add(display_pos);
-    invalidate();
-  }
-
-  void delete_waypoint() {
-    if (Logger.mWaypoints.delete(display_pos, pixel_shift)) {
-      invalidate();
-    }
-  }
-
-  void delete_visible_waypoints() {
-    int adjusted_pixel_shift;
-    if (mScaled) {
-      adjusted_pixel_shift = pixel_shift - 1;
-    } else {
-      adjusted_pixel_shift = pixel_shift;
-    }
-    if (Logger.mWaypoints.delete_visible(display_pos, adjusted_pixel_shift, getWidth(), getHeight() )) {
-      invalidate();
-    }
-  }
-
-  void delete_all_waypoints() {
-    Logger.mWaypoints.delete_all();
-    invalidate();
-  }
-
-  void set_destination_waypoint() {
-    Logger.mWaypoints.set_destination(display_pos, pixel_shift);
-    invalidate();
-  }
-
-  void add_landmark() {
-    Logger.mLandmarks.add(display_pos);
-    invalidate();
-  }
-
-  void delete_landmark() {
-    if (Logger.mLandmarks.delete(display_pos, pixel_shift)) {
-      invalidate();
-    }
   }
 
 }

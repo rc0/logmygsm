@@ -123,7 +123,7 @@
     android:id="@+id/shim_over_big_map2">
   </TextView>
 
-  <uk.org.rc0.logmygsm.Map
+  <uk.org.rc0.logmygsm.WaypointEditMap
     android:id="@+id/big_map"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"

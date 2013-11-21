@@ -44,7 +44,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
 
   private CellUpdateReceiver myCellReceiver;
   private GPSUpdateReceiver myGPSReceiver;
-  private Map mMap;
+  private WaypointEditMap mMap;
   private ImageButton mAddButton;
   private ImageButton mDeleteButton;
   private ImageButton mDeleteVisibleButton;
@@ -63,7 +63,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
     setContentView(R.layout.bigmap);
-    mMap = (Map) findViewById(R.id.big_map);
+    mMap = (WaypointEditMap) findViewById(R.id.big_map);
     mMap.restore_state_from_file(PREFS_FILE);
     mAddButton = (ImageButton) findViewById(R.id.add_button);
     mDeleteButton = (ImageButton) findViewById(R.id.delete_button);
