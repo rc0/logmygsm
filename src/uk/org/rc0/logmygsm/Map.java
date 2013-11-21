@@ -64,7 +64,7 @@ public class Map extends View {
 
   static final private String TAG = "Map";
   static final private int MAX_ZOOM = 18;
-  static final private int MIN_ZOOM = 5;
+  static final private int MIN_ZOOM = 2;
 
   static final float TILE_SCALING = 2.0f;
 
