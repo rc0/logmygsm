@@ -356,16 +356,20 @@ class Overlay {
       return in.readInt();
     }
 
-    static int table1[] = {
+    static final int table1[] = {
       -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0,
       -1, -1, 0, 1, -1, -1, 0, 1, -1, -1, 0, 1, -1, -1, 0, 1,
       -1, -1, -1, -1, 0, 1, 1, 2, -1, -1, -1, -1, 0, 1, 1, 2,
       -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 1, 2, 1, 2, 2, 3
     };
 
-    static int table2[] = {
-      0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
-      1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5
+    static final int table2[] = {
+      0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4
+    };
+
+    static final int table3[] = {
+      -1, 0, -1, 0,
+      -1, -1, 0, 1
     };
 
     // return position in the file where the required overlay data starts, or -1 if there is none
@@ -376,7 +380,7 @@ class Overlay {
           param_offset = 0;
           break;
         case 3:
-          param_offset = 16;
+          param_offset = 4;
           break;
         default:
           return -1;
@@ -387,6 +391,8 @@ class Overlay {
         long len;
         long loc;
         int magic;
+        boolean wide;
+        int pp0, pp1, idx1;
 
         magic = read32(in, 0);
         if (magic != MAGIC_NUMBER) {
@@ -405,10 +411,11 @@ class Overlay {
           int p = read8(in, loc);
           int idx = (p & 15) + ((xz + xz + yz) << 4);
           int t = table1[idx];
+          wide = ((p & 0x80) != 0);
           if (t < 0) {
             return -1;
           }
-          if ((p & 0x80) != 0) {
+          if (wide) {
             offset = read32(in, loc + 1 + 4*t);
           } else {
             offset = read16(in, loc + 1 + 2*t);
@@ -416,20 +423,19 @@ class Overlay {
           loc -= offset;
         }
         int p = read8(in, loc);
-        if ((p & 0x3f) != 0) {
-          int idx = (p & 15) + param_offset;
-          int t = table2[idx];
-          if (t < 0) {
-            return -1;
+        wide = ((p & 0x80) != 0);
+        pp0 = p & 0xf;
+        pp1 = (p >> 4) & 0x3;
+        idx1 = table3[param_offset + pp1];
+        if (idx1 >= 0) {
+          int idx = idx1 + table2[pp0];
+          if (wide) {
+            offset = read32(in, loc + 1 + 4*idx);
           } else {
-            if ((p & 0x80) != 0) {
-              offset = read32(in, loc + 1 + 4*t);
-            } else {
-              offset = read16(in, loc + 1 + 2*t);
-            }
-            loc -= offset;
-            return loc;
+            offset = read16(in, loc + 1 + 2*idx);
           }
+          loc -= offset;
+          return loc;
         } else {
           return -1;
         }
