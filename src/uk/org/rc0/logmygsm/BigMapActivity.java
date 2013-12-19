@@ -259,6 +259,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     @Override
     public void onReceive(Context context, Intent intent) {
       mMap.update_map();
+      updateDisplay();
     }
   }
 
