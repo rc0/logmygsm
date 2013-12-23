@@ -112,7 +112,7 @@ class Menus2 {
          map.trigger_fetch_tree(0, true, context);
          return true;
        case DOWNLOAD_LEV_0_ROUTE:
-         map.trigger_fetch_route(0, false, context);
+         Downloader.trigger_fetch_route(0, false, context, map);
          return true;
        default:
          return false;

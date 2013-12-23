@@ -44,6 +44,9 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Iterator;
 
 class Downloader {
 
@@ -165,6 +168,74 @@ class Downloader {
     }
     is_busy = true;
     (new DownloadThread(jobs)).start();
+  }
+
+  static private void insert_targets(Set<Target> targets, int z, int x0, int y0) {
+    int dx, dy;
+    for (dx=-1; dx<=1; dx++) {
+      int xx = (x0 + dx) >> 1; // reverse the extra zoom level
+      for (dy=-1; dy<=1; dy++) {
+        int yy = (y0 + dy) >> 1; // reverse the extra zoom level
+        Target t = new Target(z, xx, yy);
+        targets.add(t); // auto-discard targets we already have
+      }
+    }
+  }
+
+  // Consider the 'waypoints' trail (maybe user's intended route) currently on
+  // the map, download the tiles required to cover the whole trail at the
+  // current + all outer zoom levels, with a fuzz of +/- 0.5 tiles in all 8
+  // directions around
+  static void trigger_fetch_route(int levels, boolean forced, Context context, Map map) {
+    Linkages.Edge[] route_edges = Logger.mWaypoints.get_edges();
+    Set<Target> targets = new HashSet<Target>();
+
+    int z;
+    int max_zoom = map.current_zoom();
+    MapSource source = map.current_mapsource();
+    for (z = Map.MIN_ZOOM; z <= max_zoom; z++) {
+      int z1 = z + 1; // work 1 zoom level deeper to get the 0.5 tile fuzz
+      int tile_shift = 28 - z1;
+      for (int j = 0; j < route_edges.length; j++) {
+        Linkages.Edge e = route_edges[j];
+        Merc28 m0 = e.m0;
+        Merc28 m1 = e.m1;
+        int x0 = m0.X >> tile_shift;
+        int y0 = m0.Y >> tile_shift;
+        int x1 = m1.X >> tile_shift;
+        int y1 = m1.Y >> tile_shift;
+
+        // Bresenham algorithm (under 'simplification' on Wikipedia)
+        int dx = Math.abs(x1 - x0);
+        int dy = Math.abs(y1 - y0);
+        int sx = (x0 < x1) ? 1 : -1;
+        int sy = (y0 < y1) ? 1 : -1;
+        int err = dx - dy;
+        while (true) {
+          insert_targets(targets, z, x0, y0);
+          if ((x0 == x1) && (y0 == y1)) break;
+          int e2 = 2*err;
+          if (e2 > -dy) {
+            err -= dy;
+            x0 += sx;
+          } else {
+            err += dx;
+            y0 += sy;
+          }
+        }
+      }
+    }
+
+    LinkedList<TileStore.TilePos> tiles;
+    tiles = new LinkedList<TileStore.TilePos> ();
+    Iterator<Target> iter = targets.iterator();
+    while (iter.hasNext()) {
+      Target t = iter.next();
+      //Log.i(TAG, "Would get z=" + t.zoom + " x=" + t.x + " y=" + t.y);
+      tiles.add(new TileStore.TilePos(t.zoom, t.x, t.y, source));
+    }
+    Downloader.start_multiple_fetch(tiles, forced, context);
+
   }
 
 }
