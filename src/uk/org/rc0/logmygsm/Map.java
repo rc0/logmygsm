@@ -285,7 +285,7 @@ public class Map extends View {
 
     TileStore.draw(canvas, width, height, zoom, map_source, display_pos, mScaled);
     Logger.mWaypoints.draw(canvas, t, true);
-    Logger.mLandmarks.draw(canvas, t, true);
+    Logger.mLandmarks.draw(canvas, t);
     draw_position(canvas, width, height);
     if (TowerLine.is_active()) {
       TowerLine.draw_line(canvas, width, height, pixel_shift, display_pos);

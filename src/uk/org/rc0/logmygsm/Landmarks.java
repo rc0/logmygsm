@@ -166,7 +166,7 @@ class Landmarks {
   private final static float a2 = 0.92f * (float) RADIUS;
 
   // pos is the position of the centre-screen
-  void draw(Canvas c, Transform t, boolean do_show_track) {
+  void draw(Canvas c, Transform t) {
     int n = points.size();
     for (int i = 0; i < n; i++) {
       Merc28 p = points.get(i);
