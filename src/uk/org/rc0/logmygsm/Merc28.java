@@ -110,14 +110,39 @@ class Merc28 {
     return 360.0 * (xx - 0.5);
   }
 
-  double to_lat() {
-    double t = (1.0 - 2.0*iscale*(double)Y) * Math.PI;
-    double tt = (2.0 * Math.atan(Math.exp(t))) - 0.5*Math.PI;
-    return Math.toDegrees(tt);
-  }
+  static final double P1 = 179.9989063857;
+  static final double P3 = 507.2276380744;
+  static final double P5 = 176.2675623673;
+  static final double Q0 = 1.0000000000;
+  static final double Q2 = 4.4623636863;
+  static final double Q4 = 4.2727924855;
+  static final double Q6 = 0.4175728442;
 
   // See
-  // http://rc0.posterous.com/approximating-os-grid-references
+  // http://rc0rc0.wordpress.com/2013/11/25/approximating-the-gudermannian-function/
+  double to_lat()
+  {
+    double y = iscale * (double) this.Y;
+    double z = 1.0 - 2.0*y;
+    double z2 = z*z;
+    double z4 = z2*z2;
+    double t, b0, b4, b, t2;
+    b4 = Q4 + Q6*z2;
+    b0 = Q0 + Q2*z2;
+    t2 = P3 + P5*z2;
+    b = b0 + b4*z4;
+    t = P1 + t2*z2;
+    return z*t/b;
+  }
+
+  // double to_lat_old() {
+  //   double t = (1.0 - 2.0*iscale*(double)Y) * Math.PI;
+  //   double tt = (2.0 * Math.atan(Math.exp(t))) - 0.5*Math.PI;
+  //   return Math.toDegrees(tt);
+  // }
+
+  // See
+  // http://issuu.com/rc0rc0/docs/wmen_paper
   // which explains the approximations that follow
 
   // Convert GPS altitude into estimated height above mean sea level
