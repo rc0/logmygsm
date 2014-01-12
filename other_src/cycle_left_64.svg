@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="64px"
+   height="64px"
+   id="svg3825"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="cycle_left_64.svg"
+   inkscape:export-filename="/android/richard/with_ant/LogMyGSM/other_src/cycle_left_64.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs3827" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="5.5"
+     inkscape:cx="32"
+     inkscape:cy="32"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:document-units="px"
+     inkscape:grid-bbox="true"
+     inkscape:window-width="1337"
+     inkscape:window-height="946"
+     inkscape:window-x="150"
+     inkscape:window-y="10"
+     inkscape:window-maximized="0">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3833" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata3830">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer">
+    <path
+       inkscape:connector-curvature="0"
+       style="color:#000000;fill:#000000;fill-opacity:0.627451;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       d="M 56.093751,0.75852234 1.8948863,32.066337 56.093751,63.310388 l 0,-62.55186566 z M 39.196458,12.299693 l 14.984392,8.608055 -14.984392,8.671818 0,-6.05752 c -0.145605,-0.0015 -0.307246,-0.0059 -0.446344,0 -5.737421,0.244869 -10.063779,5.023359 -9.819558,10.776009 0.244222,5.752652 5.038585,10.191955 10.776009,9.947085 5.737422,-0.244871 10.127543,-5.087123 9.883322,-10.839772 l 6.121283,-0.255054 c 0.384725,9.062228 -6.711313,16.830363 -15.749552,17.21611 -9.038238,0.385747 -16.767619,-6.75109 -17.152346,-15.813316 -0.384725,-9.062227 6.711314,-16.830362 15.749552,-17.216109 0.230126,-0.0098 0.416188,-0.002 0.637634,0 l 0,-5.037306 z m 0,5.037306 0,6.185047 c 0.02079,2.1e-4 0.04385,-7.2e-5 0.06376,0 l 0,-6.185047 c -0.02302,-8.4e-5 -0.04162,2.1e-4 -0.06376,0 z"
+       id="path2993" />
+    <rect
+       style="color:#000000;fill:none;stroke:#000000;stroke-width:0.01;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3810"
+       width="64.167595"
+       height="64.169891"
+       x="0.46165639"
+       y="0.64232725" />
+  </g>
+</svg>

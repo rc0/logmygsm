@@ -52,7 +52,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.Log;
 
-public class Map extends View {
+public class Map extends View implements MapActionBar.Callbacks {
 
   private final Paint red_paint;
   private final Paint red_stroke_paint;
@@ -66,6 +66,7 @@ public class Map extends View {
   static final float TILE_SCALING = 2.0f;
 
   private RoutingsBar mRB;
+  private MapActionBar mAB;
 
   private int zoom;
   protected int pixel_shift;
@@ -127,6 +128,7 @@ public class Map extends View {
     int dest_text_size = res.getDimensionPixelSize(R.dimen.distanceFontSize);
 
     mRB = new RoutingsBar(dest_text_size);
+    mAB = new MapActionBar(context, this);
 
     setZoom(14);
     map_source = MapSources.get_default();
@@ -142,29 +144,19 @@ public class Map extends View {
 
   private float len1, len3, len4;
 
-  private int button_half_line;
-  private int button_radius;
   private int button_size;
   private int button_size_2;
   private int button_size_h;
-  private int succ_centre_x;
-  private int pred_centre_x;
-  private int tog2x_centre_x;
 
   private void set_lengths(int width, int height) {
     int t;
     t = (width + height) >> 1;
-    button_half_line = (t>>4) - (t>>6); // approx 12 * (t/240)
-    button_radius = (t>>4); // approx 16 * (t/240)
-    button_size = (t>>2) - (t>>3) + (t>>5); // approx 40 * (t/240)
+    button_size = (height >> 3) + (height >> 4); /* 3/16* h */
     button_size_2 = button_size>>1;
     button_size_h = button_size_2 - (button_size>>3);
     len1 = (float)(t>>5); // approx 8 * (t/240)
     len3 = (float)((t+t+t)>>5); // approx 3*len1
     len4 = 0.5f*len3; // approx 1.5*len1
-    pred_centre_x = width >> 2;
-    tog2x_centre_x = width >> 1;
-    succ_centre_x = width - pred_centre_x;
   }
 
   private void draw_centre_circle(Canvas c, int w, int h) {
@@ -221,49 +213,6 @@ public class Map extends View {
 
   }
 
-  private void draw_buttons(Canvas c, int w, int h) {
-    int button_offset = button_radius + (button_radius >> 1);
-    // draw plus
-    c.drawCircle(button_offset, button_offset, button_radius, button_stroke_paint);
-    c.drawLine(button_offset - button_half_line, button_offset,
-        button_offset + button_half_line, button_offset,
-        button_stroke_paint);
-    c.drawLine(button_offset, button_offset - button_half_line,
-        button_offset, button_offset + button_half_line,
-        button_stroke_paint);
-    // draw minus
-    c.drawCircle(w - button_offset, button_offset, button_radius, button_stroke_paint);
-    c.drawLine(w - button_offset - button_half_line, button_offset,
-        w - button_offset + button_half_line, button_offset,
-        button_stroke_paint);
-    // draw cycle left
-    int bs8, x0, x1;
-    x0 = pred_centre_x - button_size_h;
-    x1 = pred_centre_x + button_size_h;
-    int yc = button_size_2;
-    int y0 = yc - button_size_h;
-    int y1 = yc + button_size_h;
-    c.drawLine(x0, yc, x1, y0, button_stroke_paint);
-    c.drawLine(x1, y0, x1, y1, button_stroke_paint);
-    c.drawLine(x1, y1, x0, yc, button_stroke_paint);
-    // draw cycle right
-    x0 = succ_centre_x + button_size_h;
-    x1 = succ_centre_x - button_size_h;
-    c.drawLine(x0, yc, x1, y0, button_stroke_paint);
-    c.drawLine(x1, y0, x1, y1, button_stroke_paint);
-    c.drawLine(x1, y1, x0, yc, button_stroke_paint);
-    // draw toggle 2x
-    x0 = tog2x_centre_x + button_size_h;
-    x1 = tog2x_centre_x - button_size_h;
-    int y2 = yc - (button_size_h >> 1);
-    int y3 = yc + (button_size_h >> 1);
-    c.drawLine(x0, y2, x1, y0, button_stroke_paint);
-    c.drawLine(x1, y0, x1, y1, button_stroke_paint);
-    c.drawLine(x1, y1, x0, y3, button_stroke_paint);
-    c.drawLine(x0, y3, x0, y2, button_stroke_paint);
-  }
-
-
   private void redraw_map(Canvas canvas) {
     int width = getWidth();
     int height = getHeight();
@@ -296,7 +245,7 @@ public class Map extends View {
     }
 
     draw_centre_circle(canvas, width, height);
-    draw_buttons(canvas, width, height);
+    mAB.draw(canvas, width, button_size);
     mRB.show_routings(canvas, width, height, display_pos, button_size);
   }
 
@@ -549,7 +498,7 @@ public class Map extends View {
     invalidate();
   }
 
-  void zoom_out() {
+  public void zoom_out() {
     if (zoom > MIN_ZOOM) {
       setZoom(zoom - 1);
       notify_position_update();
@@ -557,7 +506,7 @@ public class Map extends View {
     }
   }
 
-  void zoom_in() {
+  public void zoom_in() {
     if (zoom < MAX_ZOOM) {
       setZoom(zoom + 1);
       notify_position_update();
@@ -565,7 +514,7 @@ public class Map extends View {
     }
   }
 
-  void toggle_scaled() {
+  public void toggle_scaled() {
     mScaled = !mScaled;
     invalidate();
   }
@@ -577,45 +526,14 @@ public class Map extends View {
   private float mLastX;
   private float mLastY;
 
-  private boolean try_zoom(float x, float y) {
-    if (y < button_size) {
-      if (x < button_size) {
-        zoom_in();
-        return true;
-      } else if (x > (getWidth() - button_size)) {
-        zoom_out();
-        return true;
-      }
-    }
-    return false;
+  public void cycle_left() {
+    map_source = MapSources.predecessor(map_source);
+    maybe_invalidate();
   }
 
-  private boolean try_map_cycle(float x, float y) {
-    if (y < button_size) {
-      if ((x >= (pred_centre_x - button_size_2)) &&
-          (x <= (pred_centre_x + button_size_2))) {
-        map_source = MapSources.predecessor(map_source);
-        maybe_invalidate();
-        return true;
-      } else if ((x >= (succ_centre_x - button_size_2)) &&
-                 (x <= (succ_centre_x + button_size_2))) {
-        map_source = MapSources.successor(map_source);
-        maybe_invalidate();
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private boolean try_toggle_scaling(float x, float y) {
-    if (y < button_size) {
-      if ((x >= (tog2x_centre_x - button_size_2)) &&
-          (x <= (tog2x_centre_x + button_size_2))) {
-        toggle_scaled();
-        return true;
-      }
-    }
-    return false;
+  public void cycle_right() {
+    map_source = MapSources.successor(map_source);
+    maybe_invalidate();
   }
 
   private boolean check_buttons(float x, float y) {
@@ -671,13 +589,8 @@ public class Map extends View {
 
     switch (action) {
       case MotionEvent.ACTION_DOWN:
-        if (try_zoom(x, y)) {
-          return true;
-        }
-        if (try_map_cycle(x, y)) {
-          return true;
-        }
-        if (try_toggle_scaling(x, y)) {
+        if (check_buttons(x, y)) {
+          mAB.decode((int)x);
           return true;
         }
         if (try_recentre(x, y)) {
