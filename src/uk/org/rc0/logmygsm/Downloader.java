@@ -55,6 +55,8 @@ class Downloader {
   static private Handler mHandler;
   static final private String TAG = "Downloader";
 
+  static final private String USER_AGENT_STRING = "LogMyGsm";
+
   static void init (Context _app_context) {
     mContext = _app_context;
     mHandler = new Handler();
@@ -75,6 +77,7 @@ class Downloader {
           (file.lastModified() < TileStore.get_epoch())) {
         URI uri = new URI("http", the_url, null);
         HttpGet get = new HttpGet(uri);
+        get.setHeader("User-Agent", USER_AGENT_STRING);
         HttpClient client = new DefaultHttpClient();
         HttpResponse response = client.execute(get);
         HttpEntity entity = response.getEntity();
