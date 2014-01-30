@@ -30,6 +30,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
 
 class MapSource {
   private String menu_name = "";
@@ -43,6 +48,17 @@ class MapSource {
     "/sdcard/external_sd/LogMyGsm/tiles",
     last_hope_path
   };
+
+  static final private String PREFS_DIR = "/sdcard/LogMyGsm/prefs/";
+  static final private String URL_MAP_FILE = PREFS_DIR + "urls.txt";
+  static HashMap<String,String> url_map;
+
+  static final String KEY_MAPNIK = "MAPNIK";
+  static final String KEY_OPENCYCLEMAP = "OPENCYCLEMAP";
+  static final String KEY_OS_1 = "OS_1";
+  static final String KEY_OS_2 = "OS_2";
+  static final String KEY_AERIAL_1 = "AERIAL_1";
+  static final String KEY_AERIAL_2 = "AERIAL_2";
 
   static String path_start = null;
 
@@ -75,6 +91,47 @@ class MapSource {
     index = -1;
   }
 
+  static void read_url_map() {
+    // Store download URLs in a text file outside of the application
+    url_map = new HashMap<String, String>();
+    // Put dummy values in the map so at least something exists if URL_MAP_FILE
+    // fails to load
+    url_map.put(KEY_MAPNIK, "//127.0.0.1/%d/%d/%d.png");
+    url_map.put(KEY_OPENCYCLEMAP, "//127.0.0.1/%d/%d/%d.png");
+    url_map.put(KEY_OS_1, "//127.0.0.1/");
+    url_map.put(KEY_OS_2, "");
+    url_map.put(KEY_AERIAL_1, "//127.0.0.1/");
+    url_map.put(KEY_AERIAL_2, "");
+
+    File f = new File(URL_MAP_FILE);
+    BufferedReader br;
+    boolean is_open = false;
+    if (f.exists()) {
+      try {
+        br = new BufferedReader(new FileReader(URL_MAP_FILE));
+        is_open = true;
+
+        try {
+          String key, value;
+          while (true) {
+            key = br.readLine();
+            if (key.compareTo("END") == 0) {
+              break;
+            }
+            value = br.readLine();
+            url_map.put(key, value);
+          }
+          // exception at EOF or any other error
+        } catch (IOException e) {
+        }
+        if (is_open) {
+          br.close();
+        }
+      } catch (IOException e) {
+      }
+    }
+  }
+
   // Discover where the tiles are stored.  Share tiles with Maverick (-Pro) if
   // possible, otherwise use our own storage
   static void init() {
@@ -93,6 +150,8 @@ class MapSource {
       File dir = new File(path_start);
       dir.mkdirs();
     }
+
+    read_url_map();
   }
 
   static final char [] qk03 = "0123" . toCharArray();
@@ -119,7 +178,7 @@ class MapSource_Mapnik extends MapSource {
   }
 
   String get_download_url(int zoom, int x, int y) {
-    return String.format("//a.tile.openstreetmap.org/%d/%d/%d.png", zoom, x, y);
+    return String.format(url_map.get(KEY_MAPNIK), zoom, x, y);
   }
 
 };
@@ -133,7 +192,7 @@ class MapSource_Cycle extends MapSource {
   }
 
   String get_download_url(int zoom, int x, int y) {
-    return String.format("//a.tile.opencyclemap.org/cycle/%d/%d/%d.png", zoom, x, y);
+    return String.format(url_map.get(KEY_OPENCYCLEMAP), zoom, x, y);
   }
 
 };
@@ -147,7 +206,7 @@ class MapSource_OS extends MapSource {
   }
 
   String get_download_url(int zoom, int x, int y) {
-    return new String("//ecn.t3.tiles.virtualearth.net/tiles/r" + get_quadkey(zoom, x, y) + ".png?g=41&productSet=mmOS");
+    return new String(url_map.get(KEY_OS_1) + get_quadkey(zoom, x, y) + url_map.get(KEY_OS_2));
   }
 
 };
@@ -161,7 +220,7 @@ class MapSource_Bing_Aerial extends MapSource {
   }
 
   String get_download_url(int zoom, int x, int y) {
-    return new String("//ak.dynamic.t3.tiles.virtualearth.net/comp/ch/" + get_quadkey(zoom, x, y) + "?mkt=en-gb&it=A,G,L&shading=hill&og=17&n=z");
+    return new String(url_map.get(KEY_AERIAL_1) + get_quadkey(zoom, x, y) + url_map.get(KEY_AERIAL_2));
   }
 
   String get_tile_path(int zoom, int x, int y) {
