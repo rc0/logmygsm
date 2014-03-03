@@ -132,6 +132,7 @@ public class MainActivity extends Activity implements Map.PositionListener {
       mMap.save_state_to_file(PREFS_FILE);
       // Dump the old tiles that haven't been rescued yet - avoid the most gratuituous memory wastage
       TileStore.sleep_invalidate();
+      finish();
       super.onPause();
     }
 
@@ -441,8 +442,8 @@ public class MainActivity extends Activity implements Map.PositionListener {
             Logger.do_bookmark(this);
             return true;
           case OPTION_BIG_MAP:
-            Intent launch_intent = new Intent(this, BigMapActivity.class);
-            startActivity(launch_intent);
+            //Intent launch_intent = new Intent(this, BigMapActivity.class);
+            //startActivity(launch_intent);
             return true;
           case Menus2.OPTION_TOGGLE_TOWERLINE:
             TowerLine.toggle_active();

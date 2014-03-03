@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">LogMyGsm!</string>
-    <string name="CellStat">A tool to collect coverage info for GSM/3G</string>
     <string name="app_name">LogMyGsm</string>
-    <string name="big_map_name">Waypoint edit</string>
+    <string name="big_map_name">Waypoints</string>
 </resources>

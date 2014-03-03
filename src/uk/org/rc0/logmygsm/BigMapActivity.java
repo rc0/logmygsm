@@ -131,8 +131,8 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
 
   @Override
   public void onResume () {
-    //Logger.stop_tracing = false;
-    //startService(new Intent(this, Logger.class));
+    Logger.stop_tracing = false;
+    startService(new Intent(this, Logger.class));
     IntentFilter filter;
 
     filter = new IntentFilter(Logger.UPDATE_GPS);
@@ -155,6 +155,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     // in effect we are 'committing' the user's changes at this point.
     mMap.save_state_to_file(PREFS_FILE);
     TileStore.sleep_invalidate();
+    finish();
     super.onPause();
   }
 
