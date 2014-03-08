@@ -373,7 +373,6 @@ public class MainActivity extends Activity implements Map.PositionListener {
   static private final int OPTION_EXIT             = Menus2.OPTION_LOCAL_BASE | 0x1;
   static private final int OPTION_SHARE            = Menus2.OPTION_LOCAL_BASE | 0x2;
   static private final int OPTION_LOG_MARKER       = Menus2.OPTION_LOCAL_BASE | 0x3;
-  static private final int OPTION_BIG_MAP          = Menus2.OPTION_LOCAL_BASE | 0x4;
 
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -381,18 +380,14 @@ public class MainActivity extends Activity implements Map.PositionListener {
       MenuItem[] toggles = Menus2.insert_maps_menu(menu);
       mTileScalingToggle = toggles[0];
       mTowerlineToggle = toggles[1];
-      MenuItem m_waypoints =
-        menu.add (Menu.NONE, OPTION_BIG_MAP, Menu.NONE, "Waypoints");
-      m_waypoints.setIcon(android.R.drawable.ic_menu_myplaces);
       Menus2.insert_download_menu(menu);
-
+      MenuItem m_share =
+        menu.add (Menu.NONE, OPTION_SHARE,  Menu.NONE, "Share OS ref");
+      m_share.setIcon(android.R.drawable.ic_menu_share);
       // Bottom row
       MenuItem m_logmark =
         menu.add (Menu.NONE, OPTION_LOG_MARKER, Menu.NONE, "Bookmark");
       m_logmark.setIcon(android.R.drawable.ic_menu_save);
-      MenuItem m_share =
-        menu.add (Menu.NONE, OPTION_SHARE,  Menu.NONE, "Share OS ref");
-      m_share.setIcon(android.R.drawable.ic_menu_share);
       MenuItem m_exit =
         menu.add (Menu.NONE, OPTION_EXIT,    Menu.NONE, "Exit");
       m_exit.setIcon(android.R.drawable.ic_lock_power_off);
@@ -439,10 +434,6 @@ public class MainActivity extends Activity implements Map.PositionListener {
             return true;
           case OPTION_LOG_MARKER:
             Logger.do_bookmark(this);
-            return true;
-          case OPTION_BIG_MAP:
-            //Intent launch_intent = new Intent(this, BigMapActivity.class);
-            //startActivity(launch_intent);
             return true;
           case Menus2.OPTION_TOGGLE_TOWERLINE:
             TowerLine.toggle_active();

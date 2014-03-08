@@ -39,6 +39,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 
 public class BigMapActivity extends Activity implements Map.PositionListener {
 
@@ -201,7 +203,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     } else if (group == Menus2.OPTION_LOCAL_BASE) {
       switch (code) {
         case OPTION_CLEAR_TRAIL:
-          mMap.clear_trail();
+          confirm_clear_trail();
           return true;
         case OPTION_LOG_MARKER:
           Logger.do_bookmark(this);
@@ -218,6 +220,25 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     } else {
       return false;
     }
+  }
+
+  private void confirm_clear_trail() {
+    AlertDialog.Builder builder;
+    builder = new AlertDialog.Builder(this);
+    builder.setMessage("Clear the trail?");
+    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
+        mMap.clear_trail();
+      }
+    });
+    builder.setNegativeButton("Calcel", new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
+        return;
+      }
+    });
+    AlertDialog alert = builder.create();
+    alert.show();
+
   }
 
   private void updateDisplay() {
@@ -273,8 +294,6 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
       updateDisplay();
     }
   }
-
-
 }
 
 // vim:et:sw=2:sts=2
