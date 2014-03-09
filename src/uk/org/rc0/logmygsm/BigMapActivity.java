@@ -42,7 +42,10 @@ import android.widget.TextView;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 
-public class BigMapActivity extends Activity implements Map.PositionListener {
+public class BigMapActivity
+  extends Activity
+  implements Map.PositionListener,
+           Confirm.Callback {
 
   private CellUpdateReceiver myCellReceiver;
   private GPSUpdateReceiver myGPSReceiver;
@@ -203,7 +206,7 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     } else if (group == Menus2.OPTION_LOCAL_BASE) {
       switch (code) {
         case OPTION_CLEAR_TRAIL:
-          confirm_clear_trail();
+          Confirm confirm = new Confirm(this, "Clear the trail?", this);
           return true;
         case OPTION_LOG_MARKER:
           Logger.do_bookmark(this);
@@ -222,23 +225,8 @@ public class BigMapActivity extends Activity implements Map.PositionListener {
     }
   }
 
-  private void confirm_clear_trail() {
-    AlertDialog.Builder builder;
-    builder = new AlertDialog.Builder(this);
-    builder.setMessage("Clear the trail?");
-    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int id) {
-        mMap.clear_trail();
-      }
-    });
-    builder.setNegativeButton("Calcel", new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int id) {
-        return;
-      }
-    });
-    AlertDialog alert = builder.create();
-    alert.show();
-
+  public void do_when_confirmed() {
+    mMap.clear_trail();
   }
 
   private void updateDisplay() {
