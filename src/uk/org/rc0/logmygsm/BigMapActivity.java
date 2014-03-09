@@ -163,9 +163,10 @@ public class BigMapActivity
     super.onPause();
   }
 
-  private final int OPTION_CLEAR_TRAIL  = Menus2.OPTION_LOCAL_BASE | 0x1;
-  private final int OPTION_SHARE        = Menus2.OPTION_LOCAL_BASE | 0x2;
-  private final int OPTION_LOG_MARKER   = Menus2.OPTION_LOCAL_BASE | 0x3;
+  static private final int OPTION_CLEAR_TRAIL  = Menus2.OPTION_LOCAL_BASE | 0x1;
+  static private final int OPTION_SHARE        = Menus2.OPTION_LOCAL_BASE | 0x2;
+  static private final int OPTION_LOG_MARKER   = Menus2.OPTION_LOCAL_BASE | 0x3;
+  static private final int OPTION_EXIT         = Menus2.OPTION_LOCAL_BASE | 0x4;
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -173,18 +174,21 @@ public class BigMapActivity
     mTileScalingToggle = toggles[0];
     mTowerlineToggle = toggles[1];
     Menus2.insert_download_menu(menu);
+    MenuItem m_share =
+      menu.add (Menu.NONE, OPTION_SHARE,  Menu.NONE, "Share OS ref");
+    m_share.setIcon(android.R.drawable.ic_menu_share);
 
     MenuItem m_logmark =
       menu.add (Menu.NONE, OPTION_LOG_MARKER, Menu.NONE, "Bookmark");
     m_logmark.setIcon(android.R.drawable.ic_menu_save);
-    MenuItem m_share =
-      menu.add (Menu.NONE, OPTION_SHARE,  Menu.NONE, "Share grid ref");
-    m_share.setIcon(android.R.drawable.ic_menu_share);
     MenuItem m_clear_waypoints =
       menu.add (Menu.NONE, OPTION_CLEAR_TRAIL,  Menu.NONE, "Clear trail");
     m_clear_waypoints.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-
+    MenuItem m_exit =
+      menu.add (Menu.NONE, OPTION_EXIT,    Menu.NONE, "Exit");
+    m_exit.setIcon(android.R.drawable.ic_lock_power_off);
     return true;
+
   }
 
   @Override
@@ -205,6 +209,21 @@ public class BigMapActivity
       return Menus2.decode_map_option(option, mMap);
     } else if (group == Menus2.OPTION_LOCAL_BASE) {
       switch (code) {
+      case OPTION_EXIT:
+        Logger.stop_tracing = true;
+
+        // If app stays in memory, start 'clean' next time wrt tile downloading
+        TileStore.refresh_epoch();
+        // avoid holding onto oodles of memory at Application level...
+        TileStore.invalidate();
+
+        // Send an intent to the Logger to get it to exit promptly even if there are no
+        // GPS or cell updates soon
+        Intent quit_intent = new Intent(Logger.QUIT_LOGGER);
+        sendBroadcast(quit_intent);
+
+        finish();
+        return true;
         case OPTION_CLEAR_TRAIL:
           Confirm confirm = new Confirm(this, "Clear the trail?", this);
           return true;

@@ -40,7 +40,10 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.widget.TextView;
 
-public class MainActivity extends Activity implements Map.PositionListener {
+public class MainActivity
+  extends Activity
+  implements Map.PositionListener,
+           Confirm.Callback {
 
   private TextView latText;
   private TextView lonText;
@@ -370,9 +373,10 @@ public class MainActivity extends Activity implements Map.PositionListener {
   // --------------------------------------------------------------------------
   //
 
-  static private final int OPTION_EXIT             = Menus2.OPTION_LOCAL_BASE | 0x1;
+  static private final int OPTION_CLEAR_TRAIL      = Menus2.OPTION_LOCAL_BASE | 0x1;
   static private final int OPTION_SHARE            = Menus2.OPTION_LOCAL_BASE | 0x2;
   static private final int OPTION_LOG_MARKER       = Menus2.OPTION_LOCAL_BASE | 0x3;
+  static private final int OPTION_EXIT             = Menus2.OPTION_LOCAL_BASE | 0x4;
 
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -388,6 +392,9 @@ public class MainActivity extends Activity implements Map.PositionListener {
       MenuItem m_logmark =
         menu.add (Menu.NONE, OPTION_LOG_MARKER, Menu.NONE, "Bookmark");
       m_logmark.setIcon(android.R.drawable.ic_menu_save);
+      MenuItem m_clear_waypoints =
+        menu.add (Menu.NONE, OPTION_CLEAR_TRAIL,  Menu.NONE, "Clear trail");
+      m_clear_waypoints.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
       MenuItem m_exit =
         menu.add (Menu.NONE, OPTION_EXIT,    Menu.NONE, "Exit");
       m_exit.setIcon(android.R.drawable.ic_lock_power_off);
@@ -429,11 +436,14 @@ public class MainActivity extends Activity implements Map.PositionListener {
 
             finish();
             return true;
-          case OPTION_SHARE:
-            mMap.share_grid_ref(this);
+          case OPTION_CLEAR_TRAIL:
+            Confirm confirm = new Confirm(this, "Clear the trail?", this);
             return true;
           case OPTION_LOG_MARKER:
             Logger.do_bookmark(this);
+            return true;
+          case OPTION_SHARE:
+            mMap.share_grid_ref(this);
             return true;
           case Menus2.OPTION_TOGGLE_TOWERLINE:
             TowerLine.toggle_active();
@@ -445,6 +455,10 @@ public class MainActivity extends Activity implements Map.PositionListener {
         return false;
       }
     }
+
+  public void do_when_confirmed() {
+    mMap.clear_trail();
+  }
 }
 //
 // vim:et:sw=2:sts=2
