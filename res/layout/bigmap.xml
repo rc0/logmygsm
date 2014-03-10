@@ -86,6 +86,13 @@
         android:src="@drawable/del_landmark_16"
         android:gravity="center">
     </ImageButton>
+    <ImageButton
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/cut_route_button"
+        android:src="@drawable/cut_route_16"
+        android:gravity="center">
+    </ImageButton>
   </LinearLayout>
   <!-- The block around the buttons at the top -->
 

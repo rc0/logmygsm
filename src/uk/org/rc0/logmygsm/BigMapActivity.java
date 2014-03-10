@@ -57,6 +57,7 @@ public class BigMapActivity
   private ImageButton mSetDestinationButton;
   private ImageButton mAddLMButton;
   private ImageButton mDeleteLMButton;
+  private ImageButton mCutRouteButton;
   private TextView summaryText;
   private TextView gridRefText;
   private MenuItem mTileScalingToggle;
@@ -77,6 +78,7 @@ public class BigMapActivity
     mSetDestinationButton = (ImageButton) findViewById(R.id.set_destination_button);
     mAddLMButton = (ImageButton) findViewById(R.id.add_landmark_button);
     mDeleteLMButton = (ImageButton) findViewById(R.id.del_landmark_button);
+    mCutRouteButton = (ImageButton) findViewById(R.id.cut_route_button);
     summaryText = (TextView) findViewById(R.id.big_summary);
     gridRefText = (TextView) findViewById(R.id.big_grid_ref);
 
