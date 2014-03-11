@@ -45,7 +45,24 @@ class Waypoints {
 
   static final private String TAG = "Waypoints";
 
-  private ArrayList<Merc28> points;
+  // ---------------------------
+
+  static class Point extends Merc28 {
+    boolean zombie;
+    int index;
+    Point(Merc28 pos) {
+      super(pos);
+      this.zombie = false;
+      this.index = -1;
+    }
+    Point(int x, int y) {
+      super(x, y);
+      this.zombie = false;
+      this.index = -1;
+    }
+  }
+
+  private ArrayList<Point> points;
   private int destination = -1;
   private Linkages mLinkages = null;
   private Paint marker_paint;
@@ -98,7 +115,7 @@ class Waypoints {
   }
 
   private void restore_state_from_file() {
-    points = new ArrayList<Merc28> ();
+    points = new ArrayList<Point> ();
     mLinkages = null;
     File file = new File("/sdcard/LogMyGsm/prefs/" + TAIL);
     boolean failed = false;
@@ -113,7 +130,7 @@ class Waypoints {
           int x = Integer.parseInt(line);
           line = br.readLine();
           int y = Integer.parseInt(line);
-          points.add(new Merc28(x, y));
+          points.add(new Point(x, y));
         }
         line = br.readLine();
         destination = Integer.parseInt(line);
@@ -125,14 +142,14 @@ class Waypoints {
       }
     }
     if (failed) {
-      points = new ArrayList<Merc28> ();
+      points = new ArrayList<Point> ();
     }
   }
 
   // ---------------------------
 
   void add(Merc28 pos) {
-    points.add(new Merc28(pos));
+    points.add(new Point(pos));
     mLinkages = null;
   }
 
@@ -202,7 +219,7 @@ class Waypoints {
   }
 
   void delete_all() {
-    points = new ArrayList<Merc28> ();
+    points = new ArrayList<Point> ();
     mLinkages = null;
     destination = -1;
   }

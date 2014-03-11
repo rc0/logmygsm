@@ -206,7 +206,7 @@ class Linkages {
 
   // ---------------------------
 
-  private void do_meshing(ArrayList<Merc28> _points) {
+  private void do_meshing(ArrayList<Waypoints.Point> _points) {
     // defensive copy of the points fed in
     points = new Merc28[_points.size()];
     for (int i = 0; i < _points.size(); i++) {
@@ -434,14 +434,14 @@ class Linkages {
 
   // ---------------------------
 
-  public Linkages(ArrayList<Merc28> _points) {
+  public Linkages(ArrayList<Waypoints.Point> _points) {
     do_meshing(_points);
   }
 
   // ---------------------------
   // ---------------------------
 
-  public Linkages(ArrayList<Merc28> _points, int _destination) {
+  public Linkages(ArrayList<Waypoints.Point> _points, int _destination) {
     do_meshing(_points);
     do_distances(_destination);
   }
