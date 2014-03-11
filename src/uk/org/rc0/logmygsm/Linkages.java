@@ -102,6 +102,17 @@ class Linkages {
     Set<WorkingEdge> result = new HashSet<WorkingEdge>();
     int n = p.length;
     int i, j, k;
+    float[][] dist2 = new float[n][n];
+    for (i=0; i<n; i++) {
+      dist2[i][i] = 0.0f;
+      for (j=i+1; j<n; j++) {
+        float dx = (float)(p[j].X - p[i].X);
+        float dy = (float)(p[j].Y - p[i].Y);
+        dist2[i][j] = dist2[j][i] = dx*dx + dy*dy;
+      }
+    }
+
+    // TODO : apply fudging so that links the user doesn't want are up-scaled
 
     for (i=0; i<n; i++) {
       for (j=i+1; j<n; j++) {
@@ -109,18 +120,17 @@ class Linkages {
         boolean ok = true;
         for (k=0; k<n; k++) {
           if ((k != i) && (k != j)) {
-            // work in FP to avoid integer overflow ?
-            float dxi = (float)(p[k].X - p[i].X);
-            float dyi = (float)(p[k].Y - p[i].Y);
-            float dxj = (float)(p[k].X - p[j].X);
-            float dyj = (float)(p[k].Y - p[j].Y);
-            if ((dxi * dxj) + (dyi * dyj) < 0.0) {
+            // Detect if the i,j side is the hypotenuse of the i,j,k triangle
+            // and subtends > 90 degrees at vertex k
+            if (dist2[i][j] > (dist2[i][k] + dist2[j][k])) {
               ok = false;
               break;
             }
           }
         }
         if (ok) {
+          // For the distance values shown to the user on-screen, use real
+          // distances, not the up-scaled ones.
           float d = (float) p[i].metres_away(p[j]);
           result.add(new WorkingEdge(i, j, p, d));
         }
