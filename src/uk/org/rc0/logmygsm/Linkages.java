@@ -441,19 +441,11 @@ class Linkages {
 
   // ---------------------------
 
-
-  // ---------------------------
-
-  public Linkages(ArrayList<Waypoints.Point> _points) {
+  public Linkages(ArrayList<Waypoints.Point> _points, Waypoints.Point _destination) {
     do_meshing(_points);
-  }
-
-  // ---------------------------
-  // ---------------------------
-
-  public Linkages(ArrayList<Waypoints.Point> _points, int _destination) {
-    do_meshing(_points);
-    do_distances(_destination);
+    if (_destination != null) {
+      do_distances(_destination.index);
+    }
   }
 
   // ---------------------------

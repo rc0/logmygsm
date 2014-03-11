@@ -63,7 +63,7 @@ class Waypoints {
   }
 
   private ArrayList<Point> points;
-  private int destination = -1;
+  private Point destination = null;
   private Linkages mLinkages = null;
   private Paint marker_paint;
   private Paint thick_marker_paint;
@@ -108,7 +108,11 @@ class Waypoints {
         bw.write(String.format("%d\n", points.get(i).X));
         bw.write(String.format("%d\n", points.get(i).Y));
       }
-      bw.write(String.format("%d\n", destination));
+      if (destination == null) {
+        bw.write(String.format("-1\n", destination));
+      } else {
+        bw.write(String.format("%d\n", destination.index));
+      }
       bw.close();
     } catch (IOException e) {
     }
@@ -133,7 +137,12 @@ class Waypoints {
           points.add(new Point(x, y));
         }
         line = br.readLine();
-        destination = Integer.parseInt(line);
+        int destination_index = Integer.parseInt(line);
+        if ((destination_index < 0) || (destination_index >= points.size())) {
+          destination = null;
+        } else {
+          destination = points.get(destination_index);
+        }
         br.close();
       } catch (IOException e) {
         failed = true;
@@ -144,29 +153,50 @@ class Waypoints {
     if (failed) {
       points = new ArrayList<Point> ();
     }
+    tidy();
+  }
+
+  // ---------------------------
+
+  private void tidy() {
+    // Bring the points array and everything referencing its entries back into a clean state
+    if ((destination != null) && destination.zombie) {
+      destination = null;
+    }
+    ArrayList<Point> new_points = new ArrayList<Point>();
+    int n = points.size();
+    for (int i=0, new_index=0; i<n; i++) {
+      Point p = points.get(i);
+      if (!p.zombie) {
+        p.index = new_index++;
+        new_points.add(p);
+      }
+    }
+    points = new_points;
   }
 
   // ---------------------------
 
   void add(Merc28 pos) {
     points.add(new Point(pos));
+    tidy();
     mLinkages = null;
   }
 
-  private int find_closest_point(Merc28 pos, int pixel_shift) {
-    int victim;
+  private Point find_closest_point(Merc28 pos, int pixel_shift) {
+    Point victim = null;
     int closest;
     int n = points.size();
-    victim = -1;
     closest = 0;
     for (int i=0; i<n; i++) {
-      int dx = (points.get(i).X - pos.X) >> pixel_shift;
-      int dy = (points.get(i).Y - pos.Y) >> pixel_shift;
+      Point p = points.get(i);
+      int dx = (p.X - pos.X) >> pixel_shift;
+      int dy = (p.Y - pos.Y) >> pixel_shift;
       int d = Math.abs(dx) + Math.abs(dy);
-      if ((victim < 0) ||
+      if ((victim == null) ||
           (d < closest)) {
         closest = d;
-        victim = i;
+        victim = p;
       }
     }
     return victim;
@@ -175,18 +205,15 @@ class Waypoints {
   // Return value is true if a deletion successfully occurred, false if no point was
   // close enough to 'pos' to qualify.  Only delete the point that is 'closest'
   boolean delete(Merc28 pos, int pixel_shift) {
-    int victim;
+    Point victim;
     victim = find_closest_point(pos, pixel_shift);
-    if (victim < 0) {
+    if (victim == null) {
       return false;
     } else {
-      if (victim == destination) {
-        destination = -1;
-      } else if (victim < destination) {
-        destination--;
-      }
-      points.remove(victim);
+      victim.zombie = true;
+      points.remove(victim.index);
       mLinkages = null;
+      tidy();
       return true;
     }
   }
@@ -199,29 +226,31 @@ class Waypoints {
     // work from the top down so that the indices of the points still to do
     // stay the same.
     for (int i=n-1; i>=0; i-- ) {
-      int dx = (points.get(i).X - pos.X) >> pixel_shift;
-      int dy = (points.get(i).Y - pos.Y) >> pixel_shift;
+      Point p = points.get(i);
+      int dx = (p.X - pos.X) >> pixel_shift;
+      int dy = (p.Y - pos.Y) >> pixel_shift;
       if ((Math.abs(dx) < w2) &&
           (Math.abs(dy) < h2)) {
         did_any = true;
+        p.zombie = true;
         points.remove(i);
-        if (i == destination) {
-          destination = -1;
-        } else if (i < destination) {
-          destination--;
-        }
       }
     }
     if (did_any) {
       mLinkages = null;
+      tidy();
     }
     return did_any;
   }
 
   void delete_all() {
+    int n = points.size();
+    for (int i=0; i<n; i++) {
+      points.get(i).zombie = true;
+    }
     points = new ArrayList<Point> ();
     mLinkages = null;
-    destination = -1;
+    tidy();
   }
 
   // ---------------------------
@@ -247,7 +276,7 @@ class Waypoints {
       Merc28 p = points.get(i);
       int x = t.X(p);
       int y = t.Y(p);
-      if (i == destination) {
+      if ((destination != null) && (i == destination.index)) {
         c.drawCircle(x, y, (float) RADIUS2, thick_marker_paint);
       }
       c.drawCircle(x, y, (float) RADIUS, marker_paint);
@@ -262,11 +291,7 @@ class Waypoints {
 
   private void calculate_linkages() {
     if (mLinkages == null) {
-      if (destination >= 0) {
-        mLinkages = new Linkages(points, destination);
-      } else {
-        mLinkages = new Linkages(points);
-      }
+      mLinkages = new Linkages(points, destination);
     }
   }
 
