@@ -42,8 +42,7 @@ import android.widget.TextView;
 
 public class MainActivity
   extends Activity
-  implements Map.PositionListener,
-           Confirm.Callback {
+  implements Map.PositionListener {
 
   private TextView latText;
   private TextView lonText;
@@ -408,6 +407,11 @@ public class MainActivity
       return true;
     }
 
+  private class TrailDeleter implements Confirm.Callback {
+    public void do_when_confirmed() {
+      mMap.clear_trail();
+    }
+  }
 
   @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -437,7 +441,7 @@ public class MainActivity
             finish();
             return true;
           case OPTION_CLEAR_TRAIL:
-            Confirm confirm = new Confirm(this, "Clear the trail?", this);
+            Confirm confirm = new Confirm(this, "Clear the trail?", new TrailDeleter());
             return true;
           case OPTION_LOG_MARKER:
             Logger.do_bookmark(this);
@@ -455,10 +459,6 @@ public class MainActivity
         return false;
       }
     }
-
-  public void do_when_confirmed() {
-    mMap.clear_trail();
-  }
 }
 //
 // vim:et:sw=2:sts=2

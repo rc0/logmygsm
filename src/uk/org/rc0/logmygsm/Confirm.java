@@ -31,7 +31,7 @@ import android.content.DialogInterface;
 
 class Confirm {
 
-  public interface Callback {
+  interface Callback {
     void do_when_confirmed();
   }
 
