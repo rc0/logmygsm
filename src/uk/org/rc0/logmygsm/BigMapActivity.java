@@ -123,6 +123,13 @@ public class BigMapActivity
         mMap.delete_landmark();
       }
     });
+
+    mCutRouteButton.setOnClickListener(new OnClickListener () {
+      public void onClick(View v) {
+        mMap.cut_route();
+      }
+    });
+
     mMap.register_position_listener(this);
   }
 

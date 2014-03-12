@@ -77,6 +77,11 @@ public class WaypointEditMap extends Map {
     }
   }
 
+  void cut_route() {
+    Logger.mWaypoints.cut_route(display_pos);
+    invalidate();
+  }
+
 }
 
 // vim:et:sw=2:sts=2

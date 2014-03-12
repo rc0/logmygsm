@@ -28,6 +28,7 @@ package uk.org.rc0.logmygsm;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.util.FloatMath;
 import android.util.Log;
 import java.io.File;
@@ -62,12 +63,22 @@ class Waypoints {
     }
   }
 
+  static class Strut {
+    Point p0, p1;
+    Strut(Point _p0, Point _p1) {
+      p0 = _p0;
+      p1 = _p1;
+    }
+  }
+
   private ArrayList<Point> points;
+  private ArrayList<Strut> struts; // the edges that the user has deleted by hand
   private Point destination = null;
   private Linkages mLinkages = null;
   private Paint marker_paint;
   private Paint thick_marker_paint;
   private Paint track_paint;
+  private Paint strut_paint;
 
   static final private String TAIL = "waypoints.txt";
 
@@ -90,6 +101,13 @@ class Waypoints {
     track_paint.setStyle(Paint.Style.STROKE);
     track_paint.setStrokeCap(Paint.Cap.ROUND);
 
+    strut_paint = new Paint();
+    strut_paint.setStrokeWidth(2);
+    strut_paint.setColor(Color.argb(0xe0, 0x80, 0x00, 0x20));
+    strut_paint.setStyle(Paint.Style.STROKE);
+    strut_paint.setStrokeCap(Paint.Cap.ROUND);
+    DashPathEffect dpe = new DashPathEffect(new float[] {2.0f,2.0f}, 0.0f);
+    strut_paint.setPathEffect(dpe);
   }
 
   // ---------------------------
@@ -120,6 +138,7 @@ class Waypoints {
 
   private void restore_state_from_file() {
     points = new ArrayList<Point> ();
+    struts = new ArrayList<Strut> ();
     mLinkages = null;
     File file = new File("/sdcard/LogMyGsm/prefs/" + TAIL);
     boolean failed = false;
@@ -152,6 +171,7 @@ class Waypoints {
     }
     if (failed) {
       points = new ArrayList<Point> ();
+      struts = new ArrayList<Strut> ();
     }
     tidy();
   }
@@ -159,12 +179,23 @@ class Waypoints {
   // ---------------------------
 
   private void tidy() {
+    int n;
     // Bring the points array and everything referencing its entries back into a clean state
     if ((destination != null) && destination.zombie) {
       destination = null;
     }
+    ArrayList<Strut> new_struts = new ArrayList<Strut>();
+    n = struts.size();
+    for (int i=0; i<n; i++) {
+      Strut s = struts.get(i);
+      if (!s.p0.zombie && !s.p1.zombie) {
+        new_struts.add(s);
+      }
+    }
+    struts = new_struts;
+
     ArrayList<Point> new_points = new ArrayList<Point>();
-    int n = points.size();
+    n = points.size();
     for (int i=0, new_index=0; i<n; i++) {
       Point p = points.get(i);
       if (!p.zombie) {
@@ -257,6 +288,18 @@ class Waypoints {
 
   // ---------------------------
 
+  // ---------------------------
+
+  void cut_route(Merc28 pos) {
+    //Log.i(TAG, "Cutting a route");
+    calculate_linkages();
+    int[] indices = mLinkages.nearest_edge(pos);
+    if (indices != null) {
+      //Log.i(TAG, "Indices are " + indices[0] + " and " + indices[1]);
+      struts.add(new Strut(points.get(indices[0]), points.get(indices[1])));
+    }
+    mLinkages = null;
+  }
 
   // ---------------------------
 
@@ -276,6 +319,15 @@ class Waypoints {
       c.drawCircle(x, y, (float) RADIUS, marker_paint);
       c.drawPoint(x, y, marker_paint);
     }
+    n = struts.size();
+    for (int i=0; i<n; i++) {
+      Strut s = struts.get(i);
+      int x0 = t.X(s.p0);
+      int x1 = t.X(s.p1);
+      int y0 = t.Y(s.p0);
+      int y1 = t.Y(s.p1);
+      c.drawLine(x0, y0, x1, y1, strut_paint);
+    }
     if (do_show_track) {
       draw_track(c, t);
     }
@@ -285,7 +337,7 @@ class Waypoints {
 
   private void calculate_linkages() {
     if (mLinkages == null) {
-      mLinkages = new Linkages(points, destination);
+      mLinkages = new Linkages(points, destination, struts);
     }
   }
 

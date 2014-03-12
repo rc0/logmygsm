@@ -98,7 +98,7 @@ class Linkages {
 
   // ---------------------------
 
-  private static Set<WorkingEdge> compute_mesh(Merc28[] p) {
+  private static Set<WorkingEdge> compute_mesh(Merc28[] p, ArrayList<Waypoints.Strut> _struts) {
     Set<WorkingEdge> result = new HashSet<WorkingEdge>();
     int n = p.length;
     int i, j, k;
@@ -112,7 +112,18 @@ class Linkages {
       }
     }
 
-    // TODO : apply fudging so that links the user doesn't want are up-scaled
+    // Make all the 'strut' edges appear to be ludicrously long, so that they
+    // won't get picked as edges to keep
+    int ns = _struts.size();
+    //Log.i(TAG, "Doing " + ns + " struts");
+    for (i=0; i<ns; i++) {
+      Waypoints.Strut s = _struts.get(i);
+      int i0 = s.p0.index;
+      int i1 = s.p1.index;
+      //Log.i(TAG, "Struct between indices " + i0 + " and " + i1);
+      dist2[i0][i1] *= 1000000.0f;
+      dist2[i1][i0] *= 1000000.0f;
+    }
 
     for (i=0; i<n; i++) {
       for (j=i+1; j<n; j++) {
@@ -216,19 +227,57 @@ class Linkages {
 
   // ---------------------------
 
-  private void do_meshing(ArrayList<Waypoints.Point> _points) {
+  private void do_meshing(ArrayList<Waypoints.Point> _points,
+      ArrayList<Waypoints.Strut> _struts) {
     // defensive copy of the points fed in
     points = new Merc28[_points.size()];
     for (int i = 0; i < _points.size(); i++) {
       points[i] = new Merc28(_points.get(i));
     }
 
-    Set<WorkingEdge> mesh = compute_mesh(points);
+    Set<WorkingEdge> mesh = compute_mesh(points, _struts);
     compute_pruned(points.length, mesh); // sets up 'edges' and 'full_edges'
   }
 
   // ---------------------------
 
+  int[] nearest_edge(Merc28 pos) {
+    WorkingEdge best = null;
+    // The distance to the side of the edge
+    double best_distance = -1;
+    int n = full_edges.length;
+    for (int i=0; i<n; i++) {
+      WorkingEdge e = full_edges[i];
+      float dx = (float)(e.m1.X - e.m0.X);
+      float dy = (float)(e.m1.Y - e.m0.Y);
+      float d = FloatMath.sqrt(dx*dx + dy*dy);
+      if (d == 0) {
+        return null;
+      }
+      float ux = dx / d;
+      float uy = dy / d;
+      float vx = -uy;
+      float vy = ux;
+      float proj_along = ((float)(pos.X - e.m0.X) * ux) + ((float)(pos.Y - e.m0.Y) * uy);
+      if ((proj_along >= 0) && (proj_along <= d)) {
+        float proj_to_side = ((float)(pos.X - e.m0.X) * vx) + ((float)(pos.Y - e.m0.Y) * vy);
+        proj_to_side = Math.abs(proj_to_side);
+        if (proj_to_side < 0.25f*d) { // safeguard to avoid picking edges miles away
+          if ((best == null) || (proj_to_side < best_distance)) {
+            best = e;
+            best_distance = proj_to_side;
+          }
+        }
+      }
+    }
+    if (best != null) {
+      int[] result = new int[2];
+      result[0] = best.i0;
+      result[1] = best.i1;
+      return result;
+    }
+    return null;
+  }
 
   // ---------------------------
 
@@ -441,8 +490,10 @@ class Linkages {
 
   // ---------------------------
 
-  public Linkages(ArrayList<Waypoints.Point> _points, Waypoints.Point _destination) {
-    do_meshing(_points);
+  public Linkages(ArrayList<Waypoints.Point> _points,
+        Waypoints.Point _destination,
+        ArrayList<Waypoints.Strut> _struts) {
+    do_meshing(_points, _struts);
     if (_destination != null) {
       do_distances(_destination.index);
     }
