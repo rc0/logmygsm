@@ -173,14 +173,14 @@ class Waypoints {
       }
     }
     points = new_points;
+    mLinkages = null;
   }
 
   // ---------------------------
 
   void add(Merc28 pos) {
     points.add(new Point(pos));
-    tidy();
-    mLinkages = null;
+    tidy(); // not very efficient!
   }
 
   private Point find_closest_point(Merc28 pos, int pixel_shift) {
@@ -211,8 +211,6 @@ class Waypoints {
       return false;
     } else {
       victim.zombie = true;
-      points.remove(victim.index);
-      mLinkages = null;
       tidy();
       return true;
     }
@@ -233,11 +231,9 @@ class Waypoints {
           (Math.abs(dy) < h2)) {
         did_any = true;
         p.zombie = true;
-        points.remove(i);
       }
     }
     if (did_any) {
-      mLinkages = null;
       tidy();
     }
     return did_any;
@@ -248,8 +244,6 @@ class Waypoints {
     for (int i=0; i<n; i++) {
       points.get(i).zombie = true;
     }
-    points = new ArrayList<Point> ();
-    mLinkages = null;
     tidy();
   }
 
