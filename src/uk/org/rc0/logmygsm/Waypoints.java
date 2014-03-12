@@ -102,7 +102,7 @@ class Waypoints {
     track_paint.setStrokeCap(Paint.Cap.ROUND);
 
     strut_paint = new Paint();
-    strut_paint.setStrokeWidth(2);
+    strut_paint.setStrokeWidth(1);
     strut_paint.setColor(Color.argb(0xe0, 0x80, 0x00, 0x20));
     strut_paint.setStyle(Paint.Style.STROKE);
     strut_paint.setStrokeCap(Paint.Cap.ROUND);
@@ -127,9 +127,15 @@ class Waypoints {
         bw.write(String.format("%d\n", points.get(i).Y));
       }
       if (destination == null) {
-        bw.write(String.format("-1\n", destination));
+        bw.write("-1\n");
       } else {
         bw.write(String.format("%d\n", destination.index));
+      }
+      n = struts.size();
+      bw.write(String.format("%d\n", n));
+      for (int i=0; i<n; i++) {
+        bw.write(String.format("%d\n", struts.get(i).p0.index));
+        bw.write(String.format("%d\n", struts.get(i).p1.index));
       }
       bw.close();
     } catch (IOException e) {
@@ -162,6 +168,15 @@ class Waypoints {
         } else {
           destination = points.get(destination_index);
         }
+        line = br.readLine();
+        int n_struts = Integer.parseInt(line);
+        for (int i=0; i<n_struts; i++) {
+          line = br.readLine();
+          int i0 = Integer.parseInt(line);
+          line = br.readLine();
+          int i1 = Integer.parseInt(line);
+          struts.add(new Strut(points.get(i0), points.get(i1)));
+        }
         br.close();
       } catch (IOException e) {
         failed = true;
@@ -172,6 +187,7 @@ class Waypoints {
     if (failed) {
       points = new ArrayList<Point> ();
       struts = new ArrayList<Strut> ();
+      destination = null;
     }
     tidy();
   }
