@@ -44,8 +44,7 @@ import android.content.DialogInterface;
 
 public class BigMapActivity
   extends Activity
-  implements Map.PositionListener,
-           Confirm.Callback {
+  implements Map.PositionListener {
 
   private CellUpdateReceiver myCellReceiver;
   private GPSUpdateReceiver myGPSReceiver;
@@ -207,6 +206,12 @@ public class BigMapActivity
     return true;
   }
 
+  private class TrailDeleter implements Confirm.Callback {
+    public void do_when_confirmed() {
+      mMap.clear_trail();
+    }
+  }
+
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     int code = item.getItemId();
@@ -234,7 +239,7 @@ public class BigMapActivity
         finish();
         return true;
         case OPTION_CLEAR_TRAIL:
-          Confirm confirm = new Confirm(this, "Clear the trail?", this);
+          Confirm confirm = new Confirm(this, "Clear the trail?", new TrailDeleter());
           return true;
         case OPTION_LOG_MARKER:
           Logger.do_bookmark(this);
@@ -251,10 +256,6 @@ public class BigMapActivity
     } else {
       return false;
     }
-  }
-
-  public void do_when_confirmed() {
-    mMap.clear_trail();
   }
 
   private void updateDisplay() {
